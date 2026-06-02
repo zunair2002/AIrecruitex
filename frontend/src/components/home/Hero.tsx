@@ -177,7 +177,7 @@ export const Hero = () => {
             </a>
           </div>
 
-          {/* Hero Image */}
+            {/* Hero Image */}
           <div className="hero-image mt-16 lg:mt-20">
             <div className="relative">
               <img

@@ -6,7 +6,7 @@ import Navbar from "./Navbar";
 export function NavbarWrapper() {
   const pathname = usePathname();
 
-  if (pathname?.startsWith("/login") || pathname?.startsWith("/candidate")) {
+  if (pathname?.startsWith("/login") || pathname?.startsWith("/candidate") || pathname?.startsWith("/recruiter")) {
     return null;
   }
 

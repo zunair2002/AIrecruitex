@@ -1,5 +1,9 @@
-import type { ReactNode } from "react";
+"use client";
+
+import { useState, type ReactNode } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAuth, homePathForRole } from "@/context/AuthContext";
 
 export function AuthBrand() {
   return (
@@ -27,6 +31,9 @@ export function AuthBrand() {
 
 export const authInputClass =
   "w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all";
+
+export const authSubmitClass =
+  "w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-colors";
 
 export type AuthTab = "login" | "register";
 
@@ -61,22 +68,84 @@ export function AuthTabs({
   );
 }
 
-export function LoginForm() {
+export function AuthError({ message }: { message: string | null }) {
+  if (!message) return null;
   return (
-    <form className="space-y-5">
+    <p
+      role="alert"
+      className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700"
+    >
+      {message}
+    </p>
+  );
+}
+
+/** Turns a thrown value into something safe to render. */
+export function toErrorMessage(error: unknown): string {
+  return error instanceof Error && error.message
+    ? error.message
+    : "Something went wrong. Please try again.";
+}
+
+export function LoginForm() {
+  const { login } = useAuth();
+  const router = useRouter();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError(null);
+    setIsSubmitting(true);
+    try {
+      const user = await login(email.trim(), password);
+      router.replace(homePathForRole(user.role));
+    } catch (err) {
+      setError(toErrorMessage(err));
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <form className="space-y-5" onSubmit={handleSubmit} noValidate>
+      <AuthError message={error} />
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-        <input type="email" placeholder="you@company.com" className={authInputClass} />
+        <label htmlFor="login-email" className="block text-sm font-medium text-gray-700 mb-2">
+          Email
+        </label>
+        <input
+          id="login-email"
+          name="email"
+          type="email"
+          autoComplete="email"
+          required
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          placeholder="you@company.com"
+          className={authInputClass}
+        />
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-        <input type="password" placeholder="Your password" className={authInputClass} />
+        <label htmlFor="login-password" className="block text-sm font-medium text-gray-700 mb-2">
+          Password
+        </label>
+        <input
+          id="login-password"
+          name="password"
+          type="password"
+          autoComplete="current-password"
+          required
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          placeholder="Your password"
+          className={authInputClass}
+        />
       </div>
-      <button
-        type="submit"
-        className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition-colors"
-      >
-        Login
+      <button type="submit" disabled={isSubmitting} className={authSubmitClass}>
+        {isSubmitting ? "Signing in…" : "Login"}
       </button>
       <div className="text-center">
         <a href="#" className="text-sm font-medium text-indigo-500 hover:text-indigo-600">

@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 const navItems = [
   { href: "/recruiter/dashboard", label: "Dashboard", icon: "📊" },
@@ -13,6 +15,15 @@ const navItems = [
 
 export function RecruiterSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, logout } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    await logout();
+    router.replace("/login/recruiter");
+  };
 
   return (
     <aside className="w-64 min-h-screen bg-white border-r border-gray-200 flex flex-col">
@@ -49,12 +60,20 @@ export function RecruiterSidebar() {
       </nav>
 
       <div className="p-4 border-t border-gray-100">
-        <Link
-          href="/login/recruiter"
-          className="flex items-center gap-2 px-4 py-2 text-sm text-gray-500 hover:text-red-600 transition-colors"
+        {user && (
+          <div className="px-4 pb-3">
+            <p className="truncate text-sm font-semibold text-gray-900">{user.name}</p>
+            <p className="truncate text-xs text-gray-500">{user.email}</p>
+          </div>
+        )}
+        <button
+          type="button"
+          onClick={handleLogout}
+          disabled={isLoggingOut}
+          className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-500 hover:text-red-600 disabled:opacity-60 transition-colors"
         >
-          ← Log out
-        </Link>
+          ← {isLoggingOut ? "Logging out…" : "Log out"}
+        </button>
       </div>
     </aside>
   );

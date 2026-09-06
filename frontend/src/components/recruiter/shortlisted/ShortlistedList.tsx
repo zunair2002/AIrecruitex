@@ -1,201 +1,303 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useCallback, useMemo, useState } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { toErrorMessage } from "@/lib/api";
 import {
-  getCreatedJobTitles,
-  JOBS_UPDATED_EVENT,
-} from "@/lib/recruiterJobsStorage";
+  listApplicationsForJob,
+  scheduleOrgInterview,
+  updateApplicationStatus,
+} from "@/lib/applicationsApi";
+import { useApiResource } from "@/lib/useApiResource";
+import { populated, type Application } from "@/lib/types";
 import {
-  isApplicantShortlisted,
-  removeFromShortlist,
-  useShortlistSnapshot,
-} from "@/lib/shortlistedStorage";
-import { applicants, getMatchColor } from "../applicants/applicantsData";
-import { interviewReports } from "../reports/reportsData";
+  formatDate,
+  formatDateTime,
+  initials,
+  scoreColor,
+} from "@/lib/format";
+import {
+  Card,
+  EmptyState,
+  ErrorBlock,
+  InlineError,
+  LoadingBlock,
+  PageHeader,
+  SkillChips,
+} from "@/components/ui/Feedback";
+import {
+  compactInputClass,
+  dangerButtonClass,
+  primaryButtonClass,
+  smallButtonClass,
+} from "@/components/ui/controls";
+import { JobPicker } from "../JobPicker";
+import { useMyJobs } from "../useMyJobs";
+import {
+  ScheduleInterviewDialog,
+  type SchedulePayload,
+} from "../applicants/ScheduleInterviewDialog";
 
-const ALL_JOBS = "All Jobs";
-
-function getInterviewScore(name: string, jobTitle: string) {
-  return interviewReports.find(
-    (r) => r.candidateName === name && r.jobTitle === jobTitle,
-  )?.finalScore;
-}
-
+/**
+ * "Selected" is a real value of the Application schema's `status` enum, so this
+ * screen is just the selected slice of a job's applicants — no local shortlist
+ * bookkeeping. Selected candidates are also the only ones the backend lets you
+ * schedule an organisation interview for.
+ */
 export function ShortlistedList() {
-  const [search, setSearch] = useState("");
-  const [jobFilter, setJobFilter] = useState(ALL_JOBS);
-  const [createdJobs, setCreatedJobs] = useState<string[]>([]);
-  const shortlistSnapshot = useShortlistSnapshot();
-  const [hiddenIds, setHiddenIds] = useState<Set<string>>(() => new Set());
-
-  useEffect(() => {
-    const loadJobs = () => {
-      const titles = getCreatedJobTitles();
-      setCreatedJobs(titles);
-      setJobFilter((current) => {
-        if (current === ALL_JOBS) return ALL_JOBS;
-        return titles.includes(current) ? current : ALL_JOBS;
-      });
-    };
-
-    loadJobs();
-    window.addEventListener(JOBS_UPDATED_EVENT, loadJobs);
-    window.addEventListener("storage", loadJobs);
-    return () => {
-      window.removeEventListener(JOBS_UPDATED_EVENT, loadJobs);
-      window.removeEventListener("storage", loadJobs);
-    };
-  }, []);
-
-  const jobOptions = useMemo(() => [ALL_JOBS, ...createdJobs], [createdJobs]);
-
-  const filtered = useMemo(() => {
-    const createdSet = new Set(createdJobs);
-    return applicants.filter((item) => {
-      if (!isApplicantShortlisted(item.id, item.status === "Shortlisted")) return false;
-      if (!createdSet.has(item.jobTitle)) return false;
-      const matchesSearch =
-        item.name.toLowerCase().includes(search.toLowerCase()) ||
-        item.email.toLowerCase().includes(search.toLowerCase());
-      const matchesJob = jobFilter === ALL_JOBS || item.jobTitle === jobFilter;
-      return matchesSearch && matchesJob;
-    });
-  }, [search, jobFilter, createdJobs, shortlistSnapshot]);
-
-  const visible = useMemo(
-    () => filtered.filter((item) => !hiddenIds.has(item.id)),
-    [filtered, hiddenIds],
+  const { token } = useAuth();
+  const searchParams = useSearchParams();
+  const { jobs, selectedJobId, setSelectedJobId, selectedJob } = useMyJobs(
+    searchParams.get("jobId"),
   );
 
-  const handleRemove = (applicantId: string) => {
-    setHiddenIds((prev) => new Set(prev).add(applicantId));
-    removeFromShortlist(applicantId);
-  };
+  const [search, setSearch] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [dialogFor, setDialogFor] = useState<Application | null>(null);
 
-  const hasNoJobs = createdJobs.length === 0;
+  const applications = useApiResource(
+    (signal) => listApplicationsForJob(selectedJobId!, token, signal),
+    [selectedJobId, token],
+    { enabled: Boolean(token && selectedJobId) },
+  );
+
+  const selected = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    return (applications.data ?? [])
+      .filter((item) => item.status === "selected")
+      .filter((item) => {
+        if (!query) return true;
+        const candidate = populated(item.candidateId);
+        return (
+          candidate?.name.toLowerCase().includes(query) ||
+          candidate?.email.toLowerCase().includes(query)
+        );
+      });
+  }, [applications.data, search]);
+
+  const applyLocalUpdate = useCallback(
+    (updated: Application) => {
+      applications.setData((current) =>
+        (current ?? []).map((item) =>
+          item._id === updated._id
+            ? { ...updated, candidateId: item.candidateId }
+            : item,
+        ),
+      );
+    },
+    [applications],
+  );
+
+  const handleUnselect = useCallback(
+    async (application: Application) => {
+      setBusyId(application._id);
+      setError(null);
+      try {
+        applyLocalUpdate(
+          await updateApplicationStatus(application._id, "pending", token),
+        );
+      } catch (err) {
+        setError(toErrorMessage(err));
+      } finally {
+        setBusyId(null);
+      }
+    },
+    [token, applyLocalUpdate],
+  );
+
+  const handleSchedule = useCallback(
+    async (payload: SchedulePayload) => {
+      if (!dialogFor) return;
+      applyLocalUpdate(
+        await scheduleOrgInterview(
+          dialogFor._id,
+          {
+            dateTime: payload.dateTime,
+            location: payload.location,
+            notes: payload.notes,
+          },
+          token,
+        ),
+      );
+      setDialogFor(null);
+    },
+    [dialogFor, token, applyLocalUpdate],
+  );
+
+  if (jobs.isLoading) return <LoadingBlock label="Loading your jobs…" />;
+  if (jobs.error) {
+    return (
+      <div className="p-8">
+        <ErrorBlock message={jobs.error} onRetry={jobs.reload} />
+      </div>
+    );
+  }
+
+  if ((jobs.data ?? []).length === 0) {
+    return (
+      <div className="p-8">
+        <PageHeader title="Selected Candidates" />
+        <EmptyState
+          title="No jobs posted yet."
+          description="Post a job, then mark strong applicants as Selected to see them here."
+          action={
+            <Link href="/recruiter/jobs/create" className={`${primaryButtonClass} text-sm`}>
+              Create job
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Shortlisted Candidates</h1>
-        <p className="text-gray-500 mt-1">
-          Candidates selected after AI interview review — ready for the next hiring step.
-        </p>
+      <PageHeader
+        title="Selected Candidates"
+        description="Applicants whose status is Selected — ready for an organisation interview."
+      />
+
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <JobPicker
+          jobs={jobs.data ?? []}
+          selectedJobId={selectedJobId}
+          onSelect={setSelectedJobId}
+        />
+        <input
+          type="text"
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          placeholder="Search by name or email…"
+          className={`${compactInputClass} flex-1`}
+        />
       </div>
 
-      {hasNoJobs ? (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center">
-          <p className="text-gray-600 font-medium">No jobs created yet.</p>
-          <p className="text-sm text-gray-500 mt-2">
-            Create a job first — shortlisted candidates appear for your posted roles.
-          </p>
-          <Link
-            href="/recruiter/jobs/create"
-            className="inline-block mt-6 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition-colors"
-          >
-            Create Job
-          </Link>
+      {error && (
+        <div className="mb-6">
+          <InlineError message={error} />
         </div>
-      ) : (
-        <>
-          <div className="flex flex-col sm:flex-row gap-3 mb-6">
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by name or email..."
-              className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
-            <select
-              value={jobFilter}
-              onChange={(e) => setJobFilter(e.target.value)}
-              className="px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white min-w-[200px]"
-            >
-              {jobOptions.map((job) => (
-                <option key={job} value={job}>
-                  {job}
-                </option>
-              ))}
-            </select>
-          </div>
+      )}
 
-          {visible.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center">
-              <p className="text-gray-600 font-medium">No shortlisted candidates yet.</p>
-              <p className="text-sm text-gray-500 mt-2">
-                Review interview reports and shortlist top performers.
-              </p>
-              <Link
-                href="/recruiter/reports"
-                className="inline-block mt-6 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition-colors"
-              >
-                View Interview Reports
-              </Link>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {visible.map((candidate) => {
-                const interviewScore = getInterviewScore(candidate.name, candidate.jobTitle);
-                return (
-                  <div
-                    key={candidate.id}
-                    className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-sm font-bold text-indigo-700 shrink-0">
-                        {candidate.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
+      {applications.isLoading ? (
+        <LoadingBlock label="Loading candidates…" />
+      ) : applications.error ? (
+        <ErrorBlock message={applications.error} onRetry={applications.reload} />
+      ) : selected.length === 0 ? (
+        <EmptyState
+          title="No selected candidates for this job yet."
+          description="Review applicants and their interview reports, then set an applicant's status to Selected."
+          action={
+            <Link
+              href={`/recruiter/applicants?jobId=${selectedJobId ?? ""}`}
+              className={`${primaryButtonClass} text-sm`}
+            >
+              Review applicants
+            </Link>
+          }
+        />
+      ) : (
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+          {selected.map((application) => {
+            const candidate = populated(application.candidateId);
+            return (
+              <Card key={application._id}>
+                <div className="flex items-start gap-4">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-sm font-bold text-indigo-700">
+                    {initials(candidate?.name ?? "?")}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <h2 className="truncate font-bold text-gray-900">
+                          {candidate?.name ?? "Unknown candidate"}
+                        </h2>
+                        <p className="mt-0.5 truncate text-xs text-gray-500">
+                          {candidate?.email ?? "—"}
+                        </p>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <h2 className="font-bold text-gray-900">{candidate.name}</h2>
-                            <p className="text-xs text-gray-500 mt-0.5">{candidate.email}</p>
-                          </div>
-                          <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full bg-indigo-50 text-indigo-700 shrink-0">
-                            Shortlisted
-                          </span>
-                        </div>
-                        <p className="text-sm text-gray-700 mt-3 font-medium">{candidate.jobTitle}</p>
-                        <div className="flex flex-wrap gap-3 mt-3 text-sm">
-                          <span className={`font-bold ${getMatchColor(candidate.match)}`}>
-                            {candidate.match}% match
-                          </span>
-                          {interviewScore !== undefined && (
-                            <span className="text-indigo-600 font-bold">
-                              {interviewScore}% interview
-                            </span>
-                          )}
-                        </div>
-                        <button
-                          type="button"
-                          className="mt-3 text-sm text-indigo-600 hover:text-indigo-800 font-medium"
-                        >
-                          View resume: {candidate.resume}
-                        </button>
-                        <p className="text-xs text-gray-400 mt-2">Shortlisted · {candidate.appliedDate}</p>
-                        <button
-                          type="button"
-                          onClick={() => handleRemove(candidate.id)}
-                          className="mt-3 text-xs font-semibold text-red-600 hover:text-red-800 transition-colors"
-                        >
-                          Remove from shortlist
-                        </button>
+                      <span
+                        className={`shrink-0 text-lg font-bold ${scoreColor(application.matchScore)}`}
+                      >
+                        {application.matchScore}%
+                      </span>
+                    </div>
+
+                    <p className="mt-3 text-sm font-medium text-gray-700">
+                      {selectedJob?.title}
+                    </p>
+                    <p className="mt-1 text-xs text-gray-400">
+                      Applied {formatDate(application.createdAt)}
+                    </p>
+
+                    <div className="mt-3">
+                      <SkillChips
+                        skills={application.resumeSnapshotSkills}
+                        emptyLabel="No matched skills recorded."
+                      />
+                    </div>
+
+                    {application.orgInterview.scheduled && (
+                      <div className="mt-3 rounded-xl border border-emerald-100 bg-emerald-50 p-3">
+                        <p className="text-xs font-bold uppercase tracking-wide text-emerald-700">
+                          Organisation interview
+                        </p>
+                        <p className="mt-1 text-sm text-emerald-900">
+                          {formatDateTime(application.orgInterview.dateTime)}
+                        </p>
+                        {application.orgInterview.location && (
+                          <p className="text-xs text-emerald-800">
+                            {application.orgInterview.location}
+                          </p>
+                        )}
+                        {application.orgInterview.notes && (
+                          <p className="mt-1 text-xs text-emerald-800">
+                            {application.orgInterview.notes}
+                          </p>
+                        )}
                       </div>
+                    )}
+
+                    <div className="mt-4 flex flex-wrap items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setDialogFor(application)}
+                        disabled={busyId === application._id}
+                        className={smallButtonClass}
+                      >
+                        {application.orgInterview.scheduled
+                          ? "Reschedule interview"
+                          : "Schedule org interview"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleUnselect(application)}
+                        disabled={busyId === application._id}
+                        className={dangerButtonClass}
+                      >
+                        {busyId === application._id
+                          ? "Saving…"
+                          : "Move back to pending"}
+                      </button>
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          )}
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+      )}
 
-          <p className="text-xs text-gray-400 mt-4">
-            Linked to Interview Reports — mock data until the API is connected.
-          </p>
-        </>
+      {dialogFor && (
+        <ScheduleInterviewDialog
+          kind="org"
+          candidateName={populated(dialogFor.candidateId)?.name ?? "Candidate"}
+          jobTitle={selectedJob?.title ?? "This job"}
+          onCancel={() => setDialogFor(null)}
+          onSubmit={handleSchedule}
+        />
       )}
     </div>
   );

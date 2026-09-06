@@ -4,6 +4,7 @@ import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth, homePathForRole } from "@/context/AuthContext";
+import type { UserRole } from "@/lib/types";
 
 export function AuthBrand() {
   return (
@@ -80,11 +81,132 @@ export function AuthError({ message }: { message: string | null }) {
   );
 }
 
-/** Turns a thrown value into something safe to render. */
-export function toErrorMessage(error: unknown): string {
-  return error instanceof Error && error.message
-    ? error.message
-    : "Something went wrong. Please try again.";
+export { toErrorMessage } from "@/lib/api";
+
+/**
+ * The registration form for every portal. POST /api/auth/signup takes exactly
+ * four fields — name, email, password (min 6) and role — so that is exactly
+ * what is collected here; `role` is fixed per portal rather than chosen.
+ */
+export function RegisterForm({
+  role,
+  emailLabel = "Email",
+  emailPlaceholder = "you@example.com",
+  submitLabel = "Register",
+}: {
+  role: UserRole;
+  emailLabel?: string;
+  emailPlaceholder?: string;
+  submitLabel?: string;
+}) {
+  const { register } = useAuth();
+  const router = useRouter();
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError(null);
+
+    if (!name.trim()) {
+      setError("Please enter your name.");
+      return;
+    }
+    // The backend rejects anything shorter, so catch it before the round trip.
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const user = await register({
+        name: name.trim(),
+        email: email.trim(),
+        password,
+        role,
+      });
+      router.replace(homePathForRole(user.role));
+    } catch (err) {
+      setError(
+        err instanceof Error && err.message
+          ? err.message
+          : "Something went wrong. Please try again.",
+      );
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <form className="space-y-4" onSubmit={handleSubmit} noValidate>
+      <AuthError message={error} />
+      <div>
+        <label
+          htmlFor={`${role}-name`}
+          className="block text-sm font-medium text-gray-700 mb-2"
+        >
+          Full name
+        </label>
+        <input
+          id={`${role}-name`}
+          name="name"
+          type="text"
+          autoComplete="name"
+          required
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+          placeholder="Jane Doe"
+          className={authInputClass}
+        />
+      </div>
+      <div>
+        <label
+          htmlFor={`${role}-email`}
+          className="block text-sm font-medium text-gray-700 mb-2"
+        >
+          {emailLabel}
+        </label>
+        <input
+          id={`${role}-email`}
+          name="email"
+          type="email"
+          autoComplete="email"
+          required
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          placeholder={emailPlaceholder}
+          className={authInputClass}
+        />
+      </div>
+      <div>
+        <label
+          htmlFor={`${role}-password`}
+          className="block text-sm font-medium text-gray-700 mb-2"
+        >
+          Password
+        </label>
+        <input
+          id={`${role}-password`}
+          name="password"
+          type="password"
+          autoComplete="new-password"
+          required
+          minLength={6}
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          placeholder="At least 6 characters"
+          className={authInputClass}
+        />
+      </div>
+      <button type="submit" disabled={isSubmitting} className={authSubmitClass}>
+        {isSubmitting ? "Creating account…" : submitLabel}
+      </button>
+    </form>
+  );
 }
 
 export function LoginForm() {
@@ -104,7 +226,11 @@ export function LoginForm() {
       const user = await login(email.trim(), password);
       router.replace(homePathForRole(user.role));
     } catch (err) {
-      setError(toErrorMessage(err));
+      setError(
+        err instanceof Error && err.message
+          ? err.message
+          : "Something went wrong. Please try again.",
+      );
       setIsSubmitting(false);
     }
   };

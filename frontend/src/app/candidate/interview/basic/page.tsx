@@ -1,10 +1,17 @@
-import { BasicInterview } from "@/components/candidate/interview/BasicInterview";
+import { PracticeInterview } from "@/components/candidate/interview/PracticeInterview";
 
 export const metadata = {
-  title: "Basic Practice Interview | AIRecruitX Candidate",
-  description: "Practice basic HR interview questions - introduce yourself, strengths, and weaknesses",
+  title: "Beginner Practice Interview | AIRecruitX Candidate",
+  description: "Practice interview at the backend's beginner difficulty level",
 };
 
 export default function BasicInterviewPage() {
-  return <BasicInterview />;
+  return (
+    <PracticeInterview
+      levels={["beginner"]}
+      heading="Beginner Practice Interview"
+      intro="A live AI interview at the beginner difficulty level. Each answer is scored out of 10 as you go, and the interviewer adapts its next question to what you said."
+      icon="🎤"
+    />
+  );
 }

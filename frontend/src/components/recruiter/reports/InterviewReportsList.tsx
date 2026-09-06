@@ -1,167 +1,176 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useMemo, useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 import {
-  getCreatedJobTitles,
-  JOBS_UPDATED_EVENT,
-} from "@/lib/recruiterJobsStorage";
+  getApplicationReport,
+  listApplicationsForJob,
+} from "@/lib/applicationsApi";
+import { resolveSelection, useApiResource } from "@/lib/useApiResource";
+import { populated, type ObjectId } from "@/lib/types";
+import { formatDateTime, scoreColor } from "@/lib/format";
 import {
-  isApplicantShortlisted,
-  shortlistApplicant,
-  useShortlistSnapshot,
-} from "@/lib/shortlistedStorage";
-import { applicants } from "../applicants/applicantsData";
-import { InterviewReportCard, InterviewReportDetail } from "./InterviewReportCard";
-import { interviewReports, type InterviewReport } from "./reportsData";
+  EmptyState,
+  ErrorBlock,
+  LoadingBlock,
+  PageHeader,
+} from "@/components/ui/Feedback";
+import { primaryButtonClass } from "@/components/ui/controls";
+import { JobPicker } from "../JobPicker";
+import { useMyJobs } from "../useMyJobs";
+import { InterviewReportDetail } from "./InterviewReportCard";
 
-const ALL_JOBS = "All Jobs";
-
+/**
+ * GET /api/applications/job/:jobId to find applicants with an
+ * `interviewSessionId`, then GET /api/applications/:applicationId/report for
+ * the full application + interview session pair.
+ */
 export function InterviewReportsList() {
-  const [search, setSearch] = useState("");
-  const [jobFilter, setJobFilter] = useState(ALL_JOBS);
-  const [createdJobs, setCreatedJobs] = useState<string[]>([]);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const shortlistSnapshot = useShortlistSnapshot();
+  const { token } = useAuth();
+  const searchParams = useSearchParams();
+  const { jobs, selectedJobId, setSelectedJobId, selectedJob } = useMyJobs(
+    searchParams.get("jobId"),
+  );
 
-  useEffect(() => {
-    const loadJobs = () => {
-      const titles = getCreatedJobTitles();
-      setCreatedJobs(titles);
-      setJobFilter((current) => {
-        if (current === ALL_JOBS) return ALL_JOBS;
-        return titles.includes(current) ? current : ALL_JOBS;
-      });
-    };
+  const [requestedApplicationId, setSelectedApplicationId] =
+    useState<ObjectId | null>(searchParams.get("applicationId"));
 
-    loadJobs();
-    window.addEventListener(JOBS_UPDATED_EVENT, loadJobs);
-    window.addEventListener("storage", loadJobs);
-    return () => {
-      window.removeEventListener(JOBS_UPDATED_EVENT, loadJobs);
-      window.removeEventListener("storage", loadJobs);
-    };
-  }, []);
+  const applications = useApiResource(
+    (signal) => listApplicationsForJob(selectedJobId!, token, signal),
+    [selectedJobId, token],
+    { enabled: Boolean(token && selectedJobId) },
+  );
 
-  const jobOptions = useMemo(() => [ALL_JOBS, ...createdJobs], [createdJobs]);
+  // Only applicants HR has actually scheduled an AI interview for have a report.
+  const interviewed = useMemo(
+    () => (applications.data ?? []).filter((item) => item.interviewSessionId),
+    [applications.data],
+  );
 
-  const filtered = useMemo(() => {
-    const createdSet = new Set(createdJobs);
-    return interviewReports.filter((item) => {
-      if (!createdSet.has(item.jobTitle)) return false;
-      const matchesSearch = item.candidateName.toLowerCase().includes(search.toLowerCase());
-      const matchesJob = jobFilter === ALL_JOBS || item.jobTitle === jobFilter;
-      return matchesSearch && matchesJob;
-    });
-  }, [search, jobFilter, createdJobs]);
+  const selectedApplicationId =
+    resolveSelection(
+      interviewed,
+      requestedApplicationId,
+      (item) => item._id,
+    )?._id ?? null;
 
-  const selectedReport: InterviewReport | undefined =
-    filtered.find((r) => r.id === selectedId) ?? filtered[0];
+  const report = useApiResource(
+    (signal) => getApplicationReport(selectedApplicationId!, token, signal),
+    [selectedApplicationId, token],
+    { enabled: Boolean(token && selectedApplicationId) },
+  );
 
-  useEffect(() => {
-    if (filtered.length > 0 && (!selectedId || !filtered.some((r) => r.id === selectedId))) {
-      setSelectedId(filtered[0].id);
-    }
-    if (filtered.length === 0) setSelectedId(null);
-  }, [filtered, selectedId]);
-
-  const selectedShortlist = useMemo(() => {
-    if (!selectedReport) return { applicantId: null, isShortlisted: false };
-    const applicant = applicants.find(
-      (a) => a.name === selectedReport.candidateName && a.jobTitle === selectedReport.jobTitle,
+  if (jobs.isLoading) return <LoadingBlock label="Loading your jobs…" />;
+  if (jobs.error) {
+    return (
+      <div className="p-8">
+        <ErrorBlock message={jobs.error} onRetry={jobs.reload} />
+      </div>
     );
-    if (!applicant) return { applicantId: null, isShortlisted: false };
-    return {
-      applicantId: applicant.id,
-      isShortlisted: isApplicantShortlisted(applicant.id, applicant.status === "Shortlisted"),
-    };
-  }, [selectedReport, shortlistSnapshot]);
+  }
 
-  const hasNoJobs = createdJobs.length === 0;
+  if ((jobs.data ?? []).length === 0) {
+    return (
+      <div className="p-8">
+        <PageHeader title="Interview Reports" />
+        <EmptyState
+          title="No jobs posted yet."
+          description="Reports appear once you schedule AI interviews for applicants on your jobs."
+          action={
+            <Link href="/recruiter/jobs/create" className={`${primaryButtonClass} text-sm`}>
+              Create job
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Interview Reports</h1>
-        <p className="text-gray-500 mt-1">
-          AI-evaluated interview results for applicants on your posted jobs.
-        </p>
+      <PageHeader
+        title="Interview Reports"
+        description="The AI interviewer's per-question scores and overall verdict for each applicant."
+      />
+
+      <div className="mb-6">
+        <JobPicker
+          jobs={jobs.data ?? []}
+          selectedJobId={selectedJobId}
+          onSelect={setSelectedJobId}
+        />
       </div>
 
-      {hasNoJobs ? (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center">
-          <p className="text-gray-600 font-medium">No jobs created yet.</p>
-          <p className="text-sm text-gray-500 mt-2">
-            Create a job first — reports will appear for applicants who complete AI interviews on
-            your posted roles.
-          </p>
-          <Link
-            href="/recruiter/jobs/create"
-            className="inline-block mt-6 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition-colors"
-          >
-            Create Job
-          </Link>
-        </div>
-      ) : (
-        <>
-          <div className="flex flex-col sm:flex-row gap-3 mb-6">
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by candidate name..."
-              className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
-            <select
-              value={jobFilter}
-              onChange={(e) => setJobFilter(e.target.value)}
-              className="px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white min-w-[200px]"
+      {applications.isLoading ? (
+        <LoadingBlock label="Loading applicants…" />
+      ) : applications.error ? (
+        <ErrorBlock message={applications.error} onRetry={applications.reload} />
+      ) : interviewed.length === 0 ? (
+        <EmptyState
+          title="No AI interviews scheduled for this job yet."
+          description="Schedule an AI interview from the Applicants screen — the report appears here as the candidate answers."
+          action={
+            <Link
+              href={`/recruiter/applicants?jobId=${selectedJobId ?? ""}`}
+              className={`${primaryButtonClass} text-sm`}
             >
-              {jobOptions.map((job) => (
-                <option key={job} value={job}>
-                  {job}
-                </option>
-              ))}
-            </select>
+              Go to applicants
+            </Link>
+          }
+        />
+      ) : (
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <div className="space-y-2 lg:col-span-1">
+            {interviewed.map((application) => {
+              const candidate = populated(application.candidateId);
+              const isActive = application._id === selectedApplicationId;
+              return (
+                <button
+                  key={application._id}
+                  type="button"
+                  onClick={() => setSelectedApplicationId(application._id)}
+                  className={`w-full rounded-xl border p-5 text-left transition-all ${
+                    isActive
+                      ? "border-indigo-300 bg-indigo-50 shadow-sm"
+                      : "border-gray-100 bg-white hover:border-indigo-100 hover:bg-gray-50"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="truncate font-semibold text-gray-900">
+                        {candidate?.name ?? "Unknown candidate"}
+                      </p>
+                      <p className="mt-1 text-xs text-gray-500">
+                        {formatDateTime(application.aiInterview.dateTime)}
+                      </p>
+                    </div>
+                    <span
+                      className={`shrink-0 text-sm font-bold ${scoreColor(application.matchScore)}`}
+                    >
+                      {application.matchScore}%
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
           </div>
 
-          {filtered.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center text-gray-500">
-              No interview reports for this job yet. Reports appear when applicants complete AI
-              interviews.
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-1 space-y-2">
-                {filtered.map((report) => (
-                  <InterviewReportCard
-                    key={report.id}
-                    report={report}
-                    isSelected={selectedReport?.id === report.id}
-                    onSelect={() => setSelectedId(report.id)}
-                  />
-                ))}
-              </div>
-              <div className="lg:col-span-2">
-                {selectedReport && (
-                  <InterviewReportDetail
-                    report={selectedReport}
-                    isShortlisted={selectedShortlist.isShortlisted}
-                    onShortlist={
-                      selectedShortlist.applicantId
-                        ? () => shortlistApplicant(selectedShortlist.applicantId!)
-                        : undefined
-                    }
-                  />
-                )}
-              </div>
-            </div>
-          )}
-
-          <p className="text-xs text-gray-400 mt-4">
-            Linked to Applicants — mock reports until the backend API is connected.
-          </p>
-        </>
+          <div className="lg:col-span-2">
+            {report.isLoading ? (
+              <LoadingBlock label="Loading report…" />
+            ) : report.error ? (
+              <ErrorBlock message={report.error} onRetry={report.reload} />
+            ) : report.data ? (
+              <InterviewReportDetail
+                report={report.data}
+                jobTitle={selectedJob?.title ?? "This job"}
+                onStatusChanged={applications.reload}
+              />
+            ) : null}
+          </div>
+        </div>
       )}
     </div>
   );

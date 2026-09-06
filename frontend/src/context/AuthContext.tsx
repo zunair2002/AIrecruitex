@@ -9,7 +9,7 @@ import {
   useState,
 } from "react";
 import * as authApi from "@/lib/authApi";
-import type { AuthUser, UserRole } from "@/lib/authApi";
+import type { AuthUser, UserRole } from "@/lib/types";
 import {
   clearStoredToken,
   getStoredToken,
@@ -90,20 +90,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [applySession],
   );
 
-  // POST /signup only creates the account (no token), so sign the user in
-  // straight after so registering lands them in the app.
+  // POST /signup already answers with { token, user }, so the account is
+  // created and signed in from one round trip.
   const register = useCallback(
     async (input: {
       name: string;
       email: string;
       password: string;
       role: UserRole;
-    }) => {
-      await authApi.signup(input);
-      return applySession(
-        await authApi.login({ email: input.email, password: input.password }),
-      );
-    },
+    }) => applySession(await authApi.signup(input)),
     [applySession],
   );
 
@@ -157,7 +152,14 @@ export function useAuth(): AuthContextValue {
   return context;
 }
 
-/** Where each backend role lands after signing in. */
+/** Where each of the backend's three roles lands after signing in. */
 export function homePathForRole(role: UserRole): string {
-  return role === "candidate" ? "/candidate/dashboard" : "/recruiter/dashboard";
+  if (role === "candidate") return "/candidate/dashboard";
+  if (role === "admin") return "/admin/dashboard";
+  return "/recruiter/dashboard";
+}
+
+/** The login screen a signed-out visitor to each portal is bounced to. */
+export function loginPathForRole(role: UserRole): string {
+  return role === "candidate" ? "/login/candidate" : "/login/recruiter";
 }

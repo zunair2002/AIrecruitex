@@ -1,10 +1,16 @@
+import { Suspense } from "react";
 import { ApplicantsList } from "@/components/recruiter/applicants/ApplicantsList";
+import { LoadingBlock } from "@/components/ui/Feedback";
 
 export const metadata = {
   title: "Applicants | AIRecruitX HR",
-  description: "View job applicants with resume links and AI match scores",
+  description: "Review applicants, match scores and schedule interviews",
 };
 
 export default function ApplicantsPage() {
-  return <ApplicantsList />;
+  return (
+    <Suspense fallback={<LoadingBlock />}>
+      <ApplicantsList />
+    </Suspense>
+  );
 }

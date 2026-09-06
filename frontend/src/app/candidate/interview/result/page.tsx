@@ -1,10 +1,10 @@
-import { InterviewResult } from "@/components/candidate/interview/InterviewResult";
+import { InterviewHistory } from "@/components/candidate/interview/InterviewHistory";
 
 export const metadata = {
-  title: "Interview Result | AIRecruitX Candidate",
-  description: "View interview scores for communication, technical skills, confidence, and final score",
+  title: "Interview Results | AIRecruitX Candidate",
+  description: "Scores, per-answer feedback and certificates for every interview",
 };
 
 export default function InterviewResultPage() {
-  return <InterviewResult />;
+  return <InterviewHistory />;
 }

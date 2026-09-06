@@ -1,36 +1,24 @@
 /**
- * One function per endpoint exposed by the backend's `/api/auth` router
- * (see Airecruitx-backend/src/routes/auth.routes.ts).
+ * One function per endpoint on the backend's `/api/auth` router
+ * (shared/user/routes/auth.routes.ts).
  */
 import { apiRequest } from "./api";
+import type { AuthSession, AuthUser, UserRole } from "./types";
 
-export type UserRole = "candidate" | "hr" | "admin";
-export type AuthProvider = "password" | "google";
+export type { AuthProvider, AuthSession, AuthUser, UserRole } from "./types";
 
-export type AuthUser = {
-  id: string;
-  name: string;
-  email: string;
-  role: UserRole;
-  authProvider: AuthProvider;
-  avatarUrl?: string;
-  /** Only returned by GET /api/auth/me. */
-  orgId?: string;
-};
-
-export type AuthSession = {
-  token: string;
-  user: AuthUser;
-};
-
-/** POST /api/auth/signup — creates the user. Note: does NOT return a token. */
+/**
+ * POST /api/auth/signup — creates the user AND returns a session.
+ * `role` is required and must be one of candidate | hr | admin;
+ * `password` must be at least 6 characters (both enforced server-side).
+ */
 export function signup(input: {
   name: string;
   email: string;
   password: string;
   role: UserRole;
-}): Promise<AuthUser> {
-  return apiRequest<AuthUser>("/api/auth/signup", {
+}): Promise<AuthSession> {
+  return apiRequest<AuthSession>("/api/auth/signup", {
     method: "POST",
     body: input,
   });
@@ -58,12 +46,12 @@ export function googleLogin(
   });
 }
 
-/** GET /api/auth/me — protected; used to restore a session on page load. */
+/** GET /api/auth/me — protected; adds `orgId` to the public user shape. */
 export function getMe(token: string, signal?: AbortSignal): Promise<AuthUser> {
   return apiRequest<AuthUser>("/api/auth/me", { token, signal });
 }
 
-/** POST /api/auth/logout — protected; revokes Firebase refresh tokens server-side. */
+/** POST /api/auth/logout — clears the httpOnly cookie server-side. */
 export function logout(token: string): Promise<{ message?: string }> {
   return apiRequest<{ message?: string }>("/api/auth/logout", {
     method: "POST",

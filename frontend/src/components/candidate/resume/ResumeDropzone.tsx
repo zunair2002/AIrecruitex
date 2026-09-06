@@ -1,15 +1,19 @@
 "use client";
 
 import { useRef, useState, type DragEvent } from "react";
-
-const MAX_SIZE_MB = 5;
+import { RESUME_ACCEPT_ATTRIBUTE } from "@/lib/resumeApi";
 
 type ResumeDropzoneProps = {
   onFileSelect: (file: File) => void;
   error: string | null;
+  maxSizeMB: number;
 };
 
-export function ResumeDropzone({ onFileSelect, error }: ResumeDropzoneProps) {
+export function ResumeDropzone({
+  onFileSelect,
+  error,
+  maxSizeMB,
+}: ResumeDropzoneProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -32,7 +36,7 @@ export function ResumeDropzone({ onFileSelect, error }: ResumeDropzoneProps) {
       onDragLeave={() => setIsDragging(false)}
       onDrop={handleDrop}
       onClick={() => inputRef.current?.click()}
-      className={`border-2 border-dashed rounded-2xl p-12 text-center cursor-pointer transition-colors ${
+      className={`cursor-pointer rounded-2xl border-2 border-dashed p-12 text-center transition-colors ${
         isDragging
           ? "border-indigo-500 bg-indigo-50"
           : "border-gray-200 hover:border-indigo-300 hover:bg-gray-50"
@@ -41,20 +45,20 @@ export function ResumeDropzone({ onFileSelect, error }: ResumeDropzoneProps) {
       <input
         ref={inputRef}
         type="file"
-        accept=".pdf,application/pdf"
+        accept={RESUME_ACCEPT_ATTRIBUTE}
         className="hidden"
         onChange={(e) => handleFile(e.target.files?.[0])}
       />
-      <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-indigo-100 flex items-center justify-center text-3xl">
+      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-100 text-3xl">
         📄
       </div>
       <p className="text-lg font-semibold text-gray-900">
-        Drag & drop your resume here
+        Drag &amp; drop your resume here
       </p>
-      <p className="text-sm text-gray-500 mt-2">
-        or click to browse — PDF only, max {MAX_SIZE_MB}MB
+      <p className="mt-2 text-sm text-gray-500">
+        or click to browse — PDF or DOCX, max {maxSizeMB}MB
       </p>
-      {error && <p className="text-sm text-red-600 mt-4 font-medium">{error}</p>}
+      {error && <p className="mt-4 text-sm font-medium text-red-600">{error}</p>}
     </div>
   );
 }

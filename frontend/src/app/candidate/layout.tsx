@@ -10,7 +10,7 @@ export default function CandidateLayout({
     <RequireAuth roles={["candidate"]} loginPath="/login/candidate">
       <div className="flex min-h-screen bg-gray-50">
         <CandidateSidebar />
-        <main className="flex-1 overflow-auto">{children}</main>
+        <main className="min-w-0 flex-1 overflow-auto">{children}</main>
       </div>
     </RequireAuth>
   );

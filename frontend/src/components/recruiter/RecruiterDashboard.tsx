@@ -1,127 +1,247 @@
-const stats = [
-  {
-    label: "Total Jobs",
-    value: "8",
-    sub: "+2 this month",
-    icon: "💼",
-    color: "from-indigo-500 to-indigo-600",
-  },
-  {
-    label: "Applicants",
-    value: "124",
-    sub: "+18 this week",
-    icon: "👥",
-    color: "from-purple-500 to-purple-600",
-  },
-  {
-    label: "Selected Candidates",
-    value: "12",
-    sub: "3 pending offers",
-    icon: "⭐",
-    color: "from-emerald-500 to-emerald-600",
-  },
-];
+"use client";
 
-const recentJobs = [
-  { title: "React Developer", applicants: 34, status: "Active", date: "Mar 18, 2026" },
-  { title: "Node.js Backend Engineer", applicants: 28, status: "Active", date: "Mar 15, 2026" },
-  { title: "AI Engineer", applicants: 19, status: "Closed", date: "Mar 10, 2026" },
-];
+import Link from "next/link";
+import { useMemo } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { listMyJobs } from "@/lib/jobsApi";
+import { listApplicationsForJob } from "@/lib/applicationsApi";
+import { useApiResource } from "@/lib/useApiResource";
+import {
+  APPLICATION_STATUS_BADGE,
+  APPLICATION_STATUS_LABELS,
+  JOB_STATUS_BADGE,
+  JOB_STATUS_LABELS,
+  formatDate,
+  scoreColor,
+} from "@/lib/format";
+import { populated, type Application, type Job } from "@/lib/types";
+import {
+  Card,
+  EmptyState,
+  ErrorBlock,
+  LoadingBlock,
+  PageHeader,
+  StatCard,
+} from "@/components/ui/Feedback";
+import { primaryButtonClass } from "@/components/ui/controls";
 
-const recentApplicants = [
-  { name: "Sarah Khan", role: "React Developer", match: 88, status: "Interviewed" },
-  { name: "Ali Ahmed", role: "Node.js Backend Engineer", match: 82, status: "Shortlisted" },
-  { name: "Jane Doe", role: "React Developer", match: 76, status: "Applied" },
-];
+type JobWithApplications = { job: Job; applications: Application[] };
 
-const statusStyles: Record<string, string> = {
-  Active: "bg-emerald-50 text-emerald-700",
-  Closed: "bg-gray-100 text-gray-600",
-  Applied: "bg-blue-50 text-blue-700",
-  Interviewed: "bg-purple-50 text-purple-700",
-  Shortlisted: "bg-indigo-50 text-indigo-700",
-};
-
+/**
+ * The backend has no HR-wide aggregate endpoint, so the pipeline is assembled
+ * from GET /api/jobs/mine plus GET /api/applications/job/:jobId per job — the
+ * same data the applicants screen shows, counted.
+ */
 export function RecruiterDashboard() {
+  const { user, token } = useAuth();
+  const jobs = useApiResource(
+    (signal) => listMyJobs(token, signal),
+    [token],
+    { enabled: Boolean(token) },
+  );
+
+  // One applicants request per job — the backend scopes applicants to a job, so
+  // there is no single endpoint that returns an HR user's whole pipeline.
+  const pipeline = useApiResource<JobWithApplications[]>(
+    async (signal) =>
+      Promise.all(
+        (jobs.data ?? []).map(async (job) => {
+          try {
+            return {
+              job,
+              applications: await listApplicationsForJob(job._id, token, signal),
+            };
+          } catch {
+            // One unreadable job shouldn't blank the whole dashboard.
+            return { job, applications: [] as Application[] };
+          }
+        }),
+      ),
+    [jobs.data, token],
+    { enabled: Boolean(token && jobs.data) },
+  );
+
+  const rows = useMemo(() => pipeline.data ?? [], [pipeline.data]);
+  const isLoadingApplications = pipeline.isLoading;
+
+  const summary = useMemo(() => {
+    const all = rows.flatMap((row) => row.applications);
+    return {
+      totalJobs: rows.length,
+      openJobs: rows.filter((row) => row.job.status === "open").length,
+      totalApplicants: all.length,
+      matched: all.filter((item) => item.matched).length,
+      selected: all.filter((item) => item.status === "selected").length,
+      pending: all.filter((item) => item.status === "pending").length,
+      aiInterviews: all.filter((item) => item.aiInterview.scheduled).length,
+      recent: [...all]
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+        .slice(0, 5),
+    };
+  }, [rows]);
+
+  if (jobs.isLoading) return <LoadingBlock label="Loading your dashboard…" />;
+  if (jobs.error) {
+    return (
+      <div className="p-8">
+        <ErrorBlock message={jobs.error} onRetry={jobs.reload} />
+      </div>
+    );
+  }
+
   return (
     <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">HR Dashboard</h1>
-        <p className="text-gray-500 mt-1">
-          Welcome back! Here&apos;s an overview of your hiring pipeline.
-        </p>
+      <PageHeader
+        title="HR Dashboard"
+        description={
+          user
+            ? `Welcome back, ${user.name}. Here's your hiring pipeline.`
+            : "Here's your hiring pipeline."
+        }
+        action={
+          <Link href="/recruiter/jobs/create" className={`${primaryButtonClass} text-sm`}>
+            Create job
+          </Link>
+        }
+      />
+
+      <div className="mb-10 grid grid-cols-1 gap-6 md:grid-cols-4">
+        <StatCard
+          label="Jobs posted"
+          value={summary.totalJobs}
+          sub={`${summary.openJobs} open`}
+          icon="💼"
+        />
+        <StatCard
+          label="Applicants"
+          value={summary.totalApplicants}
+          sub={`${summary.pending} pending review`}
+          icon="👥"
+          gradient="from-purple-500 to-purple-600"
+        />
+        <StatCard
+          label="Above match threshold"
+          value={summary.matched}
+          sub={`${summary.aiInterviews} AI interviews scheduled`}
+          icon="🎯"
+          gradient="from-sky-500 to-blue-600"
+        />
+        <StatCard
+          label="Selected"
+          value={summary.selected}
+          sub="Ready for an org interview"
+          icon="⭐"
+          gradient="from-emerald-500 to-emerald-600"
+        />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-        {stats.map((stat) => (
-          <div
-            key={stat.label}
-            className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex items-start gap-4"
+      {(jobs.data ?? []).length === 0 ? (
+        <EmptyState
+          title="You haven't posted any jobs yet."
+          description="Post your first job and candidates can start applying right away."
+          action={
+            <Link href="/recruiter/jobs/create" className={`${primaryButtonClass} text-sm`}>
+              Create your first job
+            </Link>
+          }
+        />
+      ) : (
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+          <Card
+            title="Your job postings"
+            action={
+              <Link
+                href="/recruiter/jobs"
+                className="text-sm font-semibold text-indigo-600 hover:text-indigo-800"
+              >
+                View all
+              </Link>
+            }
           >
-            <div
-              className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center text-xl shadow-sm`}
-            >
-              {stat.icon}
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">{stat.label}</p>
-              <p className="text-3xl font-bold text-gray-900 mt-1">{stat.value}</p>
-              <p className="text-xs text-indigo-600 mt-1 font-medium">{stat.sub}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">Recent Job Postings</h2>
-          <div className="space-y-3">
-            {recentJobs.map((job) => (
-              <div
-                key={job.title + job.date}
-                className="flex items-center justify-between p-4 rounded-xl bg-gray-50 border border-gray-100"
-              >
-                <div>
-                  <p className="font-semibold text-gray-900 text-sm">{job.title}</p>
-                  <p className="text-xs text-gray-500">
-                    {job.applicants} applicants · {job.date}
-                  </p>
-                </div>
-                <span
-                  className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full ${statusStyles[job.status]}`}
+            <div className="space-y-3">
+              {rows.slice(0, 5).map(({ job, applications }) => (
+                <Link
+                  key={job._id}
+                  href={`/recruiter/applicants?jobId=${job._id}`}
+                  className="flex items-center justify-between gap-3 rounded-xl border border-gray-100 bg-gray-50 p-4 transition-colors hover:bg-gray-100"
                 >
-                  {job.status}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">Recent Applicants</h2>
-          <div className="space-y-3">
-            {recentApplicants.map((applicant) => (
-              <div
-                key={applicant.name + applicant.role}
-                className="flex items-center justify-between p-4 rounded-xl bg-gray-50 border border-gray-100"
-              >
-                <div>
-                  <p className="font-semibold text-gray-900 text-sm">{applicant.name}</p>
-                  <p className="text-xs text-gray-500">{applicant.role}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-bold text-indigo-600">{applicant.match}% match</p>
-                  <span
-                    className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${statusStyles[applicant.status]}`}
-                  >
-                    {applicant.status}
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-gray-900">
+                      {job.title}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {isLoadingApplications
+                        ? "Counting applicants…"
+                        : `${applications.length} applicant${applications.length === 1 ? "" : "s"}`}{" "}
+                      · {formatDate(job.createdAt)}
+                    </p>
+                  </div>
+                  <span className={JOB_STATUS_BADGE[job.status]}>
+                    {JOB_STATUS_LABELS[job.status]}
                   </span>
-                </div>
+                </Link>
+              ))}
+            </div>
+          </Card>
+
+          <Card
+            title="Recent applicants"
+            action={
+              <Link
+                href="/recruiter/applicants"
+                className="text-sm font-semibold text-indigo-600 hover:text-indigo-800"
+              >
+                Review
+              </Link>
+            }
+          >
+            {isLoadingApplications ? (
+              <LoadingBlock label="Loading applicants…" />
+            ) : summary.recent.length === 0 ? (
+              <EmptyState
+                title="No applicants yet."
+                description="They'll appear here as candidates apply to your jobs."
+              />
+            ) : (
+              <div className="space-y-3">
+                {summary.recent.map((application) => {
+                  const candidate = populated(application.candidateId);
+                  const job = rows.find((row) =>
+                    row.applications.some((item) => item._id === application._id),
+                  )?.job;
+                  return (
+                    <div
+                      key={application._id}
+                      className="flex items-center justify-between gap-3 rounded-xl border border-gray-100 bg-gray-50 p-4"
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold text-gray-900">
+                          {candidate?.name ?? "Unknown candidate"}
+                        </p>
+                        <p className="truncate text-xs text-gray-500">
+                          {job?.title ?? "—"}
+                        </p>
+                      </div>
+                      <div className="shrink-0 text-right">
+                        <p
+                          className={`text-sm font-bold ${scoreColor(application.matchScore)}`}
+                        >
+                          {application.matchScore}% match
+                        </p>
+                        <span
+                          className={APPLICATION_STATUS_BADGE[application.status]}
+                        >
+                          {APPLICATION_STATUS_LABELS[application.status]}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-            ))}
-          </div>
+            )}
+          </Card>
         </div>
-      </div>
+      )}
     </div>
   );
 }

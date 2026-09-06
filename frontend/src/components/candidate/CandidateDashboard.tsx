@@ -1,105 +1,227 @@
-const stats = [
-  {
-    label: "Total Interviews",
-    value: "12",
-    sub: "+3 this month",
-    icon: "🎤",
-    color: "from-indigo-500 to-indigo-600",
-  },
-  {
-    label: "Average Score",
-    value: "78%",
-    sub: "+5% from last month",
-    icon: "⭐",
-    color: "from-purple-500 to-purple-600",
-  },
-  {
-    label: "Recommendations",
-    value: "5",
-    sub: "Skills to improve",
-    icon: "📚",
-    color: "from-emerald-500 to-emerald-600",
-  },
-];
+"use client";
 
-const recentInterviews = [
-  { role: "React Developer", type: "Advanced", score: 82, date: "Mar 20, 2026" },
-  { role: "Basic Practice", type: "Basic", score: 71, date: "Mar 18, 2026" },
-  { role: "Node Developer", type: "Advanced", score: 75, date: "Mar 15, 2026" },
-];
-
-const recommendations = [
-  { skill: "React Hooks", resource: "Master useEffect & useMemo", priority: "High" },
-  { skill: "System Design", resource: "Scalability basics course", priority: "Medium" },
-  { skill: "Communication", resource: "STAR method practice", priority: "Medium" },
-];
+import Link from "next/link";
+import { useMemo } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { listMyApplications } from "@/lib/applicationsApi";
+import { listOpenJobs } from "@/lib/jobsApi";
+import { listMyNotifications } from "@/lib/notificationsApi";
+import { useApiResource } from "@/lib/useApiResource";
+import {
+  APPLICATION_STATUS_BADGE,
+  APPLICATION_STATUS_LABELS,
+  formatDate,
+  formatDateTime,
+  scoreColor,
+} from "@/lib/format";
+import { populated } from "@/lib/types";
+import {
+  Card,
+  EmptyState,
+  ErrorBlock,
+  LoadingBlock,
+  PageHeader,
+  StatCard,
+} from "@/components/ui/Feedback";
+import { primaryButtonClass } from "@/components/ui/controls";
 
 export function CandidateDashboard() {
+  const { user, token } = useAuth();
+  const enabled = Boolean(token);
+
+  const applications = useApiResource(
+    (signal) => listMyApplications(token, signal),
+    [token],
+    { enabled },
+  );
+  const jobs = useApiResource(
+    (signal) => listOpenJobs(token, signal),
+    [token],
+    { enabled },
+  );
+  const notifications = useApiResource(
+    (signal) => listMyNotifications(token, signal),
+    [token],
+    { enabled },
+  );
+
+  const summary = useMemo(() => {
+    const list = applications.data ?? [];
+    const scored = list.filter((item) => typeof item.matchScore === "number");
+    return {
+      total: list.length,
+      matched: list.filter((item) => item.matched).length,
+      selected: list.filter((item) => item.status === "selected").length,
+      pending: list.filter((item) => item.status === "pending").length,
+      averageMatch: scored.length
+        ? Math.round(
+            scored.reduce((sum, item) => sum + item.matchScore, 0) / scored.length,
+          )
+        : 0,
+      upcoming: list.filter(
+        (item) => item.aiInterview.scheduled || item.orgInterview.scheduled,
+      ),
+    };
+  }, [applications.data]);
+
+  const unread = (notifications.data ?? []).filter((n) => !n.read);
+
+  if (applications.isLoading) {
+    return <LoadingBlock label="Loading your dashboard…" />;
+  }
+
   return (
     <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-500 mt-1">Welcome back! Here&apos;s your interview progress overview.</p>
+      <PageHeader
+        title="Dashboard"
+        description={
+          user
+            ? `Welcome back, ${user.name}. Here's where your applications stand.`
+            : "Here's where your applications stand."
+        }
+        action={
+          <Link href="/candidate/jobs" className={`${primaryButtonClass} text-sm`}>
+            Browse jobs
+          </Link>
+        }
+      />
+
+      {applications.error && (
+        <div className="mb-6">
+          <ErrorBlock message={applications.error} onRetry={applications.reload} />
+        </div>
+      )}
+
+      <div className="mb-10 grid grid-cols-1 gap-6 md:grid-cols-4">
+        <StatCard
+          label="Applications"
+          value={summary.total}
+          sub={`${summary.pending} pending`}
+          icon="📨"
+        />
+        <StatCard
+          label="Above match threshold"
+          value={summary.matched}
+          sub={`Avg match ${summary.averageMatch}%`}
+          icon="🎯"
+          gradient="from-purple-500 to-purple-600"
+        />
+        <StatCard
+          label="Selected by HR"
+          value={summary.selected}
+          sub={`${summary.upcoming.length} interview${summary.upcoming.length === 1 ? "" : "s"} scheduled`}
+          icon="⭐"
+          gradient="from-emerald-500 to-emerald-600"
+        />
+        <StatCard
+          label="Open jobs"
+          value={jobs.data?.length ?? 0}
+          sub={unread.length ? `${unread.length} unread notifications` : "All caught up"}
+          icon="💼"
+          gradient="from-sky-500 to-blue-600"
+        />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-        {stats.map((stat) => (
-          <div
-            key={stat.label}
-            className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex items-start gap-4"
-          >
-            <div
-              className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center text-xl shadow-sm`}
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+        <Card
+          title="Recent applications"
+          action={
+            <Link
+              href="/candidate/applications"
+              className="text-sm font-semibold text-indigo-600 hover:text-indigo-800"
             >
-              {stat.icon}
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">{stat.label}</p>
-              <p className="text-3xl font-bold text-gray-900 mt-1">{stat.value}</p>
-              <p className="text-xs text-indigo-600 mt-1 font-medium">{stat.sub}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">Recent Interviews</h2>
-          <div className="space-y-3">
-            {recentInterviews.map((interview) => (
-              <div
-                key={interview.date + interview.role}
-                className="flex items-center justify-between p-4 rounded-xl bg-gray-50 border border-gray-100"
-              >
-                <div>
-                  <p className="font-semibold text-gray-900 text-sm">{interview.role}</p>
-                  <p className="text-xs text-gray-500">{interview.type} · {interview.date}</p>
+              View all
+            </Link>
+          }
+        >
+          {(applications.data ?? []).length === 0 ? (
+            <EmptyState
+              title="No applications yet."
+              description="Upload your resume and apply from the job board."
+            />
+          ) : (
+            <div className="space-y-3">
+              {(applications.data ?? []).slice(0, 5).map((application) => (
+                <div
+                  key={application._id}
+                  className="flex items-center justify-between gap-3 rounded-xl border border-gray-100 bg-gray-50 p-4"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-gray-900">
+                      {populated(application.jobId)?.title ?? "Job removed"}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Applied {formatDate(application.createdAt)}
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-3">
+                    <span
+                      className={`text-sm font-bold ${scoreColor(application.matchScore)}`}
+                    >
+                      {application.matchScore}%
+                    </span>
+                    <span className={APPLICATION_STATUS_BADGE[application.status]}>
+                      {APPLICATION_STATUS_LABELS[application.status]}
+                    </span>
+                  </div>
                 </div>
-                <span className="text-lg font-bold text-indigo-600">{interview.score}%</span>
-              </div>
-            ))}
-          </div>
-        </div>
+              ))}
+            </div>
+          )}
+        </Card>
 
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">AI Recommendations</h2>
-          <div className="space-y-3">
-            {recommendations.map((rec) => (
-              <div
-                key={rec.skill}
-                className="p-4 rounded-xl bg-indigo-50 border border-indigo-100"
-              >
-                <div className="flex items-center justify-between mb-1">
-                  <p className="font-semibold text-indigo-900 text-sm">{rec.skill}</p>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 bg-white px-2 py-0.5 rounded-full">
-                    {rec.priority}
-                  </span>
+        <Card
+          title="Scheduled interviews"
+          action={
+            <Link
+              href="/candidate/interview/result"
+              className="text-sm font-semibold text-indigo-600 hover:text-indigo-800"
+            >
+              Past results
+            </Link>
+          }
+        >
+          {summary.upcoming.length === 0 ? (
+            <EmptyState
+              title="Nothing scheduled."
+              description="HR schedules AI and on-site interviews from your application."
+            />
+          ) : (
+            <div className="space-y-3">
+              {summary.upcoming.map((application) => (
+                <div
+                  key={application._id}
+                  className="rounded-xl border border-indigo-100 bg-indigo-50 p-4"
+                >
+                  <p className="text-sm font-semibold text-indigo-900">
+                    {populated(application.jobId)?.title ?? "Job removed"}
+                  </p>
+                  {application.aiInterview.scheduled && (
+                    <p className="mt-1 text-xs text-indigo-800">
+                      AI interview · {formatDateTime(application.aiInterview.dateTime)}
+                    </p>
+                  )}
+                  {application.orgInterview.scheduled && (
+                    <p className="mt-1 text-xs text-emerald-800">
+                      On-site · {formatDateTime(application.orgInterview.dateTime)}
+                      {application.orgInterview.location
+                        ? ` · ${application.orgInterview.location}`
+                        : ""}
+                    </p>
+                  )}
+                  {application.interviewSessionId && (
+                    <Link
+                      href={`/candidate/interview/session/${application.interviewSessionId}`}
+                      className="mt-3 inline-block text-sm font-semibold text-indigo-600 hover:text-indigo-800"
+                    >
+                      Open AI interview →
+                    </Link>
+                  )}
                 </div>
-                <p className="text-xs text-indigo-700">{rec.resource}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+              ))}
+            </div>
+          )}
+        </Card>
       </div>
     </div>
   );

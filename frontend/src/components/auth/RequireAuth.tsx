@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth, homePathForRole } from "@/context/AuthContext";
-import type { UserRole } from "@/lib/authApi";
+import type { UserRole } from "@/lib/types";
 
 /**
  * Gate for the dashboard areas: waits for the session check, bounces signed-out

@@ -286,10 +286,13 @@ export function AuthCardLayout({
   activeTab,
   onTabChange,
   registerForm,
+  googleButton,
 }: {
   activeTab: AuthTab;
   onTabChange: (tab: AuthTab) => void;
   registerForm: ReactNode;
+  /** Rendered under whichever form is showing; omitted when unconfigured. */
+  googleButton?: ReactNode;
 }) {
   return (
     <main className="min-h-screen flex items-center justify-center bg-white px-4 py-12">
@@ -297,6 +300,7 @@ export function AuthCardLayout({
         <AuthBrand />
         <AuthTabs activeTab={activeTab} onChange={onTabChange} />
         {activeTab === "login" ? <LoginForm /> : registerForm}
+        {googleButton && <div className="mt-6">{googleButton}</div>}
         {activeTab === "register" && (
           <p className="mt-6 text-center text-sm text-gray-500">
             Already have an account?{" "}

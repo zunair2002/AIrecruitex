@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { useServerEvent } from "@/context/RealtimeContext";
 import { toErrorMessage } from "@/lib/api";
 import {
   listApplicationsForJob,
@@ -134,6 +135,10 @@ export function ApplicantsList() {
     },
     [dialog, token, applyLocalUpdate],
   );
+
+  // Keeps the list honest if the candidate's own session, or another HR user,
+  // changes something while this screen is open.
+  useServerEvent("application:status", () => applications.reload());
 
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();

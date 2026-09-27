@@ -3,6 +3,7 @@ import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { NavbarWrapper } from "@/components/layout/NavbarWrapper";
 import { AuthProvider } from "@/context/AuthContext";
+import { RealtimeProvider } from "@/context/RealtimeContext";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -28,8 +29,10 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${plusJakarta.variable}`}>
       <body className={inter.className}>
         <AuthProvider>
-          <NavbarWrapper />
-          {children}
+          <RealtimeProvider>
+            <NavbarWrapper />
+            {children}
+          </RealtimeProvider>
         </AuthProvider>
       </body>
     </html>

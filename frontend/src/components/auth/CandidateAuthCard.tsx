@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AuthCardLayout, RegisterForm, type AuthTab } from "./AuthCardParts";
+import { GoogleSignInButton } from "./GoogleSignInButton";
 
 export function CandidateAuthCard() {
   const [activeTab, setActiveTab] = useState<AuthTab>("login");
@@ -17,6 +18,7 @@ export function CandidateAuthCard() {
           submitLabel="Create candidate account"
         />
       }
+      googleButton={<GoogleSignInButton role="candidate" />}
     />
   );
 }

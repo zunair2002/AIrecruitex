@@ -3,6 +3,10 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import { useAuth } from "@/context/AuthContext";
+import {
+  useApplicationEvents,
+  useServerEvent,
+} from "@/context/RealtimeContext";
 import { listMyApplications } from "@/lib/applicationsApi";
 import { listOpenJobs } from "@/lib/jobsApi";
 import { listMyNotifications } from "@/lib/notificationsApi";
@@ -44,6 +48,9 @@ export function CandidateDashboard() {
     [token],
     { enabled },
   );
+
+  useApplicationEvents(() => applications.reload());
+  useServerEvent("admin:notification", () => notifications.reload());
 
   const summary = useMemo(() => {
     const list = applications.data ?? [];

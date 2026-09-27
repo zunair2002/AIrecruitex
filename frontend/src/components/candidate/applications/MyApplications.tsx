@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { useApplicationEvents } from "@/context/RealtimeContext";
 import { listMyApplications } from "@/lib/applicationsApi";
 import { useApiResource } from "@/lib/useApiResource";
 import {
@@ -39,6 +40,11 @@ export function MyApplications() {
     [token],
     { enabled: Boolean(token) },
   );
+
+  // HR selecting/rejecting you, or scheduling either interview, pushes an
+  // event but writes no Notification record — so this is the only way the
+  // page learns about it without a manual refresh.
+  useApplicationEvents(() => applications.reload());
 
   const filtered = useMemo(() => {
     const list = applications.data ?? [];

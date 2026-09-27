@@ -179,6 +179,10 @@ export function InterviewReportDetail({
         </Card>
       )}
 
+      {interviewSession && interviewSession.messages.length > 0 && (
+        <Transcript messages={interviewSession.messages} />
+      )}
+
       {interviewSession && interviewSession.turns.length > 0 && (
         <Card title={`Answers (${interviewSession.turns.length})`}>
           <div className="space-y-4">
@@ -209,5 +213,52 @@ export function InterviewReportDetail({
         </Card>
       )}
     </div>
+  );
+}
+
+/**
+ * The raw model conversation (`InterviewSession.messages`).
+ *
+ * Only HR sees this: the candidate-facing `toSessionView` never includes
+ * `messages`, it returns `turns` instead. Useful for auditing how the model
+ * actually questioned someone, so it's collapsed rather than omitted.
+ */
+function Transcript({
+  messages,
+}: {
+  messages: { role: "user" | "assistant"; content: string }[];
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <Card title="Full model transcript">
+      <button
+        type="button"
+        onClick={() => setIsOpen((value) => !value)}
+        className="text-sm font-semibold text-indigo-600 hover:text-indigo-800"
+      >
+        {isOpen ? "Hide" : "Show"} raw conversation ({messages.length} messages)
+      </button>
+
+      {isOpen && (
+        <div className="mt-4 max-h-96 space-y-3 overflow-auto">
+          {messages.map((message, index) => (
+            <div
+              key={index}
+              className={`rounded-xl p-3 text-sm ${
+                message.role === "assistant"
+                  ? "bg-indigo-50 text-indigo-900"
+                  : "bg-gray-50 text-gray-700"
+              }`}
+            >
+              <p className="mb-1 text-[10px] font-bold uppercase tracking-wider opacity-60">
+                {message.role === "assistant" ? "Interviewer" : "Candidate"}
+              </p>
+              <p className="whitespace-pre-line">{message.content}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </Card>
   );
 }

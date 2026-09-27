@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AuthCardLayout, RegisterForm, type AuthTab } from "./AuthCardParts";
+import { GoogleSignInButton } from "./GoogleSignInButton";
 
 /**
  * The HR portal's sign-in card. Admin accounts sign in here too — the backend
@@ -23,6 +24,7 @@ export function RecruiterAuthCard() {
           submitLabel="Create HR account"
         />
       }
+      googleButton={<GoogleSignInButton role="hr" />}
     />
   );
 }

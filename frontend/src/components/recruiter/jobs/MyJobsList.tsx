@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { listMyJobs } from "@/lib/jobsApi";
 import { useApiResource } from "@/lib/useApiResource";
@@ -77,6 +78,8 @@ export function MyJobsList() {
                 <SkillChips skills={job.requiredSkills} />
               </div>
 
+              {job.jdRawText && <JdRawText text={job.jdRawText} />}
+
               <div className="mt-5 flex flex-wrap items-center gap-4">
                 <Link
                   href={`/recruiter/applicants?jobId=${job._id}`}
@@ -104,6 +107,31 @@ export function MyJobsList() {
             </Card>
           ))}
         </div>
+      )}
+    </div>
+  );
+}
+
+/**
+ * The text the backend extracted from the uploaded JD file (`jdRawText`).
+ * It's what required skills are suggested from, so it's worth being able to
+ * check — but it's long and unformatted, hence collapsed by default.
+ */
+function JdRawText({ text }: { text: string }) {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <div className="mt-4">
+      <button
+        type="button"
+        onClick={() => setIsOpen((value) => !value)}
+        className="text-xs font-semibold text-indigo-600 hover:text-indigo-800"
+      >
+        {isOpen ? "Hide" : "Show"} extracted JD text ({text.length.toLocaleString()} chars)
+      </button>
+      {isOpen && (
+        <pre className="mt-2 max-h-64 overflow-auto whitespace-pre-wrap rounded-xl bg-gray-50 p-4 text-xs leading-relaxed text-gray-600">
+          {text}
+        </pre>
       )}
     </div>
   );

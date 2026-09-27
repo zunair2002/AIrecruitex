@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { useServerEvent } from "@/context/RealtimeContext";
 import { toErrorMessage } from "@/lib/api";
 import {
   listMyNotifications,
@@ -30,6 +31,11 @@ export function NotificationsPanel() {
     [token],
     { enabled: Boolean(token) },
   );
+
+  // The server pushes `admin:notification` the moment a broadcast or a support
+  // reply is created. Refetch rather than splice the payload in: the event
+  // carries only { notificationId, message }, not the full document.
+  useServerEvent("admin:notification", () => notifications.reload());
 
   const handleMarkRead = useCallback(
     async (id: ObjectId) => {

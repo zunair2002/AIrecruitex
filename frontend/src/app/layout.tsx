@@ -16,7 +16,7 @@ const plusJakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Skreena - AI-Powered Recruitment Platform",
+  title: "AiRecruitex - AI-Powered Recruitment Platform",
   description: "Your shortlist, ready by morning",
 };
 

@@ -10,7 +10,7 @@ export const howItWorksSteps: HowItWorksStep[] = [
     number: 1,
     title: "Post Your Job",
     description:
-      "Paste your job description and set your interview mode. Skreena generates tailored questions automatically.",
+      "Paste your job description and set your interview mode. AiRecruitex generates tailored questions automatically.",
     icon: (
       <>
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -24,7 +24,7 @@ export const howItWorksSteps: HowItWorksStep[] = [
     number: 2,
     title: "AI Interviews",
     description:
-      "Candidates apply and Skreena interviews them automatically — any time, any timezone, no scheduling needed.",
+      "Candidates apply and AiRecruitex interviews them automatically — any time, any timezone, no scheduling needed.",
     icon: <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>,
   },
   {

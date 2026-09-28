@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { handleNavClick } from "./smoothScroll";
+import { LogoMark } from "./Logo";
 
 const navLinks = [
   { href: "#how-it-works", label: "How It Works", isPage: false },
@@ -42,24 +43,9 @@ export const Navbar = () => {
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group z-50">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md transform group-hover:scale-105 transition-transform">
-              <svg
-                viewBox="0 0 24 24"
-                width="24"
-                height="24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M15 6C15 6 9 6 9 10C9 12 12 12 12 12C12 12 15 12 15 14C15 18 9 18 9 18"
-                  stroke="white"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </div>
+            <LogoMark className="w-10 h-10 transform group-hover:scale-105 transition-transform" />
             <span className="text-2xl font-black bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent tracking-tight">
-              Skreena
+              AiRecruitex
             </span>
           </Link>
 

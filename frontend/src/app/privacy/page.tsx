@@ -2,8 +2,8 @@ import { PrivacyContent } from "./PrivacyContent";
 import { LegalPageFooter } from "./LegalPageFooter";
 
 export const metadata = {
-  title: "Privacy Policy | Skreena",
-  description: "Skreena's Privacy Policy - How we collect, use, and protect your personal data",
+  title: "Privacy Policy | AiRecruitex",
+  description: "AiRecruitex's Privacy Policy - How we collect, use, and protect your personal data",
 };
 
 export default function PrivacyPolicy() {

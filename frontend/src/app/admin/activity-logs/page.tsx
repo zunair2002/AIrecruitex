@@ -1,7 +1,7 @@
 import { ActivityLog } from "@/components/admin/ActivityLog";
 
 export const metadata = {
-  title: "Activity Log | AIRecruitX Admin",
+  title: "Activity Log | AiRecruitex Admin",
   description: "Audit trail of every recorded admin action",
 };
 

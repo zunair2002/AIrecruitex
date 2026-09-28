@@ -119,7 +119,7 @@ export const BrandedPhoneMockup = ({ id }: { id: number }) => {
         
         {/* Universal Brand Footer */}
         <div className="h-4 bg-slate-50 border-t border-slate-100 flex items-center justify-center select-none">
-          <span className="text-[5px] text-slate-400 font-medium">Powered by Skreena</span>
+          <span className="text-[5px] text-slate-400 font-medium">Powered by AiRecruitex</span>
         </div>
       </div>
     </div>

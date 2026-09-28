@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { handleNavClick } from "./smoothScroll";
+import { LogoMark } from "./Logo";
 
 export const Footer = () => {
   return (
@@ -12,13 +13,9 @@ export const Footer = () => {
           {/* Brand & Newsletter Column */}
           <div className="lg:col-span-2 flex flex-col gap-6">
             <Link href="/" className="flex items-center gap-2 group">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md">
-                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M15 6C15 6 9 6 9 10C9 12 12 12 12 12C12 12 15 12 15 14C15 18 9 18 9 18" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-                </svg>
-              </div>
+              <LogoMark className="w-10 h-10" />
               <span className="text-2xl font-black text-white tracking-tight">
-                Skreena
+                AiRecruitex
               </span>
             </Link>
             <p className="text-gray-400 text-sm leading-relaxed max-w-sm">
@@ -65,7 +62,7 @@ export const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-gray-500 text-sm">
-            &copy; {new Date().getFullYear()} Skreena. All rights reserved.
+            &copy; {new Date().getFullYear()} AiRecruitex. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
             {/* Social Icons Placeholder */}

@@ -2,8 +2,8 @@ import { TermsContent } from "./TermsContent";
 import { LegalPageFooter } from "./LegalPageFooter";
 
 export const metadata = {
-  title: "Terms of Service | Skreena",
-  description: "Skreena's Terms of Service - Legal terms governing your use of our AI-powered recruiting platform",
+  title: "Terms of Service | AiRecruitex",
+  description: "AiRecruitex's Terms of Service - Legal terms governing your use of our AI-powered recruiting platform",
 };
 
 export default function TermsOfService() {

@@ -78,7 +78,7 @@ export default function RegisterPage() {
             <div className="relative z-10 text-white max-w-lg">
               <h3 className="text-4xl font-bold mb-6">Build Your Dream Team</h3>
               <p className="text-purple-100 text-lg leading-relaxed mb-8">
-                Join thousands of companies using Skreena to screen smarter and
+                Join thousands of companies using AiRecruitex to screen smarter and
                 hire faster. Create your account today.
               </p>
 

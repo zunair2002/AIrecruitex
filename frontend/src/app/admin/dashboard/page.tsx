@@ -1,7 +1,7 @@
 import { AdminDashboard } from "@/components/admin/AdminDashboard";
 
 export const metadata = {
-  title: "Overview | AIRecruitX Admin",
+  title: "Overview | AiRecruitex Admin",
   description: "Platform-wide user, job, application and interview counts",
 };
 

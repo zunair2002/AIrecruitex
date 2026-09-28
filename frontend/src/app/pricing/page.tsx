@@ -2,8 +2,8 @@ import { PricingCards } from "@/components/home/PricingCards";
 import { Footer } from "@/components/layout/Footer";
 
 export const metadata = {
-  title: "Pricing | AIRecruitX",
-  description: "AIRecruitX pricing plans - Free, Pro, and Enterprise",
+  title: "Pricing | AiRecruitex",
+  description: "AiRecruitex pricing plans - Free, Pro, and Enterprise",
 };
 
 export default function PricingPage() {

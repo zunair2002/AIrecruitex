@@ -36,7 +36,7 @@ export function PracticeInterview({
   intro: string;
   icon: string;
 }) {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const [session, setSession] = useState<InterviewSessionView | null>(null);
   const [selectedLevel, setSelectedLevel] = useState<InterviewLevel>(levels[0]);
   const [isStarting, setIsStarting] = useState(false);
@@ -47,19 +47,21 @@ export function PracticeInterview({
     setError(null);
     try {
       const started = await startInterview(selectedLevel, token);
-      rememberSession({
-        sessionId: started.sessionId,
-        level: selectedLevel,
-        label: `${INTERVIEW_LEVEL_LABELS[selectedLevel]} practice`,
-        startedAt: new Date().toISOString(),
-      });
+      if (user) {
+        rememberSession(user.id, {
+          sessionId: started.sessionId,
+          level: selectedLevel,
+          label: `${INTERVIEW_LEVEL_LABELS[selectedLevel]} practice`,
+          startedAt: new Date().toISOString(),
+        });
+      }
       setSession(started);
     } catch (err) {
       setError(toErrorMessage(err));
     } finally {
       setIsStarting(false);
     }
-  }, [selectedLevel, token]);
+  }, [selectedLevel, token, user]);
 
   if (isStarting && !session) {
     return (

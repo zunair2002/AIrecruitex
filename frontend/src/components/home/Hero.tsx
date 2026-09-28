@@ -69,7 +69,7 @@ export const Hero = () => {
             </h1>
             
             <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-              Skreena conducts intelligent interviews 24/7, scores candidates against your requirements, and delivers a ranked shortlist &mdash; so you only spend time on the best fits.
+              AiRecruitex conducts intelligent interviews 24/7, scores candidates against your requirements, and delivers a ranked shortlist &mdash; so you only spend time on the best fits.
             </p>
             
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4">
@@ -99,7 +99,7 @@ export const Hero = () => {
                 <div className="relative w-full h-full">
                   <Image
                     src="/landing/images/hero-3-images.png"
-                    alt="Skreena Dashboard"
+                    alt="AiRecruitex Dashboard"
                     fill
                     className="object-contain"
                     priority

@@ -4,7 +4,7 @@ export const TermsSectionsPart2 = () => (
   <>
 <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">8. Intellectual Property</h2>
         <p className="text-gray-700 mb-4">
-          <strong>Our Property:</strong> The Service, including all software, design, text, graphics, and other content created by Skreena, 
+          <strong>Our Property:</strong> The Service, including all software, design, text, graphics, and other content created by AiRecruitex, 
           is owned by us and protected by intellectual property laws. You may not copy, modify, distribute, or create derivative works 
           without our written permission.
         </p>
@@ -29,15 +29,15 @@ export const TermsSectionsPart2 = () => (
         <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">10. Limitation of Liability</h2>
         <p className="text-gray-700 mb-4">To the maximum extent permitted by law:</p>
         <ul className="list-disc pl-6 mb-6 text-gray-700 space-y-1">
-          <li>Skreena shall not be liable for any indirect, incidental, special, consequential, or punitive damages</li>
-          <li>Skreena shall not be liable for any loss of profits, data, business opportunities, or goodwill</li>
-          <li>Skreena's total liability shall not exceed the amount you paid to us in the 12 months preceding the claim</li>
+          <li>AiRecruitex shall not be liable for any indirect, incidental, special, consequential, or punitive damages</li>
+          <li>AiRecruitex shall not be liable for any loss of profits, data, business opportunities, or goodwill</li>
+          <li>AiRecruitex's total liability shall not exceed the amount you paid to us in the 12 months preceding the claim</li>
         </ul>
         <p className="text-gray-700 mb-4">This limitation applies regardless of the legal theory on which the claim is based.</p>
         <p className="text-gray-700 mb-6">Nothing in these Terms excludes or limits liability for death or personal injury caused by negligence, fraud, or any other liability that cannot be excluded by law.</p>
 
         <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">11. Indemnification</h2>
-        <p className="text-gray-700 mb-4">You agree to indemnify and hold harmless Skreena, its directors, employees, and agents from any claims, damages, losses, or expenses (including legal fees) arising from:</p>
+        <p className="text-gray-700 mb-4">You agree to indemnify and hold harmless AiRecruitex, its directors, employees, and agents from any claims, damages, losses, or expenses (including legal fees) arising from:</p>
         <ul className="list-disc pl-6 mb-6 text-gray-700 space-y-1">
           <li>Your use of the Service</li>
           <li>Your violation of these Terms</li>
@@ -61,7 +61,7 @@ export const TermsSectionsPart2 = () => (
           <strong>Term:</strong> These Terms remain in effect while you use the Service.
         </p>
         <p className="text-gray-700 mb-4">
-          <strong>Termination by You:</strong> You may stop using the Service and close your account at any time by contacting us at hello@skreena.com.
+          <strong>Termination by You:</strong> You may stop using the Service and close your account at any time by contacting us at hello@airecruitex.com.
         </p>
         <p className="text-gray-700 mb-4">
           <strong>Termination by Us:</strong> We may suspend or terminate your access to the Service immediately if you violate these Terms, 
@@ -87,7 +87,7 @@ export const TermsSectionsPart2 = () => (
         <ul className="list-disc pl-6 mb-6 text-gray-700 space-y-1">
           <li><strong>Governing Law:</strong> These Terms are governed by the laws of England and Wales.</li>
           <li><strong>Jurisdiction:</strong> Any disputes shall be subject to the exclusive jurisdiction of the courts of England and Wales.</li>
-          <li><strong>Entire Agreement:</strong> These Terms, together with our Privacy Policy, constitute the entire agreement between you and Skreena regarding the Service.</li>
+          <li><strong>Entire Agreement:</strong> These Terms, together with our Privacy Policy, constitute the entire agreement between you and AiRecruitex regarding the Service.</li>
           <li><strong>Severability:</strong> If any provision of these Terms is found to be unenforceable, the remaining provisions shall continue in effect.</li>
           <li><strong>No Waiver:</strong> Our failure to enforce any right or provision shall not constitute a waiver of that right or provision.</li>
           <li><strong>Assignment:</strong> You may not assign or transfer your rights under these Terms. We may assign our rights to any affiliate or successor.</li>
@@ -96,11 +96,11 @@ export const TermsSectionsPart2 = () => (
         <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">16. Contact Us</h2>
         <p className="text-gray-700 mb-4">For questions about these Terms, please contact us:</p>
         <p className="text-gray-700 mb-6">
-          <strong>SKREENA LIMITED</strong><br />
+          <strong>AIRECRUITEX LIMITED</strong><br />
           71-75 Shelton Street, Covent Garden<br />
           London, WC2H 9JQ<br />
           United Kingdom<br /><br />
-          Email: <a href="mailto:hello@skreena.com" className="text-indigo-600 hover:underline">hello@skreena.com</a>
+          Email: <a href="mailto:hello@airecruitex.com" className="text-indigo-600 hover:underline">hello@airecruitex.com</a>
         </p>
   </>
 );

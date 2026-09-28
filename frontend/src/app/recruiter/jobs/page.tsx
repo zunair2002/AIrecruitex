@@ -1,7 +1,7 @@
 import { MyJobsList } from "@/components/recruiter/jobs/MyJobsList";
 
 export const metadata = {
-  title: "My Jobs | AIRecruitX HR",
+  title: "My Jobs | AiRecruitex HR",
   description: "Every job you've posted, with required skills and status",
 };
 

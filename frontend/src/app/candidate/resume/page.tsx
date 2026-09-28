@@ -1,7 +1,7 @@
 import { ResumeUpload } from "@/components/candidate/resume/ResumeUpload";
 
 export const metadata = {
-  title: "Resume Upload | AIRecruitX Candidate",
+  title: "Resume Upload | AiRecruitex Candidate",
   description: "Upload your PDF resume for AI-powered interview preparation",
 };
 

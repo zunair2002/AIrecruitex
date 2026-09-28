@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth, homePathForRole } from "@/context/AuthContext";
 import type { UserRole } from "@/lib/types";
+import { LogoMark } from "@/components/layout/Logo";
 
 export function AuthBrand() {
   return (
@@ -13,17 +14,8 @@ export function AuthBrand() {
         href="/"
         className="flex items-center gap-2 mb-2 group transition-opacity hover:opacity-80"
       >
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path
-              d="M15 6C15 6 9 6 9 10C9 12 12 12 12 12C12 12 15 12 15 14C15 18 9 18 9 18"
-              stroke="white"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-            />
-          </svg>
-        </div>
-        <span className="text-2xl font-bold text-indigo-600">Skreena</span>
+        <LogoMark className="w-10 h-10 group-hover:scale-105 transition-transform" />
+        <span className="text-2xl font-bold text-indigo-600">AiRecruitex</span>
       </Link>
       <p className="text-sm text-gray-500">AI-Powered Recruiting</p>
     </div>

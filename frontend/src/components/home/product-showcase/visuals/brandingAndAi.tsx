@@ -56,7 +56,7 @@ export const AIHumanVisual = () => (
             <div className="absolute -bottom-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-emerald-500 border border-white" />
           </div>
           <div className="flex flex-col">
-            <span className="text-[9px] font-bold text-slate-800 leading-none">Skreena Voice AI</span>
+            <span className="text-[9px] font-bold text-slate-800 leading-none">AiRecruitex Voice AI</span>
             <span className="text-[6px] text-emerald-605 mt-0.5 tracking-wider uppercase font-bold">Active Chat</span>
           </div>
         </div>

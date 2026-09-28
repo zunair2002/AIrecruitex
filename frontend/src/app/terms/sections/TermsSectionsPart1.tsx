@@ -4,8 +4,8 @@
         <div className="bg-indigo-50 border-l-4 border-indigo-600 p-6 rounded-lg mb-8">
           <h3 className="text-lg font-bold text-gray-900 mb-2">Summary</h3>
           <p className="text-gray-700">
-            These terms govern your use of Skreena's AI-powered recruiting platform. By using our service, you agree to these terms. 
-            Key points: Skreena is a screening tool (you make hiring decisions), you're responsible for how you use candidate data, 
+            These terms govern your use of AiRecruitex's AI-powered recruiting platform. By using our service, you agree to these terms. 
+            Key points: AiRecruitex is a screening tool (you make hiring decisions), you're responsible for how you use candidate data, 
             and we operate on a pay-as-you-go credit system.
           </p>
         </div>
@@ -13,11 +13,11 @@
         <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">1. Agreement to Terms</h2>
         <p className="text-gray-700 mb-4">
           These Terms of Service ("Terms") constitute a legally binding agreement between you and{" "}
-          <strong>SKREENA LIMITED</strong> (Company Number: 16983568), a company registered in England and Wales with its 
-          registered address at 71-75 Shelton Street, Covent Garden, London, WC2H 9JQ, United Kingdom ("Skreena", "we", "our", "us").
+          <strong>AIRECRUITEX LIMITED</strong> (Company Number: 16983568), a company registered in England and Wales with its 
+          registered address at 71-75 Shelton Street, Covent Garden, London, WC2H 9JQ, United Kingdom ("AiRecruitex", "we", "our", "us").
         </p>
         <p className="text-gray-700 mb-4">
-          By accessing or using our AI-powered recruiting platform at skreena.com (the "Service"), you agree to be bound by these Terms. 
+          By accessing or using our AI-powered recruiting platform at airecruitex.com (the "Service"), you agree to be bound by these Terms. 
           If you do not agree to these Terms, do not use the Service.
         </p>
         <p className="text-gray-700 mb-6">
@@ -26,7 +26,7 @@
         </p>
 
         <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">2. Description of Service</h2>
-        <p className="text-gray-700 mb-4">Skreena provides an AI-powered candidate screening and interview platform that enables recruiters to:</p>
+        <p className="text-gray-700 mb-4">AiRecruitex provides an AI-powered candidate screening and interview platform that enables recruiters to:</p>
         <ul className="list-disc pl-6 mb-6 text-gray-700 space-y-1">
           <li>Create job listings with AI-generated interview questions</li>
           <li>Share application links with candidates</li>
@@ -36,8 +36,8 @@
         </ul>
 
         <div className="bg-yellow-50 border-l-4 border-yellow-500 p-6 rounded-lg mb-8">
-          <strong className="text-gray-900">Important:</strong> Skreena is a screening and prioritisation tool. 
-          All hiring decisions must be made by human recruiters. Skreena does not make employment decisions and should not be used 
+          <strong className="text-gray-900">Important:</strong> AiRecruitex is a screening and prioritisation tool. 
+          All hiring decisions must be made by human recruiters. AiRecruitex does not make employment decisions and should not be used 
           as the sole basis for hiring or rejecting candidates.
         </div>
 
@@ -55,7 +55,7 @@
         </p>
 
         <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">4. Credits and Payment</h2>
-        <p className="text-gray-700 mb-4">Skreena operates on a pay-as-you-go credit system:</p>
+        <p className="text-gray-700 mb-4">AiRecruitex operates on a pay-as-you-go credit system:</p>
         <ul className="list-disc pl-6 mb-6 text-gray-700 space-y-1">
           <li>Credits are purchased in advance and used to access AI features</li>
           <li>Credit costs vary by operation (job analysis, interviews, scoring, etc.)</li>
@@ -83,7 +83,7 @@
         </ul>
 
         <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">6. Your Responsibilities as a Recruiter</h2>
-        <p className="text-gray-700 mb-4">As a user of Skreena, you are responsible for:</p>
+        <p className="text-gray-700 mb-4">As a user of AiRecruitex, you are responsible for:</p>
         <ul className="list-disc pl-6 mb-6 text-gray-700 space-y-1">
           <li><strong>Compliance with employment laws:</strong> Ensuring your use of the Service complies with all applicable employment, anti-discrimination, and data protection laws</li>
           <li><strong>Candidate data:</strong> How you collect, use, and store candidate personal data processed through the Service</li>
@@ -92,7 +92,7 @@
           <li><strong>Candidate communications:</strong> Any communications you have with candidates outside of the automated interview process</li>
         </ul>
         <p className="text-gray-700 mb-6">
-          Skreena provides AI-generated scores and insights as a tool to assist your decision-making. These are not recommendations 
+          AiRecruitex provides AI-generated scores and insights as a tool to assist your decision-making. These are not recommendations 
           to hire or reject any candidate. You must independently evaluate candidates and make your own hiring decisions.
         </p>
 

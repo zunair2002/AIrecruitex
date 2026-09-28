@@ -18,13 +18,30 @@ export type StoredSession = {
   startedAt: string;
 };
 
-const STORAGE_KEY = "airecruitx_interview_sessions";
+/**
+ * Scoped per user: sessions are per-tab now (see authStorage), so two people
+ * can be signed in on one browser at once and must not see each other's index.
+ * The legacy unscoped key is migrated on first read rather than discarded.
+ */
+const STORAGE_PREFIX = "airecruitx_interview_sessions";
+const LEGACY_KEY = STORAGE_PREFIX;
 export const SESSIONS_UPDATED_EVENT = "airecruitx-interview-sessions-updated";
 
-function read(): StoredSession[] {
+const keyFor = (userId: string) => `${STORAGE_PREFIX}:${userId}`;
+
+function read(userId: string): StoredSession[] {
   if (typeof window === "undefined") return [];
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    let raw = localStorage.getItem(keyFor(userId));
+    if (raw === null) {
+      // One-time migration from the pre-scoping key.
+      const legacy = localStorage.getItem(LEGACY_KEY);
+      if (legacy !== null) {
+        localStorage.setItem(keyFor(userId), legacy);
+        localStorage.removeItem(LEGACY_KEY);
+        raw = legacy;
+      }
+    }
     if (!raw) return [];
     const parsed = JSON.parse(raw) as StoredSession[];
     return Array.isArray(parsed) ? parsed.filter((s) => s?.sessionId) : [];
@@ -33,31 +50,31 @@ function read(): StoredSession[] {
   }
 }
 
-function write(sessions: StoredSession[]): void {
+function write(userId: string, sessions: StoredSession[]): void {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
+    localStorage.setItem(keyFor(userId), JSON.stringify(sessions));
     window.dispatchEvent(new Event(SESSIONS_UPDATED_EVENT));
   } catch {
     // Storage blocked (private mode) — history just won't persist.
   }
 }
 
-export function getStoredSessions(): StoredSession[] {
-  return read().sort((a, b) => b.startedAt.localeCompare(a.startedAt));
+export function getStoredSessions(userId: string): StoredSession[] {
+  return read(userId).sort((a, b) => b.startedAt.localeCompare(a.startedAt));
 }
 
 /** Records a session id, or refreshes the label of one already known. */
-export function rememberSession(entry: StoredSession): void {
-  const sessions = read();
+export function rememberSession(userId: string, entry: StoredSession): void {
+  const sessions = read(userId);
   const existing = sessions.findIndex((s) => s.sessionId === entry.sessionId);
   if (existing >= 0) {
     sessions[existing] = { ...sessions[existing], ...entry };
   } else {
     sessions.push(entry);
   }
-  write(sessions);
+  write(userId, sessions);
 }
 
-export function forgetSession(sessionId: ObjectId): void {
-  write(read().filter((s) => s.sessionId !== sessionId));
+export function forgetSession(userId: string, sessionId: ObjectId): void {
+  write(userId, read(userId).filter((s) => s.sessionId !== sessionId));
 }

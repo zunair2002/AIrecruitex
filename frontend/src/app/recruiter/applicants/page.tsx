@@ -3,7 +3,7 @@ import { ApplicantsList } from "@/components/recruiter/applicants/ApplicantsList
 import { LoadingBlock } from "@/components/ui/Feedback";
 
 export const metadata = {
-  title: "Applicants | AIRecruitX HR",
+  title: "Applicants | AiRecruitex HR",
   description: "Review applicants, match scores and schedule interviews",
 };
 

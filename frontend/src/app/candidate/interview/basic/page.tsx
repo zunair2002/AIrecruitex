@@ -1,7 +1,7 @@
 import { PracticeInterview } from "@/components/candidate/interview/PracticeInterview";
 
 export const metadata = {
-  title: "Beginner Practice Interview | AIRecruitX Candidate",
+  title: "Beginner Practice Interview | AiRecruitex Candidate",
   description: "Practice interview at the backend's beginner difficulty level",
 };
 

@@ -26,7 +26,7 @@ export const RaaS = () => {
             Don&apos;t have a recruitment team?
           </motion.h2>
           <motion.p variants={fadeInUp} className="raas-subtitle mx-auto" style={{ color: "#FFFFFFCC", fontSize: "18px", fontFamily: "'Inter', sans-serif", maxWidth: "700px", margin: "0 auto 48px auto", lineHeight: "1.6" }}>
-            Skreena isn&apos;t just software — we also run the entire first-stage process for you.
+            AiRecruitex isn&apos;t just software — we also run the entire first-stage process for you.
             We post the role, screen every applicant with AI interviews, and deliver a scored
             shortlist of candidates actually worth meeting.
           </motion.p>

@@ -1,7 +1,7 @@
 import { ScheduledInterview } from "@/components/candidate/interview/ScheduledInterview";
 
 export const metadata = {
-  title: "AI Interview | AIRecruitX Candidate",
+  title: "AI Interview | AiRecruitex Candidate",
   description: "Take the AI interview scheduled for your application",
 };
 

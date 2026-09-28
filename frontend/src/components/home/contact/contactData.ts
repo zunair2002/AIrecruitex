@@ -2,7 +2,7 @@ export const contactInfo = {
   demo: {
     heading: "Book a Demo",
     subtext:
-      "Want to see Skreena in action? Book a demo and we'll show you how AI-powered screening can transform your hiring process.",
+      "Want to see AiRecruitex in action? Book a demo and we'll show you how AI-powered screening can transform your hiring process.",
   },
   recruit: {
     heading: "We Need Recruitment Help",

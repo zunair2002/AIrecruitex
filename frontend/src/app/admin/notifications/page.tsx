@@ -1,7 +1,7 @@
 import { BroadcastForm } from "@/components/admin/BroadcastForm";
 
 export const metadata = {
-  title: "Broadcast | AIRecruitX Admin",
+  title: "Broadcast | AiRecruitex Admin",
   description: "Send a notification to a user or an entire role",
 };
 

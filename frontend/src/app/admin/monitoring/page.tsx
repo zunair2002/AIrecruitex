@@ -1,7 +1,7 @@
 import { Monitoring } from "@/components/admin/Monitoring";
 
 export const metadata = {
-  title: "Monitoring | AIRecruitX Admin",
+  title: "Monitoring | AiRecruitex Admin",
   description: "Database state, uptime and recent server errors",
 };
 

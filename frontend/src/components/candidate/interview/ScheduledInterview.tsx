@@ -15,7 +15,7 @@ import { InterviewRunner } from "./InterviewRunner";
  * against an application, and for revisiting a finished practice session.
  */
 export function ScheduledInterview({ sessionId }: { sessionId: ObjectId }) {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const resource = useApiResource(
     (signal) => getInterviewReport(sessionId, token, signal),
     [sessionId, token],
@@ -28,13 +28,13 @@ export function ScheduledInterview({ sessionId }: { sessionId: ObjectId }) {
 
   // Records the id so the session also shows up in the interview history list.
   useEffect(() => {
-    if (!resource.data) return;
-    rememberSession({
+    if (!resource.data || !user) return;
+    rememberSession(user.id, {
       sessionId,
       label: "Interview",
       startedAt: new Date().toISOString(),
     });
-  }, [resource.data, sessionId]);
+  }, [resource.data, sessionId, user]);
 
   if (resource.isLoading && !session) {
     return <LoadingBlock label="Loading interview…" />;

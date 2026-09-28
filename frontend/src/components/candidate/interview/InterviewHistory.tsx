@@ -48,12 +48,12 @@ type Entry = {
  * GET /api/interview/report/:sessionId, which is the real report.
  */
 export function InterviewHistory() {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const [stored, setStored] = useState<StoredSession[]>([]);
   const [requestedId, setRequestedId] = useState<ObjectId | null>(null);
 
   useEffect(() => {
-    const sync = () => setStored(getStoredSessions());
+    const sync = () => setStored(user ? getStoredSessions(user.id) : []);
     sync();
     window.addEventListener(SESSIONS_UPDATED_EVENT, sync);
     window.addEventListener("storage", sync);
@@ -61,7 +61,7 @@ export function InterviewHistory() {
       window.removeEventListener(SESSIONS_UPDATED_EVENT, sync);
       window.removeEventListener("storage", sync);
     };
-  }, []);
+  }, [user]);
 
   const history = useApiResource<Entry[]>(
     async (signal) => {

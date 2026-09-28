@@ -26,7 +26,7 @@
           No need to contact us or the recruiter.
         </p>
         <p className="text-gray-700 mb-6">
-          For all other rights, contact us at <a href="mailto:hello@skreena.com" className="text-indigo-600 hover:underline">hello@skreena.com</a>. 
+          For all other rights, contact us at <a href="mailto:hello@airecruitex.com" className="text-indigo-600 hover:underline">hello@airecruitex.com</a>. 
           We will respond within 30 days.
         </p>
 
@@ -54,7 +54,7 @@
         <p className="text-gray-700 mb-6">
           Our Service is not intended for individuals under 16 years of age. We do not knowingly collect personal data from 
           children under 16. If you believe we have collected data from a child under 16, please contact us immediately at{" "}
-          <a href="mailto:hello@skreena.com" className="text-indigo-600 hover:underline">hello@skreena.com</a> and we will delete it promptly.
+          <a href="mailto:hello@airecruitex.com" className="text-indigo-600 hover:underline">hello@airecruitex.com</a> and we will delete it promptly.
         </p>
 
         <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">14. Changes to This Policy</h2>
@@ -66,7 +66,7 @@
         <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">15. Complaints</h2>
         <p className="text-gray-700 mb-4">
           If you have concerns about how we handle your personal data, please contact us first at{" "}
-          <a href="mailto:hello@skreena.com" className="text-indigo-600 hover:underline">hello@skreena.com</a>. 
+          <a href="mailto:hello@airecruitex.com" className="text-indigo-600 hover:underline">hello@airecruitex.com</a>. 
           We will do our best to resolve your concerns.
         </p>
         <p className="text-gray-700 mb-4">
@@ -83,11 +83,11 @@
           For any questions about this Privacy Policy or our data practices, please contact us:
         </p>
         <p className="text-gray-700 mb-4">
-          <strong>SKREENA LIMITED</strong><br />
+          <strong>AIRECRUITEX LIMITED</strong><br />
           71-75 Shelton Street, Covent Garden<br />
           London, WC2H 9JQ<br />
           United Kingdom<br /><br />
-          Email: <a href="mailto:hello@skreena.com" className="text-indigo-600 hover:underline">hello@skreena.com</a>
+          Email: <a href="mailto:hello@airecruitex.com" className="text-indigo-600 hover:underline">hello@airecruitex.com</a>
         </p>
   </>
 );

@@ -1,7 +1,7 @@
 import { CreateJobForm } from "@/components/recruiter/CreateJobForm";
 
 export const metadata = {
-  title: "Create Job | AIRecruitX HR",
+  title: "Create Job | AiRecruitex HR",
   description: "Post a new job opening with title, description, skills, and experience requirements",
 };
 

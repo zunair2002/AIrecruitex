@@ -1,7 +1,7 @@
 import { JobBoard } from "@/components/candidate/jobs/JobBoard";
 
 export const metadata = {
-  title: "Job Board | AIRecruitX Candidate",
+  title: "Job Board | AiRecruitex Candidate",
   description: "Browse every open job and apply with your parsed resume",
 };
 

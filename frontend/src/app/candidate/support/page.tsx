@@ -1,7 +1,7 @@
 import { SupportForm } from "@/components/shared/SupportForm";
 
 export const metadata = {
-  title: "Support | AIRecruitX Candidate",
+  title: "Support | AiRecruitex Candidate",
   description: "Raise a support ticket with the platform admins",
 };
 

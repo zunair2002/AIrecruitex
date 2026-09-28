@@ -1,7 +1,7 @@
 import { CandidateDashboard } from "@/components/candidate/CandidateDashboard";
 
 export const metadata = {
-  title: "Dashboard | AIRecruitX Candidate",
+  title: "Dashboard | AiRecruitex Candidate",
   description: "Candidate dashboard - track interviews, scores, and recommendations",
 };
 

@@ -4,7 +4,7 @@
         <div className="bg-indigo-50 border-l-4 border-indigo-600 p-6 rounded-lg mb-8">
           <h3 className="text-lg font-bold text-gray-900 mb-2">Summary</h3>
           <p className="text-gray-700">
-            Skreena is an AI-powered recruiting platform. We process candidate data on behalf of recruiters (as a processor) 
+            AiRecruitex is an AI-powered recruiting platform. We process candidate data on behalf of recruiters (as a processor) 
             and manage recruiter accounts directly (as a controller). We use AI to conduct interviews and score candidates. 
             We do not sell your data. Candidates can delete all their data at any time via the{" "}
             <a href="/portal" className="text-indigo-600 hover:underline">Candidate Portal</a>.
@@ -13,16 +13,16 @@
 
         <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">1. Who We Are</h2>
         <p className="text-gray-700 mb-4">
-          <strong>SKREENA LIMITED</strong> ("Skreena", "we", "our", "us") is a company registered in England and Wales.
+          <strong>AIRECRUITEX LIMITED</strong> ("AiRecruitex", "we", "our", "us") is a company registered in England and Wales.
         </p>
         <ul className="list-disc pl-6 mb-6 text-gray-700 space-y-1">
           <li><strong>Company Number:</strong> 16983568</li>
           <li><strong>Registered Address:</strong> 71-75 Shelton Street, Covent Garden, London, WC2H 9JQ, United Kingdom</li>
-          <li><strong>Contact:</strong> <a href="mailto:hello@skreena.com" className="text-indigo-600 hover:underline">hello@skreena.com</a></li>
+          <li><strong>Contact:</strong> <a href="mailto:hello@airecruitex.com" className="text-indigo-600 hover:underline">hello@airecruitex.com</a></li>
         </ul>
         <p className="text-gray-700 mb-6">
           This Privacy Policy explains how we collect, use, and protect personal data when you use our AI-powered recruiting 
-          platform at skreena.com (the "Service").
+          platform at airecruitex.com (the "Service").
         </p>
 
         <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">2. Our Role: Controller vs Processor</h2>
@@ -41,9 +41,9 @@
           <li>In this case, the recruiter (our customer) is the Data Controller</li>
         </ul>
         <p className="text-gray-700 mb-6">
-          If you are a candidate who has applied for a role through Skreena and wish to exercise your data protection rights, 
+          If you are a candidate who has applied for a role through AiRecruitex and wish to exercise your data protection rights, 
           please contact the recruiter/employer you applied to directly. If you need assistance identifying them, contact us at{" "}
-          <a href="mailto:hello@skreena.com" className="text-indigo-600 hover:underline">hello@skreena.com</a>.
+          <a href="mailto:hello@airecruitex.com" className="text-indigo-600 hover:underline">hello@airecruitex.com</a>.
         </p>
 
         <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">3. Information We Collect</h2>
@@ -137,7 +137,7 @@
         </ul>
 
         <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">5. AI Processing</h2>
-        <p className="text-gray-700 mb-4">Skreena uses artificial intelligence (powered by Anthropic's Claude) to:</p>
+        <p className="text-gray-700 mb-4">AiRecruitex uses artificial intelligence (powered by Anthropic's Claude) to:</p>
         <ul className="list-disc pl-6 mb-6 text-gray-700 space-y-1">
           <li>Conduct automated candidate interviews via chat</li>
           <li>Parse and analyse CV content</li>
@@ -147,7 +147,7 @@
         </ul>
         <p className="text-gray-700 mb-4">
           <strong>Important:</strong> AI-generated scores and insights are provided to assist recruiters in their decision-making. 
-          All final hiring decisions are made by human recruiters, not by our AI systems. Skreena is a screening tool that helps 
+          All final hiring decisions are made by human recruiters, not by our AI systems. AiRecruitex is a screening tool that helps 
           prioritise candidates; it does not make employment decisions.
         </p>
         <p className="text-gray-700 mb-6">

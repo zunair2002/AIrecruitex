@@ -3,7 +3,7 @@ import { InterviewReportsList } from "@/components/recruiter/reports/InterviewRe
 import { LoadingBlock } from "@/components/ui/Feedback";
 
 export const metadata = {
-  title: "Interview Reports | AIRecruitX HR",
+  title: "Interview Reports | AiRecruitex HR",
   description: "AI interview scores and per-answer feedback for your applicants",
 };
 

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { LogoMark } from "./Logo";
 import { useAuth } from "@/context/AuthContext";
 import { useRealtimeConnected } from "@/context/RealtimeContext";
 import { useUnreadNotifications } from "@/components/shared/useUnreadNotifications";
@@ -40,11 +41,9 @@ export function PortalSidebar({
     <aside className="flex min-h-screen w-64 shrink-0 flex-col border-r border-gray-200 bg-white">
       <div className="border-b border-gray-100 p-6">
         <Link href="/" className="group flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600">
-            <span className="text-sm font-bold text-white">A</span>
-          </div>
+          <LogoMark className="h-9 w-9" rounded="rounded-lg" />
           <div>
-            <p className="text-sm font-bold text-gray-900">AIRecruitX</p>
+            <p className="text-sm font-bold text-gray-900">AiRecruitex</p>
             <p className="text-xs text-gray-500">{portalName}</p>
           </div>
         </Link>

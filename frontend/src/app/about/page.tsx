@@ -2,8 +2,8 @@ import Link from "next/link";
 import { Footer } from "@/components/layout/Footer";
 
 export const metadata = {
-  title: "About | AIRecruitX",
-  description: "Learn about AIRecruitX - Virtual Interview Platform for candidates and HR teams",
+  title: "About | AiRecruitex",
+  description: "Learn about AiRecruitex - Virtual Interview Platform for candidates and HR teams",
 };
 
 export default function AboutPage() {
@@ -11,9 +11,9 @@ export default function AboutPage() {
     <main>
       <section className="pt-32 pb-20 bg-gradient-to-br from-indigo-50 via-white to-purple-50">
         <div className="container mx-auto max-w-4xl px-4 sm:px-6 text-center">
-          <h1 className="text-5xl font-bold text-gray-900 mb-6">About AIRecruitX</h1>
+          <h1 className="text-5xl font-bold text-gray-900 mb-6">About AiRecruitex</h1>
           <p className="text-xl text-gray-600 leading-relaxed">
-            AIRecruitX is a Virtual Interview Platform that connects job seekers with companies
+            AiRecruitex is a Virtual Interview Platform that connects job seekers with companies
             through AI-powered interviews, resume matching, and intelligent hiring tools.
           </p>
         </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { resendOtp } from "@/lib/authApi";
 import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -91,7 +92,7 @@ export function RegisterForm({
   emailPlaceholder?: string;
   submitLabel?: string;
 }) {
-  const { register } = useAuth();
+  const { register, verifyEmail } = useAuth();
   const router = useRouter();
 
   const [name, setName] = useState("");
@@ -99,39 +100,146 @@ export function RegisterForm({
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [verificationEmail, setVerificationEmail] = useState<string | null>(null);
+  const [otp, setOtp] = useState("");
+  const [notice, setNotice] = useState("");
+  const [isResending, setIsResending] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setError(null);
+  event.preventDefault();
+  setError(null);
 
-    if (!name.trim()) {
-      setError("Please enter your name.");
-      return;
-    }
-    // The backend rejects anything shorter, so catch it before the round trip.
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters.");
-      return;
-    }
+  if (!name.trim()) {
+    setError("Please enter your name.");
+    return;
+  }
 
-    setIsSubmitting(true);
-    try {
-      const user = await register({
-        name: name.trim(),
-        email: email.trim(),
-        password,
-        role,
-      });
-      router.replace(homePathForRole(user.role));
-    } catch (err) {
-      setError(
-        err instanceof Error && err.message
-          ? err.message
-          : "Something went wrong. Please try again.",
-      );
-      setIsSubmitting(false);
-    }
-  };
+  if (!email.trim()) {
+    setError("Please enter your email.");
+    return;
+  }
+
+  if (password.length < 6) {
+    setError("Password must be at least 6 characters.");
+    return;
+  }
+
+  setIsSubmitting(true);
+
+  try {
+    const result = await register({
+      name: name.trim(),
+      email: email.trim(),
+      password,
+      role,
+    });
+
+    setVerificationEmail(result.email);
+    setNotice(result.message);
+    setPassword("");
+  } catch (err) {
+    setError(
+      err instanceof Error ? err.message : "Registration failed.",
+    );
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
+const handleVerify = async (event: React.FormEvent<HTMLFormElement>) => {
+  event.preventDefault();
+  if (!verificationEmail) return;
+
+  if (!otp.trim()) {
+    setError("Please enter your verification code.");
+    return;
+  }
+
+  setError(null);
+  setIsSubmitting(true);
+
+  try {
+    const user = await verifyEmail(verificationEmail, otp.trim());
+    router.replace(homePathForRole(user.role));
+  } catch (err) {
+    setError(
+      err instanceof Error ? err.message : "Verification failed.",
+    );
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
+const handleResend = async () => {
+  if (!verificationEmail) return;
+
+  setError(null);
+  setNotice("");
+  setIsResending(true);
+
+  try {
+    const result = await resendOtp(verificationEmail);
+    setNotice(result.message);
+  } catch (err) {
+    setError(
+      err instanceof Error ? err.message : "Could not resend code.",
+    );
+  } finally {
+    setIsResending(false);
+  }
+};
+
+  if (verificationEmail) {
+  return (
+    <form className="space-y-4" onSubmit={handleVerify}>
+      <h2 className="text-lg font-semibold">Verify your email</h2>
+
+      <p className="text-sm text-gray-600">
+        Enter the code sent to {verificationEmail}.
+      </p>
+
+      {notice && (
+        <p role="status" className="text-sm text-green-700">
+          {notice}
+        </p>
+      )}
+
+      <AuthError message={error} />
+
+      <label htmlFor={`${role}-otp`} className="block text-sm font-medium">
+        Verification code
+      </label>
+
+      <input
+        id={`${role}-otp`}
+        type="text"
+        inputMode="numeric"
+        autoComplete="one-time-code"
+        required
+        value={otp}
+        onChange={(event) => setOtp(event.target.value)}
+        className={authInputClass}
+      />
+
+      <button
+        type="submit"
+        disabled={isSubmitting || isResending}
+        className={authSubmitClass}
+      >
+        {isSubmitting ? "Verifying…" : "Verify email"}
+      </button>
+
+      <button
+        type="button"
+        onClick={handleResend}
+        disabled={isSubmitting || isResending}
+        className="w-full text-sm text-indigo-600 disabled:opacity-50"
+      >
+        {isResending ? "Sending…" : "Resend code"}
+      </button>
+    </form>
+  );
+}
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit} noValidate>
@@ -211,21 +319,24 @@ export function LoginForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setError(null);
-    setIsSubmitting(true);
-    try {
-      const user = await login(email.trim(), password);
-      router.replace(homePathForRole(user.role));
-    } catch (err) {
-      setError(
-        err instanceof Error && err.message
-          ? err.message
-          : "Something went wrong. Please try again.",
-      );
-      setIsSubmitting(false);
-    }
-  };
+  event.preventDefault();
+  setError(null);
+  setIsSubmitting(true);
+
+  try {
+    const user = await login(email.trim(), password);
+    router.replace(homePathForRole(user.role));
+  } catch (err) {
+    setError(
+      err instanceof Error && err.message
+        ? err.message
+        : "Something went wrong. Please try again.",
+    );
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
 
   return (
     <form className="space-y-5" onSubmit={handleSubmit} noValidate>

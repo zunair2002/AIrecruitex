@@ -12,15 +12,41 @@ export type { AuthProvider, AuthSession, AuthUser, UserRole } from "./types";
  * `role` is required and must be one of candidate | hr | admin;
  * `password` must be at least 6 characters (both enforced server-side).
  */
+export type SignupResult = {
+  email: string;
+  message: string;
+  devOtp?: string;
+};
+
 export function signup(input: {
   name: string;
   email: string;
   password: string;
   role: UserRole;
-}): Promise<AuthSession> {
-  return apiRequest<AuthSession>("/api/auth/signup", {
+}): Promise<SignupResult> {
+  return apiRequest<SignupResult>("/api/auth/signup", {
     method: "POST",
     body: input,
+  });
+}
+
+export function verifyEmail(input: {
+  email: string;
+  otp: string;
+}): Promise<AuthSession> {
+  return apiRequest<AuthSession>("/api/auth/verify-email", {
+    method: "POST",
+    body: input,
+  });
+}
+
+export function resendOtp(email: string): Promise<{
+  message: string;
+  devOtp?: string;
+}> {
+  return apiRequest("/api/auth/resend-otp", {
+    method: "POST",
+    body: { email },
   });
 }
 

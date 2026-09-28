@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar";
 import { AuthError } from "@/components/auth/AuthCardParts";
-import { useAuth, homePathForRole } from "@/context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 import { toErrorMessage } from "@/lib/api";
 import { ROLE_LABELS } from "@/lib/format";
 import type { UserRole } from "@/lib/types";
@@ -51,13 +51,18 @@ export default function RegisterPage() {
 
     setIsSubmitting(true);
     try {
-      const user = await register({
-        name: name.trim(),
-        email: email.trim(),
-        password,
-        role,
-      });
-      router.replace(homePathForRole(user.role));
+      const result = await register({
+  name: name.trim(),
+  email: email.trim(),
+  password,
+  role,
+});
+
+setError(
+  `${result.message}${
+    result.devOtp ? ` Development OTP: ${result.devOtp}` : ""
+  }`,
+);
     } catch (err) {
       setError(toErrorMessage(err));
       setIsSubmitting(false);

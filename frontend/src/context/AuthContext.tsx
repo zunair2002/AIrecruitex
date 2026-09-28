@@ -23,12 +23,14 @@ type AuthContextValue = {
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<AuthUser>;
-  register: (input: {
-    name: string;
-    email: string;
-    password: string;
-    role: UserRole;
-  }) => Promise<AuthUser>;
+ register: (input: {
+  name: string;
+  email: string;
+  password: string;
+  role: UserRole;
+}) => Promise<authApi.SignupResult>;
+
+verifyEmail: (email: string, otp: string) => Promise<AuthUser>;
   loginWithGoogle: (idToken: string, role?: UserRole) => Promise<AuthUser>;
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
@@ -93,14 +95,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // POST /signup already answers with { token, user }, so the account is
   // created and signed in from one round trip.
   const register = useCallback(
-    async (input: {
-      name: string;
-      email: string;
-      password: string;
-      role: UserRole;
-    }) => applySession(await authApi.signup(input)),
-    [applySession],
-  );
+  async (input: {
+    name: string;
+    email: string;
+    password: string;
+    role: UserRole;
+  }) => authApi.signup(input),
+  [],
+);
+
+const verifyEmail = useCallback(
+  async (email: string, otp: string) =>
+    applySession(await authApi.verifyEmail({ email, otp })),
+  [applySession],
+);
 
   const logout = useCallback(async () => {
     const current = token ?? getStoredToken();
@@ -126,20 +134,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [token]);
 
-  const value = useMemo<AuthContextValue>(
-    () => ({
-      user,
-      token,
-      isLoading,
-      isAuthenticated: Boolean(user),
-      login,
-      register,
-      loginWithGoogle,
-      logout,
-      refresh,
-    }),
-    [user, token, isLoading, login, register, loginWithGoogle, logout, refresh],
-  );
+const value = useMemo<AuthContextValue>(
+  () => ({
+    user,
+    token,
+    isLoading,
+    isAuthenticated: Boolean(user),
+    login,
+    register,
+    verifyEmail,
+    loginWithGoogle,
+    logout,
+    refresh,
+  }),
+  [
+    user,
+    token,
+    isLoading,
+    login,
+    register,
+    verifyEmail,
+    loginWithGoogle,
+    logout,
+    refresh,
+  ],
+);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

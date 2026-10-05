@@ -9,7 +9,12 @@ import {
   useState,
 } from "react";
 import * as authApi from "@/lib/authApi";
-import type { AuthUser, UserRole } from "@/lib/types";
+import type {
+  AuthUser,
+  ResendOtpResult,
+  SignupResult,
+  UserRole,
+} from "@/lib/types";
 import {
   clearStoredToken,
   getStoredToken,
@@ -23,12 +28,19 @@ type AuthContextValue = {
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<AuthUser>;
+  /**
+   * Creates the account and triggers the OTP email. It does NOT sign you in —
+   * the session is issued by `verifyEmail` once the code is confirmed.
+   */
   register: (input: {
     name: string;
     email: string;
     password: string;
     role: UserRole;
-  }) => Promise<AuthUser>;
+  }) => Promise<SignupResult>;
+  /** Confirms the emailed OTP and starts the session. */
+  verifyEmail: (email: string, otp: string) => Promise<AuthUser>;
+  resendOtp: (email: string) => Promise<ResendOtpResult>;
   loginWithGoogle: (idToken: string, role?: UserRole) => Promise<AuthUser>;
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
@@ -90,17 +102,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [applySession],
   );
 
-  // POST /signup already answers with { token, user }, so the account is
-  // created and signed in from one round trip.
+  // POST /signup only creates the account and emails an OTP — no session yet.
   const register = useCallback(
-    async (input: {
+    (input: {
       name: string;
       email: string;
       password: string;
       role: UserRole;
-    }) => applySession(await authApi.signup(input)),
+    }) => authApi.signup(input),
+    [],
+  );
+
+  const verifyEmail = useCallback(
+    async (email: string, otp: string) =>
+      applySession(await authApi.verifyEmail({ email, otp })),
     [applySession],
   );
+
+  const resendOtp = useCallback((email: string) => authApi.resendOtp(email), []);
 
   const logout = useCallback(async () => {
     const current = token ?? getStoredToken();
@@ -134,11 +153,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isAuthenticated: Boolean(user),
       login,
       register,
+      verifyEmail,
+      resendOtp,
       loginWithGoogle,
       logout,
       refresh,
     }),
-    [user, token, isLoading, login, register, loginWithGoogle, logout, refresh],
+    [
+      user,
+      token,
+      isLoading,
+      login,
+      register,
+      verifyEmail,
+      resendOtp,
+      loginWithGoogle,
+      logout,
+      refresh,
+    ],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

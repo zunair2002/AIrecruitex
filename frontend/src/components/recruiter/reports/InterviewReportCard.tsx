@@ -19,6 +19,7 @@ import {
   populated,
   type ApplicationReport,
   type ApplicationStatus,
+  type InterviewSession,
 } from "@/lib/types";
 import { Card, InlineError, SkillChips } from "@/components/ui/Feedback";
 import { smallButtonClass } from "@/components/ui/controls";
@@ -37,7 +38,7 @@ export function InterviewReportDetail({
   onStatusChanged?: () => void;
 }) {
   const { token } = useAuth();
-  const { application, interviewSession } = report;
+  const { application, interviewSession, orgInterviewSession } = report;
   const candidate = populated(application.candidateId);
 
   const [status, setStatus] = useState<ApplicationStatus>(application.status);
@@ -179,6 +180,10 @@ export function InterviewReportDetail({
         </Card>
       )}
 
+      {orgInterviewSession && (
+        <OrgInterviewResult session={orgInterviewSession} />
+      )}
+
       {interviewSession && interviewSession.messages.length > 0 && (
         <Transcript messages={interviewSession.messages} />
       )}
@@ -196,7 +201,9 @@ export function InterviewReportDetail({
                     Q{turn.questionNumber}. {turn.question}
                   </p>
                   <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-xs font-bold text-indigo-600">
-                    {turn.score}/10
+                    {turn.marksPossible !== undefined
+                      ? `${turn.marksEarned ?? 0}/${turn.marksPossible} marks`
+                      : `${turn.score}/10`}
                   </span>
                 </div>
                 <p className="mt-3 whitespace-pre-line text-sm text-gray-700">
@@ -258,6 +265,83 @@ function Transcript({
             </div>
           ))}
         </div>
+      )}
+    </Card>
+  );
+}
+
+/**
+ * The organisational interview — graded against HR's question pool, so each
+ * turn carries raw marks as well as the normalised score. The candidate never
+ * sees any of this; it exists only on HR's report.
+ */
+function OrgInterviewResult({ session }: { session: InterviewSession }) {
+  const earned = session.turns.reduce((sum, t) => sum + (t.marksEarned ?? 0), 0);
+  const possible = session.turns.reduce((sum, t) => sum + (t.marksPossible ?? 0), 0);
+
+  return (
+    <Card title="Organisational interview">
+      <div className="flex flex-wrap items-center gap-3">
+        <span className={INTERVIEW_STATUS_BADGE[session.status]}>
+          {INTERVIEW_STATUS_LABELS[session.status]}
+        </span>
+        {session.result && (
+          <span className={INTERVIEW_RESULT_BADGE[session.result]}>
+            {INTERVIEW_RESULT_LABELS[session.result]}
+          </span>
+        )}
+        {session.score !== undefined && (
+          <span className={`text-lg font-bold ${scoreColor(session.score)}`}>
+            {session.score}%
+          </span>
+        )}
+        {possible > 0 && (
+          <span className="text-sm text-gray-500">
+            {earned}/{possible} marks
+          </span>
+        )}
+      </div>
+
+      {session.feedback && (
+        <p className="mt-4 whitespace-pre-line rounded-xl bg-gray-50 p-4 text-sm text-gray-700">
+          {session.feedback}
+        </p>
+      )}
+
+      {session.turns.length > 0 ? (
+        <div className="mt-4 space-y-4">
+          {session.turns.map((turn) => (
+            <div
+              key={turn.questionNumber}
+              className="rounded-xl border border-gray-100 bg-gray-50 p-4"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <p className="text-sm font-semibold text-gray-900">
+                  Q{turn.questionNumber}. {turn.question}
+                </p>
+                <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-xs font-bold text-indigo-600">
+                  {turn.marksPossible !== undefined
+                    ? `${turn.marksEarned ?? 0}/${turn.marksPossible} marks`
+                    : `${turn.score}/10`}
+                </span>
+              </div>
+              <p className="mt-3 whitespace-pre-line text-sm text-gray-700">
+                <span className="font-semibold text-gray-500">Answer: </span>
+                {turn.answer}
+              </p>
+              {turn.feedback && (
+                <p className="mt-2 whitespace-pre-line text-sm text-indigo-900">
+                  <span className="font-semibold text-indigo-600">Grading: </span>
+                  {turn.feedback}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="mt-4 text-sm text-gray-600">
+          The candidate hasn&apos;t answered any questions yet.
+        </p>
       )}
     </Card>
   );

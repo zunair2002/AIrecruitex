@@ -7,10 +7,13 @@ import { useAuth } from "@/context/AuthContext";
 import { useServerEvent } from "@/context/RealtimeContext";
 import { toErrorMessage } from "@/lib/api";
 import {
+  bulkInviteToOrgInterview,
+  bulkTriggerAiInterview,
+  bulkUpdateStatus,
+  inviteToOrgInterview,
   listApplicationsForJob,
   listMatchedApplicationsForJob,
   scheduleAiInterview,
-  scheduleOrgInterview,
   updateApplicationStatus,
 } from "@/lib/applicationsApi";
 import { useApiResource } from "@/lib/useApiResource";
@@ -19,6 +22,7 @@ import {
   populated,
   type Application,
   type ApplicationStatus,
+  type ObjectId,
 } from "@/lib/types";
 import {
   APPLICATION_STATUS_BADGE,
@@ -28,6 +32,7 @@ import {
   initials,
   scoreColor,
 } from "@/lib/format";
+import { OrgInterviewPanel } from "@/components/shared/OrgInterviewPanel";
 import {
   EmptyState,
   ErrorBlock,
@@ -68,6 +73,18 @@ export function ApplicantsList() {
   const [actionError, setActionError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [dialog, setDialog] = useState<DialogState>(null);
+  // Ticked rows, for the backend's bulk status / AI-interview / invite endpoints.
+  const [selectedIds, setSelectedIds] = useState<Set<ObjectId>>(new Set());
+  const [isBulkBusy, setIsBulkBusy] = useState(false);
+
+  const toggleSelected = useCallback((id: ObjectId) => {
+    setSelectedIds((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
 
   const applications = useApiResource(
     (signal) =>
@@ -114,31 +131,55 @@ export function ApplicantsList() {
     async (payload: SchedulePayload) => {
       if (!dialog) return;
       const { application, kind } = dialog;
-      const updated =
-        kind === "ai"
-          ? await scheduleAiInterview(
-              application._id,
-              { dateTime: payload.dateTime, message: payload.message },
-              token,
-            )
-          : await scheduleOrgInterview(
-              application._id,
-              {
-                dateTime: payload.dateTime,
-                location: payload.location,
-                notes: payload.notes,
-              },
-              token,
-            );
-      applyLocalUpdate(updated);
+      if (selectedIds.size > 1) {
+        // Bulk: the backend applies the same action to every id in one request.
+        const ids: ObjectId[] = Array.from(selectedIds);
+        await (kind === "ai"
+          ? bulkTriggerAiInterview(ids, token)
+          : bulkInviteToOrgInterview(ids, { validityDays: payload.validityDays }, token));
+        setSelectedIds(new Set());
+        applications.reload();
+      } else {
+        const updated =
+          kind === "ai"
+            ? await scheduleAiInterview(
+                application._id,
+                { dateTime: payload.dateTime!, message: payload.message },
+                token,
+              )
+            : await inviteToOrgInterview(
+                application._id,
+                { validityDays: payload.validityDays },
+                token,
+              );
+        applyLocalUpdate(updated);
+      }
       setDialog(null);
     },
-    [dialog, token, applyLocalUpdate],
+    [dialog, token, applyLocalUpdate, selectedIds, applications],
   );
 
   // Keeps the list honest if the candidate's own session, or another HR user,
   // changes something while this screen is open.
   useServerEvent("application:status", () => applications.reload());
+
+  const handleBulkStatus = useCallback(
+    async (status: ApplicationStatus) => {
+      if (selectedIds.size === 0) return;
+      setIsBulkBusy(true);
+      setActionError(null);
+      try {
+        await bulkUpdateStatus(Array.from(selectedIds), status, token);
+        setSelectedIds(new Set());
+        applications.reload();
+      } catch (error) {
+        setActionError(toErrorMessage(error));
+      } finally {
+        setIsBulkBusy(false);
+      }
+    },
+    [selectedIds, token, applications],
+  );
 
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -231,10 +272,54 @@ export function ApplicantsList() {
         />
       ) : (
         <div className="space-y-5">
+          {selectedIds.size > 0 && (
+            <div className="sticky top-0 z-10 flex flex-wrap items-center gap-3 rounded-2xl border border-indigo-200 bg-indigo-50 p-4 shadow-sm">
+              <span className="text-sm font-semibold text-indigo-900">
+                {selectedIds.size} selected
+              </span>
+              {APPLICATION_STATUSES.map((status) => (
+                <button
+                  key={status}
+                  type="button"
+                  onClick={() => handleBulkStatus(status)}
+                  disabled={isBulkBusy}
+                  className={smallButtonClass}
+                >
+                  Mark {APPLICATION_STATUS_LABELS[status].toLowerCase()}
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={() => setDialog({ application: filtered[0], kind: "ai" })}
+                disabled={isBulkBusy}
+                className={smallButtonClass}
+              >
+                Trigger AI interviews
+              </button>
+              <button
+                type="button"
+                onClick={() => setDialog({ application: filtered[0], kind: "org" })}
+                disabled={isBulkBusy}
+                className={smallButtonClass}
+              >
+                Invite to org interview
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedIds(new Set())}
+                className="ml-auto text-sm font-medium text-gray-500 hover:text-gray-800"
+              >
+                Clear
+              </button>
+            </div>
+          )}
+
           {filtered.map((application) => (
             <ApplicantCard
               key={application._id}
               application={application}
+              isSelected={selectedIds.has(application._id)}
+              onToggleSelected={() => toggleSelected(application._id)}
               jobTitle={selectedJob?.title ?? "This job"}
               isBusy={busyId === application._id}
               onStatusChange={(status) => handleStatusChange(application, status)}
@@ -251,6 +336,7 @@ export function ApplicantsList() {
             populated(dialog.application.candidateId)?.name ?? "Candidate"
           }
           jobTitle={selectedJob?.title ?? "This job"}
+          count={selectedIds.size}
           onCancel={() => setDialog(null)}
           onSubmit={handleSchedule}
         />
@@ -263,22 +349,39 @@ function ApplicantCard({
   application,
   jobTitle,
   isBusy,
+  isSelected,
+  onToggleSelected,
   onStatusChange,
   onSchedule,
 }: {
   application: Application;
   jobTitle: string;
   isBusy: boolean;
+  isSelected: boolean;
+  onToggleSelected: () => void;
   onStatusChange: (status: ApplicationStatus) => void;
   onSchedule: (kind: ScheduleKind) => void;
 }) {
   const candidate = populated(application.candidateId);
-  const { aiInterview, orgInterview } = application;
+  const { aiInterview } = application;
+  // Absent until HR invites — see the note on Application.orgInterview.
+  const orgInterview = application.orgInterview;
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+    <div
+      className={`rounded-2xl border bg-white p-6 shadow-sm transition-colors ${
+        isSelected ? "border-indigo-300 ring-1 ring-indigo-200" : "border-gray-100"
+      }`}
+    >
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex min-w-0 items-center gap-3">
+          <input
+            type="checkbox"
+            checked={isSelected}
+            onChange={onToggleSelected}
+            aria-label={`Select ${candidate?.name ?? "applicant"}`}
+            className="h-4 w-4 shrink-0 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+          />
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-sm font-bold text-indigo-700">
             {initials(candidate?.name ?? "?")}
           </div>
@@ -320,7 +423,7 @@ function ApplicantCard({
         />
       </div>
 
-      {(aiInterview.scheduled || orgInterview.scheduled) && (
+      {(aiInterview.scheduled || orgInterview?.status) && (
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
           {aiInterview.scheduled && (
             <div className="rounded-xl border border-indigo-100 bg-indigo-50 p-4">
@@ -345,23 +448,8 @@ function ApplicantCard({
               )}
             </div>
           )}
-          {orgInterview.scheduled && (
-            <div className="rounded-xl border border-emerald-100 bg-emerald-50 p-4">
-              <p className="text-xs font-bold uppercase tracking-wide text-emerald-700">
-                Organisation interview
-              </p>
-              <p className="mt-1 text-sm text-emerald-900">
-                {formatDateTime(orgInterview.dateTime)}
-              </p>
-              {orgInterview.location && (
-                <p className="mt-1 text-xs text-emerald-800">
-                  {orgInterview.location}
-                </p>
-              )}
-              {orgInterview.notes && (
-                <p className="mt-1 text-xs text-emerald-800">{orgInterview.notes}</p>
-              )}
-            </div>
+          {orgInterview?.status && (
+            <OrgInterviewPanel orgInterview={orgInterview} audience="hr" />
           )}
         </div>
       )}
@@ -410,9 +498,11 @@ function ApplicantCard({
               : "Mark the candidate as Selected before scheduling an organisation interview."
           }
         >
-          {orgInterview.scheduled
-            ? "Reschedule org interview"
-            : "Schedule org interview"}
+          {orgInterview?.status === "invited"
+            ? "Re-send invite"
+            : orgInterview?.status === "completed"
+              ? "Invite again"
+              : "Invite to org interview"}
         </button>
 
         {application.interviewSessionId && (

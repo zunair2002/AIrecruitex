@@ -6,18 +6,14 @@ import { useCallback, useMemo, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { toErrorMessage } from "@/lib/api";
 import {
+  inviteToOrgInterview,
   listApplicationsForJob,
-  scheduleOrgInterview,
   updateApplicationStatus,
 } from "@/lib/applicationsApi";
 import { useApiResource } from "@/lib/useApiResource";
 import { populated, type Application } from "@/lib/types";
-import {
-  formatDate,
-  formatDateTime,
-  initials,
-  scoreColor,
-} from "@/lib/format";
+import { formatDate, initials, scoreColor } from "@/lib/format";
+import { OrgInterviewPanel } from "@/components/shared/OrgInterviewPanel";
 import {
   Card,
   EmptyState,
@@ -112,13 +108,9 @@ export function ShortlistedList() {
     async (payload: SchedulePayload) => {
       if (!dialogFor) return;
       applyLocalUpdate(
-        await scheduleOrgInterview(
+        await inviteToOrgInterview(
           dialogFor._id,
-          {
-            dateTime: payload.dateTime,
-            location: payload.location,
-            notes: payload.notes,
-          },
+          { validityDays: payload.validityDays },
           token,
         ),
       );
@@ -239,24 +231,12 @@ export function ShortlistedList() {
                       />
                     </div>
 
-                    {application.orgInterview.scheduled && (
-                      <div className="mt-3 rounded-xl border border-emerald-100 bg-emerald-50 p-3">
-                        <p className="text-xs font-bold uppercase tracking-wide text-emerald-700">
-                          Organisation interview
-                        </p>
-                        <p className="mt-1 text-sm text-emerald-900">
-                          {formatDateTime(application.orgInterview.dateTime)}
-                        </p>
-                        {application.orgInterview.location && (
-                          <p className="text-xs text-emerald-800">
-                            {application.orgInterview.location}
-                          </p>
-                        )}
-                        {application.orgInterview.notes && (
-                          <p className="mt-1 text-xs text-emerald-800">
-                            {application.orgInterview.notes}
-                          </p>
-                        )}
+                    {application.orgInterview?.status && (
+                      <div className="mt-3">
+                        <OrgInterviewPanel
+                          orgInterview={application.orgInterview}
+                          audience="hr"
+                        />
                       </div>
                     )}
 
@@ -267,9 +247,9 @@ export function ShortlistedList() {
                         disabled={busyId === application._id}
                         className={smallButtonClass}
                       >
-                        {application.orgInterview.scheduled
-                          ? "Reschedule interview"
-                          : "Schedule org interview"}
+                        {application.orgInterview?.status === "invited"
+                          ? "Re-send invite"
+                          : "Invite to org interview"}
                       </button>
                       <button
                         type="button"

@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { getInterviewReport } from "@/lib/interviewApi";
-import { rememberSession } from "@/lib/interviewSessionStore";
 import { useApiResource } from "@/lib/useApiResource";
 import type { InterviewSessionView, ObjectId } from "@/lib/types";
 import { ErrorBlock, LoadingBlock } from "@/components/ui/Feedback";
@@ -15,7 +14,7 @@ import { InterviewRunner } from "./InterviewRunner";
  * against an application, and for revisiting a finished practice session.
  */
 export function ScheduledInterview({ sessionId }: { sessionId: ObjectId }) {
-  const { token, user } = useAuth();
+  const { token } = useAuth();
   const resource = useApiResource(
     (signal) => getInterviewReport(sessionId, token, signal),
     [sessionId, token],
@@ -25,16 +24,6 @@ export function ScheduledInterview({ sessionId }: { sessionId: ObjectId }) {
   // Answering advances the session locally; until then the fetched view is used.
   const [answered, setAnswered] = useState<InterviewSessionView | null>(null);
   const session = answered ?? resource.data;
-
-  // Records the id so the session also shows up in the interview history list.
-  useEffect(() => {
-    if (!resource.data || !user) return;
-    rememberSession(user.id, {
-      sessionId,
-      label: "Interview",
-      startedAt: new Date().toISOString(),
-    });
-  }, [resource.data, sessionId, user]);
 
   if (resource.isLoading && !session) {
     return <LoadingBlock label="Loading interview…" />;

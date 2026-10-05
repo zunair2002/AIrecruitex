@@ -1,6 +1,6 @@
 /** `/api/resume` — candidate/resume/routes/resume.routes.ts */
 import { apiRequest } from "./api";
-import type { ResumeUploadResult } from "./types";
+import type { MyResume, ResumeUploadResult } from "./types";
 
 /** The multer field name the backend's `uploadResumeFile` expects. */
 export const RESUME_FILE_FIELD = "resume";
@@ -16,6 +16,9 @@ export const RESUME_ACCEPT_ATTRIBUTE = ".pdf,.docx,application/pdf,application/v
 /**
  * POST /api/resume/upload — multipart. Uploading again overwrites the previous
  * resume (the model has a unique index on `userId`).
+ *
+ * The response is just the file link and parse status: extracted text and
+ * detected skills are no longer stored, they're re-derived when matching runs.
  */
 export function uploadResume(
   file: File,
@@ -28,4 +31,12 @@ export function uploadResume(
     formData,
     token,
   });
+}
+
+/** GET /api/resume/mine — the resume on file, or null if none uploaded yet. */
+export function getMyResume(
+  token: string | null,
+  signal?: AbortSignal,
+): Promise<MyResume> {
+  return apiRequest<MyResume>("/api/resume/mine", { token, signal });
 }

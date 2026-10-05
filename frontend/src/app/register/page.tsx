@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar";
 import { AuthError } from "@/components/auth/AuthCardParts";
-import { useAuth, homePathForRole } from "@/context/AuthContext";
+import { VerifyEmailForm } from "@/components/auth/VerifyEmailForm";
+import { useAuth } from "@/context/AuthContext";
 import { toErrorMessage } from "@/lib/api";
 import { ROLE_LABELS } from "@/lib/format";
 import type { UserRole } from "@/lib/types";
@@ -24,9 +24,12 @@ const ROLE_BLURBS: Record<"hr" | "candidate", string> = {
 
 export default function RegisterPage() {
   const { register } = useAuth();
-  const router = useRouter();
 
   const [role, setRole] = useState<UserRole>("hr");
+  // Signup emails an OTP instead of returning a session; this holds the step.
+  const [pending, setPending] = useState<{ email: string; devOtp?: string } | null>(
+    null,
+  );
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -51,13 +54,13 @@ export default function RegisterPage() {
 
     setIsSubmitting(true);
     try {
-      const user = await register({
+      const result = await register({
         name: name.trim(),
         email: email.trim(),
         password,
         role,
       });
-      router.replace(homePathForRole(user.role));
+      setPending({ email: result.email, devOtp: result.devOtp });
     } catch (err) {
       setError(toErrorMessage(err));
       setIsSubmitting(false);
@@ -107,6 +110,9 @@ export default function RegisterPage() {
                 Start streamlining your hiring process today.
               </p>
 
+              {pending ? (
+                <VerifyEmailForm email={pending.email} devOtp={pending.devOtp} />
+              ) : (
               <form className="space-y-5" onSubmit={handleSubmit} noValidate>
                 <AuthError message={error} />
 
@@ -207,7 +213,11 @@ export default function RegisterPage() {
                 >
                   {isSubmitting ? "Creating account…" : "Create Account"}
                 </button>
+                <p className="text-center text-xs text-gray-400">
+                  We&apos;ll email you a 6-digit code to confirm your address.
+                </p>
               </form>
+              )}
 
               <div className="mt-8 text-center">
                 <p className="text-sm text-gray-600">

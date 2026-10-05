@@ -6,6 +6,8 @@
 import type {
   ApplicationStatus,
   AuthProvider,
+  InterviewHistoryType,
+  OrgInterviewStatus,
   InterviewLevel,
   InterviewResultVerdict,
   InterviewStatus,
@@ -103,6 +105,18 @@ export const INTERVIEW_LEVEL_LABELS: Record<InterviewLevel, string> = {
   expert: "Expert",
 };
 
+export const ORG_INTERVIEW_STATUS_LABELS: Record<OrgInterviewStatus, string> = {
+  invited: "Invited",
+  completed: "Completed",
+  expired: "Expired",
+};
+
+export const INTERVIEW_HISTORY_TYPE_LABELS: Record<InterviewHistoryType, string> = {
+  practice: "Practice",
+  ai_interview: "AI interview",
+  organizational: "Organisational",
+};
+
 export const RESUME_STATUS_LABELS: Record<ResumeStatus, string> = {
   parsed: "Parsed",
   failed: "Failed",
@@ -152,6 +166,18 @@ export const INTERVIEW_RESULT_BADGE: Record<InterviewResultVerdict, string> = {
   fail: badgeClass("bg-red-50 text-red-700"),
 };
 
+export const ORG_INTERVIEW_STATUS_BADGE: Record<OrgInterviewStatus, string> = {
+  invited: badgeClass("bg-amber-50 text-amber-700"),
+  completed: badgeClass("bg-emerald-50 text-emerald-700"),
+  expired: badgeClass("bg-gray-100 text-gray-600"),
+};
+
+export const INTERVIEW_HISTORY_TYPE_BADGE: Record<InterviewHistoryType, string> = {
+  practice: badgeClass("bg-sky-50 text-sky-700"),
+  ai_interview: badgeClass("bg-indigo-50 text-indigo-700"),
+  organizational: badgeClass("bg-purple-50 text-purple-700"),
+};
+
 export const SUPPORT_STATUS_BADGE: Record<SupportTicketStatus, string> = {
   open: badgeClass("bg-amber-50 text-amber-700"),
   resolved: badgeClass("bg-emerald-50 text-emerald-700"),
@@ -183,4 +209,23 @@ export function initials(name: string): string {
 export function humanizeAction(action: string): string {
   const words = action.replace(/[.\-_]/g, " ").trim();
   return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
+/** True once an invite's validity window has passed, even if the server-side
+ *  sweeper hasn't yet flipped its status to "expired". */
+export function isInviteExpired(expiresAt?: string): boolean {
+  return Boolean(expiresAt && new Date(expiresAt).getTime() < Date.now());
+}
+
+/** "3 days left" / "expires today" for an org-interview invite window. */
+export function timeUntil(expiresAt?: string): string {
+  if (!expiresAt) return "—";
+  const ms = new Date(expiresAt).getTime() - Date.now();
+  if (Number.isNaN(ms)) return "—";
+  if (ms <= 0) return "expired";
+  const days = Math.floor(ms / 86_400_000);
+  if (days >= 1) return `${days} day${days === 1 ? "" : "s"} left`;
+  const hours = Math.floor(ms / 3_600_000);
+  if (hours >= 1) return `${hours} hour${hours === 1 ? "" : "s"} left`;
+  return "less than an hour left";
 }

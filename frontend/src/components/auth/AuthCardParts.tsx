@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth, homePathForRole } from "@/context/AuthContext";
 import type { UserRole } from "@/lib/types";
+import { VerifyEmailForm } from "./VerifyEmailForm";
 import { LogoMark } from "@/components/layout/Logo";
 
 export function AuthBrand() {
@@ -92,13 +93,16 @@ export function RegisterForm({
   submitLabel?: string;
 }) {
   const { register } = useAuth();
-  const router = useRouter();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // Set once signup succeeds; swaps this form for the OTP step.
+  const [pending, setPending] = useState<{ email: string; devOtp?: string } | null>(
+    null,
+  );
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -116,13 +120,13 @@ export function RegisterForm({
 
     setIsSubmitting(true);
     try {
-      const user = await register({
+      const result = await register({
         name: name.trim(),
         email: email.trim(),
         password,
         role,
       });
-      router.replace(homePathForRole(user.role));
+      setPending({ email: result.email, devOtp: result.devOtp });
     } catch (err) {
       setError(
         err instanceof Error && err.message
@@ -132,6 +136,12 @@ export function RegisterForm({
       setIsSubmitting(false);
     }
   };
+
+  // Signing up no longer logs you in — the account must confirm the emailed
+  // code first, and that is what issues the session.
+  if (pending) {
+    return <VerifyEmailForm email={pending.email} devOtp={pending.devOtp} />;
+  }
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit} noValidate>
@@ -197,6 +207,9 @@ export function RegisterForm({
       <button type="submit" disabled={isSubmitting} className={authSubmitClass}>
         {isSubmitting ? "Creating account…" : submitLabel}
       </button>
+      <p className="text-center text-xs text-gray-400">
+        We&apos;ll email you a 6-digit code to confirm your address.
+      </p>
     </form>
   );
 }

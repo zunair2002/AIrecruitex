@@ -4,7 +4,6 @@ import { useCallback, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { toErrorMessage } from "@/lib/api";
 import { startInterview } from "@/lib/interviewApi";
-import { rememberSession } from "@/lib/interviewSessionStore";
 import { INTERVIEW_LEVEL_LABELS } from "@/lib/format";
 import type { InterviewLevel, InterviewSessionView } from "@/lib/types";
 import { InlineError, LoadingBlock } from "@/components/ui/Feedback";
@@ -36,7 +35,7 @@ export function PracticeInterview({
   intro: string;
   icon: string;
 }) {
-  const { token, user } = useAuth();
+  const { token } = useAuth();
   const [session, setSession] = useState<InterviewSessionView | null>(null);
   const [selectedLevel, setSelectedLevel] = useState<InterviewLevel>(levels[0]);
   const [isStarting, setIsStarting] = useState(false);
@@ -47,21 +46,13 @@ export function PracticeInterview({
     setError(null);
     try {
       const started = await startInterview(selectedLevel, token);
-      if (user) {
-        rememberSession(user.id, {
-          sessionId: started.sessionId,
-          level: selectedLevel,
-          label: `${INTERVIEW_LEVEL_LABELS[selectedLevel]} practice`,
-          startedAt: new Date().toISOString(),
-        });
-      }
       setSession(started);
     } catch (err) {
       setError(toErrorMessage(err));
     } finally {
       setIsStarting(false);
     }
-  }, [selectedLevel, token, user]);
+  }, [selectedLevel, token]);
 
   if (isStarting && !session) {
     return (

@@ -14,6 +14,7 @@ import { populated, type ObjectId } from "@/lib/types";
 import {
   APPLICATION_STATUS_BADGE,
   APPLICATION_STATUS_LABELS,
+  ORG_INTERVIEW_STATUS_LABELS,
   JOB_STATUS_BADGE,
   JOB_STATUS_LABELS,
   formatDate,
@@ -291,7 +292,9 @@ export function ContentManagement() {
                       <td className="px-6 py-4 text-xs text-gray-600">
                         {application.aiInterview.scheduled ? "AI ✓" : "AI —"}
                         {" · "}
-                        {application.orgInterview.scheduled ? "Org ✓" : "Org —"}
+                        {application.orgInterview?.status
+                          ? `Org ${ORG_INTERVIEW_STATUS_LABELS[application.orgInterview.status]}`
+                          : "Org —"}
                       </td>
                       <td className="px-6 py-4 text-gray-500">
                         {formatDate(application.createdAt)}

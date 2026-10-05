@@ -4,7 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { getMonitoringSnapshot } from "@/lib/adminApi";
 import { health } from "@/lib/authApi";
 import { useApiResource } from "@/lib/useApiResource";
-import { formatDateTime, formatUptime } from "@/lib/format";
+import { formatUptime } from "@/lib/format";
 import {
   Card,
   ErrorBlock,
@@ -109,48 +109,15 @@ export function Monitoring() {
         />
       </div>
 
-      <Card title={`Recent server errors (${data.recentErrors.length})`}>
-        {data.recentErrors.length === 0 ? (
-          <p className="py-6 text-center text-sm text-gray-500">
-            No 5xx errors have been logged.
-          </p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-gray-100 bg-gray-50">
-                  <th className="px-4 py-3 text-left font-semibold text-gray-600">Status</th>
-                  <th className="px-4 py-3 text-left font-semibold text-gray-600">Method</th>
-                  <th className="px-4 py-3 text-left font-semibold text-gray-600">Path</th>
-                  <th className="px-4 py-3 text-left font-semibold text-gray-600">Message</th>
-                  <th className="px-4 py-3 text-left font-semibold text-gray-600">When</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.recentErrors.map((entry) => (
-                  <tr key={entry._id} className="border-b border-gray-50">
-                    <td className="px-4 py-3">
-                      <span className="rounded-full bg-red-50 px-2 py-1 text-xs font-bold text-red-700">
-                        {entry.statusCode}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 font-mono text-xs text-gray-600">
-                      {entry.method}
-                    </td>
-                    <td className="px-4 py-3 font-mono text-xs text-gray-700">
-                      {entry.path}
-                    </td>
-                    <td className="px-4 py-3 text-gray-700">{entry.message}</td>
-                    <td className="px-4 py-3 text-xs text-gray-500">
-                      {formatDateTime(entry.createdAt)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+      <Card title="Error reporting">
+        <p className="text-sm text-gray-600">
+          Server errors are no longer written to the database — every 5xx used to
+          create a document, which added up quickly whenever a dependency (such as
+          Ollama) was briefly unreachable. They&apos;re captured in the server logs
+          instead.
+        </p>
       </Card>
+
     </div>
   );
 }

@@ -88,9 +88,18 @@ export async function apiRequest<T>(
     );
   }
 
-  // Endpoints that answer `{ success, message }` with no `data` (deletes, logout)
-  // fall back to the envelope itself so callers can still read `message`.
-  return (payload?.data ?? payload) as T;
+  // Unwrap `data` when the envelope carries it — testing for the KEY, not its
+  // value, because `data: null` is a legitimate answer ("no resume on file",
+  // "no question pool yet"). Using `??` here would skip over a null `data` and
+  // hand back the whole envelope, which then looks like a truthy object to the
+  // caller and blows up on the first property access.
+  //
+  // Endpoints that answer `{ success, message }` with no `data` key at all
+  // (deletes, logout) still fall back to the envelope so callers read `message`.
+  if (payload && typeof payload === "object" && "data" in payload) {
+    return payload.data as T;
+  }
+  return payload as T;
 }
 
 /** Turns a thrown value into something safe to render. */

@@ -8,7 +8,7 @@ import {
   INTERVIEW_RESULT_BADGE,
   INTERVIEW_RESULT_LABELS,
 } from "@/lib/format";
-import type { InterviewSessionView, InterviewTurn } from "@/lib/types";
+import type { InterviewSessionView, InterviewTurnView } from "@/lib/types";
 import { Card, InlineError } from "@/components/ui/Feedback";
 import { primaryButtonClass } from "@/components/ui/controls";
 import { CertificatePanel } from "./CertificatePanel";
@@ -193,7 +193,7 @@ export function TurnHistory({
   turns,
   title,
 }: {
-  turns: InterviewTurn[];
+  turns: InterviewTurnView[];
   title: string;
 }) {
   if (turns.length === 0) return null;
@@ -207,20 +207,27 @@ export function TurnHistory({
           >
             <div className="flex items-start justify-between gap-3">
               <p className="text-sm font-semibold text-gray-900">
+                <span className="mr-2 rounded bg-white px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                  Round {turn.round}
+                </span>
                 Q{turn.questionNumber}. {turn.question}
               </p>
-              <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-xs font-bold text-indigo-600">
-                {turn.score}/10
-              </span>
+              {turn.score !== undefined && (
+                <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-xs font-bold text-indigo-600">
+                  {turn.score}/10
+                </span>
+              )}
             </div>
             <p className="mt-3 whitespace-pre-line text-sm text-gray-700">
               <span className="font-semibold text-gray-500">Your answer: </span>
               {turn.answer}
             </p>
-            <p className="mt-2 whitespace-pre-line text-sm text-indigo-900">
-              <span className="font-semibold text-indigo-600">Feedback: </span>
-              {turn.feedback}
-            </p>
+            {turn.feedback && (
+              <p className="mt-2 whitespace-pre-line text-sm text-indigo-900">
+                <span className="font-semibold text-indigo-600">Feedback: </span>
+                {turn.feedback}
+              </p>
+            )}
           </div>
         ))}
       </div>

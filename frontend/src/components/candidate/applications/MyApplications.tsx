@@ -19,6 +19,7 @@ import {
   formatDateTime,
   scoreColor,
 } from "@/lib/format";
+import { OrgInterviewPanel } from "@/components/shared/OrgInterviewPanel";
 import {
   Card,
   EmptyState,
@@ -116,7 +117,8 @@ export function MyApplications() {
 
 function ApplicationCard({ application }: { application: Application }) {
   const job = populated(application.jobId);
-  const { aiInterview, orgInterview } = application;
+  const { aiInterview } = application;
+  const orgInterview = application.orgInterview;
 
   return (
     <Card>
@@ -204,24 +206,12 @@ function ApplicationCard({ application }: { application: Application }) {
         </div>
       )}
 
-      {orgInterview.scheduled && (
-        <div className="mt-4 rounded-xl border border-emerald-100 bg-emerald-50 p-4">
-          <p className="text-xs font-bold uppercase tracking-wide text-emerald-700">
-            On-site / organisation interview
-          </p>
-          <p className="mt-2 text-sm text-emerald-900">
-            {formatDateTime(orgInterview.dateTime)}
-          </p>
-          {orgInterview.location && (
-            <p className="mt-1 text-sm text-emerald-900">
-              Location: {orgInterview.location}
-            </p>
-          )}
-          {orgInterview.notes && (
-            <p className="mt-2 text-sm text-emerald-800">{orgInterview.notes}</p>
-          )}
+      {orgInterview?.status && (
+        <div className="mt-4">
+          <OrgInterviewPanel orgInterview={orgInterview} audience="candidate" />
         </div>
       )}
+
     </Card>
   );
 }

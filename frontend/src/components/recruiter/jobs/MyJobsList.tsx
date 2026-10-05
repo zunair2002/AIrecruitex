@@ -93,6 +93,12 @@ export function MyJobsList() {
                 >
                   Interview reports →
                 </Link>
+                <Link
+                  href={`/recruiter/jobs/${job._id}/questions`}
+                  className="text-sm font-semibold text-indigo-600 hover:text-indigo-800"
+                >
+                  Question pool →
+                </Link>
                 {job.jdFileUrl && (
                   <a
                     href={job.jdFileUrl}

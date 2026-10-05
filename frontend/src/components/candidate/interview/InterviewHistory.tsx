@@ -1,17 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { getInterviewReport } from "@/lib/interviewApi";
-import { listMyApplications } from "@/lib/applicationsApi";
-import {
-  getStoredSessions,
-  SESSIONS_UPDATED_EVENT,
-  type StoredSession,
-} from "@/lib/interviewSessionStore";
+import { getInterviewReport, listMySessions } from "@/lib/interviewApi";
 import { resolveSelection, useApiResource } from "@/lib/useApiResource";
 import {
+  INTERVIEW_HISTORY_TYPE_BADGE,
+  INTERVIEW_HISTORY_TYPE_LABELS,
+  INTERVIEW_LEVEL_LABELS,
   INTERVIEW_RESULT_BADGE,
   INTERVIEW_RESULT_LABELS,
   INTERVIEW_STATUS_BADGE,
@@ -19,7 +16,12 @@ import {
   formatDate,
   scoreColor,
 } from "@/lib/format";
-import { populated, type InterviewSessionView, type ObjectId } from "@/lib/types";
+import {
+  INTERVIEW_HISTORY_TYPES,
+  type InterviewHistoryType,
+  type InterviewSessionSummary,
+  type ObjectId,
+} from "@/lib/types";
 import {
   Card,
   EmptyState,
@@ -27,96 +29,43 @@ import {
   LoadingBlock,
   PageHeader,
 } from "@/components/ui/Feedback";
-import { primaryButtonClass } from "@/components/ui/controls";
+import { compactInputClass, primaryButtonClass } from "@/components/ui/controls";
 import { CertificatePanel } from "./CertificatePanel";
 import { TurnHistory } from "./InterviewRunner";
 import { FinalScoreRing } from "./ScoreBreakdown";
 
-type Entry = {
-  sessionId: ObjectId;
-  label: string;
-  startedAt: string;
-  view: InterviewSessionView;
-};
+const ALL = "all";
 
 /**
- * The candidate's interview history.
+ * The candidate's interview history, from GET /api/interview/mine.
  *
- * The backend has no "list my sessions" route, so ids come from two places:
- * the applications list (`interviewSessionId`, authoritative and server-side)
- * and this browser's practice-session index. Each id is then loaded through
- * GET /api/interview/report/:sessionId, which is the real report.
+ * Organisational interviews appear here but are "hidden": the backend strips
+ * score, result and per-answer feedback from them, because those are HR's to
+ * see. The UI says so rather than rendering empty fields.
  */
 export function InterviewHistory() {
-  const { token, user } = useAuth();
-  const [stored, setStored] = useState<StoredSession[]>([]);
+  const { token } = useAuth();
+  const [typeFilter, setTypeFilter] = useState<InterviewHistoryType | typeof ALL>(ALL);
   const [requestedId, setRequestedId] = useState<ObjectId | null>(null);
 
-  useEffect(() => {
-    const sync = () => setStored(user ? getStoredSessions(user.id) : []);
-    sync();
-    window.addEventListener(SESSIONS_UPDATED_EVENT, sync);
-    window.addEventListener("storage", sync);
-    return () => {
-      window.removeEventListener(SESSIONS_UPDATED_EVENT, sync);
-      window.removeEventListener("storage", sync);
-    };
-  }, [user]);
-
-  const history = useApiResource<Entry[]>(
-    async (signal) => {
-      const candidates = new Map<
-        ObjectId,
-        { label: string; startedAt: string }
-      >();
-      for (const entry of stored) {
-        candidates.set(entry.sessionId, {
-          label: entry.label,
-          startedAt: entry.startedAt,
-        });
-      }
-
-      // Application-linked sessions are authoritative — they survive a cleared
-      // localStorage and carry the job title as their label.
-      try {
-        for (const application of await listMyApplications(token, signal)) {
-          if (!application.interviewSessionId) continue;
-          candidates.set(application.interviewSessionId, {
-            label: populated(application.jobId)?.title ?? "Job interview",
-            startedAt: application.aiInterview.dateTime ?? application.createdAt,
-          });
-        }
-      } catch {
-        // A failed applications fetch shouldn't hide practice history.
-      }
-
-      const loaded = await Promise.all(
-        Array.from(candidates.entries()).map(async ([sessionId, meta]) => {
-          try {
-            return {
-              sessionId,
-              ...meta,
-              view: await getInterviewReport(sessionId, token, signal),
-            };
-          } catch {
-            // A session the backend no longer has, or that isn't this user's.
-            return null;
-          }
-        }),
-      );
-
-      return loaded
-        .filter((entry): entry is Entry => entry !== null)
-        .sort((a, b) => b.startedAt.localeCompare(a.startedAt));
-    },
-    [token, stored],
+  const sessions = useApiResource(
+    (signal) =>
+      listMySessions(typeFilter === ALL ? undefined : typeFilter, token, signal),
+    [token, typeFilter],
     { enabled: Boolean(token) },
   );
 
-  const entries = history.data ?? [];
-  const selected = resolveSelection(entries, requestedId, (e) => e.sessionId);
+  const list = sessions.data ?? [];
+  const selected = resolveSelection(list, requestedId, (s) => s.sessionId);
 
-  if (history.isLoading) {
+  // The list rows are summaries; the full report is fetched for the selected one.
+  const report = useApiResource(
+    (signal) => getInterviewReport(selected!.sessionId, token, signal),
+    [selected?.sessionId, token],
+    { enabled: Boolean(token && selected) },
+  );
+
+  if (sessions.isLoading) {
     return <LoadingBlock label="Loading your interview reports…" />;
   }
 
@@ -124,19 +73,34 @@ export function InterviewHistory() {
     <div className="p-8">
       <PageHeader
         title="Interview Results"
-        description="Every interview you've taken, with the model's per-answer scores and overall verdict."
+        description="Every interview you've taken — practice, AI, and organisational."
       />
 
-      {history.error && (
+      {sessions.error && (
         <div className="mb-6">
-          <ErrorBlock message={history.error} onRetry={history.reload} />
+          <ErrorBlock message={sessions.error} onRetry={sessions.reload} />
         </div>
       )}
 
-      {entries.length === 0 ? (
+      <select
+        value={typeFilter}
+        onChange={(event) =>
+          setTypeFilter(event.target.value as InterviewHistoryType | typeof ALL)
+        }
+        className={`${compactInputClass} mb-6`}
+      >
+        <option value={ALL}>All interviews</option>
+        {INTERVIEW_HISTORY_TYPES.map((type) => (
+          <option key={type} value={type}>
+            {INTERVIEW_HISTORY_TYPE_LABELS[type]}
+          </option>
+        ))}
+      </select>
+
+      {list.length === 0 ? (
         <EmptyState
           title="No interviews yet."
-          description="Take a practice interview, or wait for HR to schedule an AI interview on one of your applications."
+          description="Take a practice interview, or wait for HR to schedule one on an application."
           action={
             <Link
               href="/candidate/interview/basic"
@@ -149,114 +113,158 @@ export function InterviewHistory() {
       ) : (
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div className="space-y-2 lg:col-span-1">
-            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
-              Sessions
-            </h2>
-            {entries.map((entry) => {
-              const isActive = entry.sessionId === selected?.sessionId;
-              return (
-                <button
-                  key={entry.sessionId}
-                  type="button"
-                  onClick={() => setRequestedId(entry.sessionId)}
-                  className={`w-full rounded-xl border p-4 text-left transition-colors ${
-                    isActive
-                      ? "border-indigo-200 bg-indigo-50"
-                      : "border-gray-100 bg-white hover:border-indigo-100 hover:bg-gray-50"
-                  }`}
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <p
-                      className={`truncate text-sm font-semibold ${isActive ? "text-indigo-900" : "text-gray-900"}`}
-                    >
-                      {entry.label}
-                    </p>
-                    {entry.view.status === "completed" && (
-                      <span
-                        className={`text-sm font-bold ${scoreColor(entry.view.score ?? 0)}`}
-                      >
-                        {entry.view.score ?? 0}%
-                      </span>
-                    )}
-                  </div>
-                  <div className="mt-2 flex items-center gap-2">
-                    <span className={INTERVIEW_STATUS_BADGE[entry.view.status]}>
-                      {INTERVIEW_STATUS_LABELS[entry.view.status]}
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      {formatDate(entry.startedAt)}
-                    </span>
-                  </div>
-                </button>
-              );
-            })}
+            {list.map((session) => (
+              <SessionRow
+                key={session.sessionId}
+                session={session}
+                isActive={session.sessionId === selected?.sessionId}
+                onSelect={() => setRequestedId(session.sessionId)}
+              />
+            ))}
           </div>
 
           <div className="space-y-6 lg:col-span-2">
-            {selected?.view.status === "completed" ? (
-              <>
-                <Card>
-                  <div className="flex flex-col items-center gap-8 sm:flex-row">
-                    <FinalScoreRing score={selected.view.score ?? 0} />
-                    <div className="flex-1 text-center sm:text-left">
-                      <h2 className="text-2xl font-bold text-gray-900">
-                        {selected.label}
-                      </h2>
-                      <p className="mt-1 text-sm text-gray-500">
-                        {formatDate(selected.startedAt)} ·{" "}
-                        {selected.view.turns.length} questions answered
-                      </p>
-                      {selected.view.result && (
-                        <span
-                          className={`${INTERVIEW_RESULT_BADGE[selected.view.result]} mt-3`}
-                        >
-                          {INTERVIEW_RESULT_LABELS[selected.view.result]}
-                        </span>
-                      )}
-                      <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-gray-600">
-                        {selected.view.feedback ??
-                          "No overall feedback was returned."}
-                      </p>
+            {report.isLoading ? (
+              <LoadingBlock label="Loading report…" />
+            ) : report.error ? (
+              <ErrorBlock message={report.error} onRetry={report.reload} />
+            ) : report.data && selected ? (
+              report.data.status === "completed" ? (
+                <>
+                  <Card>
+                    <div className="flex flex-col items-center gap-8 sm:flex-row">
+                      {report.data.score !== undefined ? (
+                        <FinalScoreRing score={report.data.score} />
+                      ) : null}
+                      <div className="flex-1 text-center sm:text-left">
+                        <h2 className="text-2xl font-bold text-gray-900">
+                          {selected.jobTitle ??
+                            `${selected.level ? INTERVIEW_LEVEL_LABELS[selected.level] + " " : ""}practice interview`}
+                        </h2>
+                        <p className="mt-1 text-sm text-gray-500">
+                          {formatDate(selected.createdAt)} ·{" "}
+                          {report.data.turns.length} questions answered
+                        </p>
+                        {report.data.result && (
+                          <span
+                            className={`${INTERVIEW_RESULT_BADGE[report.data.result]} mt-3`}
+                          >
+                            {INTERVIEW_RESULT_LABELS[report.data.result]}
+                          </span>
+                        )}
+                        <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-gray-600">
+                          {report.data.feedback ??
+                            (selected.type === "organizational"
+                              ? "This interview is graded by the hiring team — your score and feedback aren't shown here."
+                              : "No overall feedback was returned.")}
+                        </p>
+                      </div>
                     </div>
+                  </Card>
+
+                  {report.data.elearningTips &&
+                    report.data.elearningTips.length > 0 && (
+                      <Card title="Before you try again">
+                        <ul className="list-inside list-disc space-y-2 text-sm text-gray-700">
+                          {report.data.elearningTips.map((tip) => (
+                            <li key={tip}>{tip}</li>
+                          ))}
+                        </ul>
+                      </Card>
+                    )}
+
+                  <TurnHistory
+                    turns={report.data.turns}
+                    title={
+                      selected.type === "organizational"
+                        ? "Your answers"
+                        : "Question-by-question feedback"
+                    }
+                  />
+
+                  {selected.type !== "organizational" && (
+                    <CertificatePanel
+                      sessionId={selected.sessionId}
+                      score={report.data.score}
+                      result={report.data.result}
+                      certificatePaid={report.data.certificatePaid}
+                    />
+                  )}
+                </>
+              ) : (
+                <Card title="Interview in progress">
+                  <p className="text-sm text-gray-600">
+                    You&apos;ve answered {report.data.turns.length} question
+                    {report.data.turns.length === 1 ? "" : "s"}. Finish the
+                    interview to see the outcome.
+                  </p>
+                  {selected.type !== "organizational" && (
+                    <Link
+                      href={`/candidate/interview/session/${selected.sessionId}`}
+                      className={`${primaryButtonClass} mt-4 inline-block text-sm`}
+                    >
+                      Continue interview
+                    </Link>
+                  )}
+                  <div className="mt-6">
+                    <TurnHistory
+                      turns={report.data.turns}
+                      title="Answered so far"
+                    />
                   </div>
                 </Card>
-
-                <TurnHistory
-                  turns={selected.view.turns}
-                  title="Question-by-question feedback"
-                />
-
-                <CertificatePanel
-                  sessionId={selected.sessionId}
-                  score={selected.view.score}
-                  result={selected.view.result}
-                  certificatePaid={selected.view.certificatePaid}
-                />
-              </>
-            ) : selected ? (
-              <Card title="Interview in progress">
-                <p className="text-sm text-gray-600">
-                  You&apos;ve answered {selected.view.turns.length} question
-                  {selected.view.turns.length === 1 ? "" : "s"}. Finish the
-                  interview to see your overall score and feedback.
-                </p>
-                <Link
-                  href={`/candidate/interview/session/${selected.sessionId}`}
-                  className={`${primaryButtonClass} mt-4 inline-block text-sm`}
-                >
-                  Continue interview
-                </Link>
-                <div className="mt-6">
-                  <TurnHistory
-                    turns={selected.view.turns}
-                    title="Answered so far"
-                  />
-                </div>
-              </Card>
+              )
             ) : null}
           </div>
         </div>
       )}
     </div>
+  );
+}
+
+function SessionRow({
+  session,
+  isActive,
+  onSelect,
+}: {
+  session: InterviewSessionSummary;
+  isActive: boolean;
+  onSelect: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className={`w-full rounded-xl border p-4 text-left transition-colors ${
+        isActive
+          ? "border-indigo-200 bg-indigo-50"
+          : "border-gray-100 bg-white hover:border-indigo-100 hover:bg-gray-50"
+      }`}
+    >
+      <div className="flex items-center justify-between gap-2">
+        <p
+          className={`truncate text-sm font-semibold ${isActive ? "text-indigo-900" : "text-gray-900"}`}
+        >
+          {session.jobTitle ??
+            `${session.level ? INTERVIEW_LEVEL_LABELS[session.level] + " " : ""}practice`}
+        </p>
+        {session.score !== undefined && (
+          <span className={`text-sm font-bold ${scoreColor(session.score)}`}>
+            {session.score}%
+          </span>
+        )}
+      </div>
+      <div className="mt-2 flex flex-wrap items-center gap-2">
+        <span className={INTERVIEW_HISTORY_TYPE_BADGE[session.type]}>
+          {INTERVIEW_HISTORY_TYPE_LABELS[session.type]}
+        </span>
+        <span className={INTERVIEW_STATUS_BADGE[session.status]}>
+          {INTERVIEW_STATUS_LABELS[session.status]}
+        </span>
+        <span className="text-xs text-gray-500">
+          {formatDate(session.createdAt)}
+        </span>
+      </div>
+    </button>
   );
 }

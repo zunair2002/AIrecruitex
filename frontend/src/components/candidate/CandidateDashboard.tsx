@@ -17,6 +17,7 @@ import {
   formatDate,
   formatDateTime,
   scoreColor,
+  timeUntil,
 } from "@/lib/format";
 import { populated } from "@/lib/types";
 import {
@@ -66,7 +67,8 @@ export function CandidateDashboard() {
           )
         : 0,
       upcoming: list.filter(
-        (item) => item.aiInterview.scheduled || item.orgInterview.scheduled,
+        (item) =>
+          item.aiInterview.scheduled || item.orgInterview?.status === "invited",
       ),
     };
   }, [applications.data]);
@@ -208,12 +210,10 @@ export function CandidateDashboard() {
                       AI interview · {formatDateTime(application.aiInterview.dateTime)}
                     </p>
                   )}
-                  {application.orgInterview.scheduled && (
+                  {application.orgInterview?.status === "invited" && (
                     <p className="mt-1 text-xs text-emerald-800">
-                      On-site · {formatDateTime(application.orgInterview.dateTime)}
-                      {application.orgInterview.location
-                        ? ` · ${application.orgInterview.location}`
-                        : ""}
+                      Organisational interview ·{" "}
+                      {timeUntil(application.orgInterview.expiresAt)}
                     </p>
                   )}
                   {application.interviewSessionId && (

@@ -3,24 +3,54 @@
  * (shared/user/routes/auth.routes.ts).
  */
 import { apiRequest } from "./api";
-import type { AuthSession, AuthUser, UserRole } from "./types";
+import type {
+  AuthSession,
+  AuthUser,
+  ResendOtpResult,
+  SignupResult,
+  UserRole,
+} from "./types";
 
 export type { AuthProvider, AuthSession, AuthUser, UserRole } from "./types";
 
 /**
- * POST /api/auth/signup — creates the user AND returns a session.
- * `role` is required and must be one of candidate | hr | admin;
- * `password` must be at least 6 characters (both enforced server-side).
+ * POST /api/auth/signup — creates the account and emails a 6-digit OTP.
+ *
+ * It does NOT return a session: a password account must confirm the code via
+ * `verifyEmail` before it can log in. `role` must be candidate | hr | admin and
+ * `password` at least 6 characters (both enforced server-side).
  */
 export function signup(input: {
   name: string;
   email: string;
   password: string;
   role: UserRole;
-}): Promise<AuthSession> {
-  return apiRequest<AuthSession>("/api/auth/signup", {
+}): Promise<SignupResult> {
+  return apiRequest<SignupResult>("/api/auth/signup", {
     method: "POST",
     body: input,
+  });
+}
+
+/**
+ * POST /api/auth/verify-email — exchanges the emailed OTP for a session.
+ * This is where signup actually produces a token.
+ */
+export function verifyEmail(input: {
+  email: string;
+  otp: string;
+}): Promise<AuthSession> {
+  return apiRequest<AuthSession>("/api/auth/verify-email", {
+    method: "POST",
+    body: input,
+  });
+}
+
+/** POST /api/auth/resend-otp — issues a fresh code (the previous one expires). */
+export function resendOtp(email: string): Promise<ResendOtpResult> {
+  return apiRequest<ResendOtpResult>("/api/auth/resend-otp", {
+    method: "POST",
+    body: { email },
   });
 }
 

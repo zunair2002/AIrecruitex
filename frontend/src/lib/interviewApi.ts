@@ -1,6 +1,12 @@
 /** `/api/interview` — candidate/interview/routes/interview.routes.ts */
 import { apiRequest } from "./api";
-import type { InterviewLevel, InterviewSessionView, ObjectId } from "./types";
+import type {
+  InterviewHistoryType,
+  InterviewLevel,
+  InterviewSessionSummary,
+  InterviewSessionView,
+  ObjectId,
+} from "./types";
 
 /**
  * POST /api/interview/start — begins (or resumes) the caller's practice session.
@@ -42,4 +48,21 @@ export function getInterviewReport(
     `/api/interview/report/${sessionId}`,
     { token, signal },
   );
+}
+
+/**
+ * GET /api/interview/mine — every session this candidate has, newest first,
+ * optionally narrowed to one kind. Replaces the browser-local session index
+ * the frontend previously had to keep.
+ */
+export function listMySessions(
+  type: InterviewHistoryType | undefined,
+  token: string | null,
+  signal?: AbortSignal,
+): Promise<InterviewSessionSummary[]> {
+  return apiRequest<InterviewSessionSummary[]>("/api/interview/mine", {
+    query: { type },
+    token,
+    signal,
+  });
 }

@@ -59,6 +59,12 @@ export type User = {
   authProvider: AuthProvider;
   avatarUrl?: string;
   isActive: boolean;
+  /**
+   * Password accounts start false and must confirm the emailed OTP before they
+   * can log in. Google accounts are created already verified.
+   * `emailOtp`/`emailOtpExpiresAt` are `select: false` and never reach the client.
+   */
+  emailVerified: boolean;
   createdAt: string;
   updatedAt: string;
 };
@@ -71,6 +77,7 @@ export type AuthUser = {
   role: UserRole;
   authProvider: AuthProvider;
   avatarUrl?: string;
+  emailVerified: boolean;
   /** Only present on GET /api/auth/me. */
   orgId?: ObjectId;
 };
@@ -78,6 +85,22 @@ export type AuthUser = {
 export type AuthSession = {
   token: string;
   user: AuthUser;
+};
+
+/**
+ * POST /api/auth/signup no longer returns a session — it emails a 6-digit OTP and
+ * the session is issued by POST /api/auth/verify-email instead.
+ * `devOtp` is echoed back only when the server is not running in production.
+ */
+export type SignupResult = {
+  email: string;
+  message: string;
+  devOtp?: string;
+};
+
+export type ResendOtpResult = {
+  message?: string;
+  devOtp?: string;
 };
 
 /** Minimal projection used by every `.populate("...Id", "name email")` call. */
@@ -132,11 +155,29 @@ export type AiInterview = {
   calendarLink?: string;
 };
 
+/**
+ * The organisational interview is now an emailed, token-authenticated invite the
+ * candidate opens any time inside a validity window — not a fixed slot. HR sets
+ * only how many days the link stays valid.
+ */
+export type OrgInterviewStatus = "invited" | "completed" | "expired";
+
+export const ORG_INTERVIEW_STATUSES: OrgInterviewStatus[] = [
+  "invited",
+  "completed",
+  "expired",
+];
+
 export type OrgInterview = {
-  scheduled: boolean;
-  dateTime?: string;
-  location?: string;
+  status?: OrgInterviewStatus;
+  /** Present to HR only; it is the secret in the candidate's join link. */
+  token?: string;
+  expiresAt?: string;
+  invitedAt?: string;
+  completedAt?: string;
   notes?: string;
+  /** All-day "add to calendar" link covering the validity window. */
+  calendarLink?: string;
 };
 
 export type Application = {
@@ -148,8 +189,17 @@ export type Application = {
   matched: boolean;
   status: ApplicationStatus;
   interviewSessionId?: ObjectId;
+  /** The structured, HR-graded organisational interview session. */
+  orgInterviewSessionId?: ObjectId;
   aiInterview: AiInterview;
-  orgInterview: OrgInterview;
+  /**
+   * Absent until HR sends an invite.
+   *
+   * The sub-document's fields are all optional and its default is `{}`, so
+   * Mongoose's `minimize` strips it from the document entirely — the key is
+   * genuinely missing from the API response, not merely empty.
+   */
+  orgInterview?: OrgInterview;
   createdAt: string;
   updatedAt: string;
 };
@@ -158,12 +208,22 @@ export type Application = {
 
 export type ResumeStatus = "parsed" | "failed";
 
-/** POST /api/resume/upload returns this projection, not the whole document. */
+/**
+ * The Resume document no longer stores extracted text or skills — matching
+ * re-extracts from the stored file on demand, so the client only ever sees the
+ * file link and the parse status.
+ */
 export type ResumeUploadResult = {
   fileUrl: string;
-  skills: string[];
   status: ResumeStatus;
 };
+
+/** GET /api/resume/mine — null when nothing has been uploaded yet. */
+export type MyResume = {
+  fileUrl: string;
+  status: ResumeStatus;
+  updatedAt: string;
+} | null;
 
 /* ------------------------------------------------------------- interview */
 
@@ -177,13 +237,49 @@ export const INTERVIEW_LEVELS: InterviewLevel[] = [
   "expert",
 ];
 
+/**
+ * "candidate" — practice and AI interviews; the candidate sees their own score.
+ * "hidden"    — HR-graded organisational interviews; the candidate can answer but
+ *               never sees feedback, score or result. The server strips them.
+ */
+export type InterviewVisibility = "candidate" | "hidden";
+
+/** How the backend classifies a session in GET /api/interview/mine. */
+export type InterviewHistoryType = "practice" | "ai_interview" | "organizational";
+
+export const INTERVIEW_HISTORY_TYPES: InterviewHistoryType[] = [
+  "practice",
+  "ai_interview",
+  "organizational",
+];
+
+/** Interviews run in two rounds; the backend tags each question with its round. */
+export type InterviewRound = 1 | 2;
+
+/**
+ * A turn as the *client* sees it. `feedback` and `score` are omitted while the
+ * interview is in progress, and permanently for a hidden (HR-graded) session.
+ */
+export type InterviewTurnView = {
+  questionNumber: number;
+  question: string;
+  answer: string;
+  feedback?: string;
+  score?: number;
+  round: InterviewRound;
+};
+
+/** The stored turn, as embedded in the session document HR reads. */
 export type InterviewTurn = {
   questionNumber: number;
   question: string;
   answer: string;
   feedback: string;
-  /** Scored out of 10 by the model, live, per answer. */
+  /** Normalised out of 10. */
   score: number;
+  /** Structured org-interview turns only — HR's exact grading. */
+  marksEarned?: number;
+  marksPossible?: number;
 };
 
 export type InterviewMessage = {
@@ -196,32 +292,56 @@ export type CertificatePayment = {
   stripeSessionId?: string;
 };
 
+/** A question snapshotted onto a session at start time, with its model answer. */
+export type SelectedQuestion = {
+  question: string;
+  referenceAnswer: string;
+  marks: number;
+};
+
 /**
- * `toSessionView()` in interview.controller.ts. The two branches are
- * discriminated by `status`, so narrowing on it gives the exact fields.
+ * `buildSessionView()` in interview.service.ts. The branches are discriminated
+ * by `status`, so narrowing on it gives the exact fields.
  */
 export type InterviewSessionInProgress = {
   sessionId: ObjectId;
   status: "in_progress";
   questionNumber?: number;
   question?: string;
-  turns: InterviewTurn[];
+  round?: InterviewRound;
+  turns: InterviewTurnView[];
 };
 
 export type InterviewSessionCompleted = {
   sessionId: ObjectId;
   status: "completed";
-  /** Overall score, 0-100. */
+  /** Overall score 0-100; absent for a hidden session. */
   score?: number;
   result?: InterviewResultVerdict;
   feedback?: string;
-  turns: InterviewTurn[];
+  turns: InterviewTurnView[];
   certificatePaid: boolean;
+  /** Returned only when a visible interview was failed. */
+  elearningTips?: string[];
 };
 
 export type InterviewSessionView =
   | InterviewSessionInProgress
   | InterviewSessionCompleted;
+
+/** One row of GET /api/interview/mine. */
+export type InterviewSessionSummary = {
+  sessionId: ObjectId;
+  type: InterviewHistoryType;
+  /** Present for application-linked sessions. */
+  jobTitle?: string;
+  level?: InterviewLevel;
+  status: InterviewStatus;
+  score?: number;
+  result?: InterviewResultVerdict;
+  createdAt: string;
+  updatedAt: string;
+};
 
 /** The full document, as embedded in the HR application report. */
 export type InterviewSession = {
@@ -229,6 +349,9 @@ export type InterviewSession = {
   userId: ObjectId;
   applicationId?: ObjectId;
   level?: InterviewLevel;
+  questionSetId?: ObjectId;
+  selectedQuestions?: SelectedQuestion[];
+  visibility: InterviewVisibility;
   status: InterviewStatus;
   messages: InterviewMessage[];
   turns: InterviewTurn[];
@@ -253,6 +376,46 @@ export type CertificateView = {
 
 export type CheckoutResult = { checkoutUrl: string };
 export type PaymentConfirmation = { paid: boolean };
+
+/* ------------------------------------------ org interview question set */
+
+/**
+ * HR's question bank for a job's organisational interview, uploaded as a
+ * PDF/DOCX of "Q: / A: / Marks:" blocks rather than typed in one by one.
+ * `referenceAnswer` is HR-only and is never sent to a candidate.
+ */
+export type OrgInterviewQuestion = {
+  question: string;
+  referenceAnswer: string;
+  marks: number;
+};
+
+export type OrgInterviewQuestionSet = {
+  _id: ObjectId;
+  jobId: ObjectId;
+  hrId: ObjectId;
+  questions: OrgInterviewQuestion[];
+  /**
+   * How many of the pool each candidate is actually asked, drawn at random and
+   * shuffled per candidate. Unset or 0 means "ask the whole pool".
+   */
+  questionsPerInterview?: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+/**
+ * GET /api/applications/org-interview/:token — public, token-authenticated, so
+ * a candidate can open the emailed link without being signed in on that device.
+ */
+export type OrgInterviewInvite = {
+  candidateName?: string;
+  jobTitle?: string;
+  expiresAt?: string;
+  calendarLink?: string;
+  /** True once the interview has been started, so the UI can resume it. */
+  started: boolean;
+};
 
 /* ---------------------------------------------------------- notification */
 
@@ -293,17 +456,6 @@ export type AuditLog = {
   targetType: string;
   targetId?: string;
   metadata?: Record<string, unknown>;
-  createdAt: string;
-};
-
-/* ------------------------------------------------------------- error log */
-
-export type ErrorLog = {
-  _id: ObjectId;
-  message: string;
-  statusCode: number;
-  path: string;
-  method: string;
   createdAt: string;
 };
 
@@ -355,11 +507,14 @@ export type AdminReportsSummary = {
   averageMatchScore: number;
 };
 
+/**
+ * Errors are no longer persisted server-side (the ErrorLog model was removed),
+ * so the snapshot is just liveness plus the open-ticket count.
+ */
 export type AdminMonitoringSnapshot = {
   /** mongoose.connection.readyState — 1 means connected. */
   dbState: number;
   uptimeSeconds: number;
-  recentErrors: ErrorLog[];
   openTicketCount: number;
 };
 
@@ -370,5 +525,8 @@ export type BroadcastResult = { recipientCount: number };
 /** GET /api/applications/:applicationId/report */
 export type ApplicationReport = {
   application: Application;
+  /** The AI interview (free-form, model-generated questions). */
   interviewSession: InterviewSession | null;
+  /** The organisational interview, graded against HR's question set. */
+  orgInterviewSession: InterviewSession | null;
 };

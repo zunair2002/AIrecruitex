@@ -7,6 +7,8 @@ import { updateApplicationStatus } from "@/lib/applicationsApi";
 import {
   APPLICATION_STATUS_BADGE,
   APPLICATION_STATUS_LABELS,
+  INTERVIEW_DECISION_BADGE,
+  INTERVIEW_DECISION_LABELS,
   INTERVIEW_LEVEL_LABELS,
   INTERVIEW_RESULT_BADGE,
   INTERVIEW_RESULT_LABELS,
@@ -19,9 +21,12 @@ import {
   populated,
   type ApplicationReport,
   type ApplicationStatus,
+  type InterviewReport,
   type InterviewSession,
 } from "@/lib/types";
 import { Card, InlineError, SkillChips } from "@/components/ui/Feedback";
+import { VerdictBadge } from "@/components/shared/VerdictBadge";
+import { ScoreBar } from "@/components/candidate/interview/ScoreBreakdown";
 import { smallButtonClass } from "@/components/ui/controls";
 
 /**
@@ -172,6 +177,10 @@ export function InterviewReportDetail({
             </p>
           )}
         </Card>
+      ) : interviewSession.report ? (
+        <Card title="AI interview report">
+          <ReportSummary report={interviewSession.report} />
+        </Card>
       ) : (
         <Card title="AI feedback">
           <p className="whitespace-pre-line text-sm leading-relaxed text-indigo-900">
@@ -200,11 +209,14 @@ export function InterviewReportDetail({
                   <p className="text-sm font-semibold text-gray-900">
                     Q{turn.questionNumber}. {turn.question}
                   </p>
-                  <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-xs font-bold text-indigo-600">
-                    {turn.marksPossible !== undefined
-                      ? `${turn.marksEarned ?? 0}/${turn.marksPossible} marks`
-                      : `${turn.score}/10`}
-                  </span>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <VerdictBadge verdict={turn.verdict} />
+                    <span className="rounded-full bg-white px-2.5 py-1 text-xs font-bold text-indigo-600">
+                      {turn.marksPossible !== undefined
+                        ? `${turn.marksEarned ?? 0}/${turn.marksPossible} marks`
+                        : `${turn.score}/10`}
+                    </span>
+                  </div>
                 </div>
                 <p className="mt-3 whitespace-pre-line text-sm text-gray-700">
                   <span className="font-semibold text-gray-500">Answer: </span>
@@ -302,10 +314,16 @@ function OrgInterviewResult({ session }: { session: InterviewSession }) {
         )}
       </div>
 
-      {session.feedback && (
-        <p className="mt-4 whitespace-pre-line rounded-xl bg-gray-50 p-4 text-sm text-gray-700">
-          {session.feedback}
-        </p>
+      {session.report ? (
+        <div className="mt-4">
+          <ReportSummary report={session.report} />
+        </div>
+      ) : (
+        session.feedback && (
+          <p className="mt-4 whitespace-pre-line rounded-xl bg-gray-50 p-4 text-sm text-gray-700">
+            {session.feedback}
+          </p>
+        )
       )}
 
       {session.turns.length > 0 ? (
@@ -319,11 +337,14 @@ function OrgInterviewResult({ session }: { session: InterviewSession }) {
                 <p className="text-sm font-semibold text-gray-900">
                   Q{turn.questionNumber}. {turn.question}
                 </p>
-                <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-xs font-bold text-indigo-600">
-                  {turn.marksPossible !== undefined
-                    ? `${turn.marksEarned ?? 0}/${turn.marksPossible} marks`
-                    : `${turn.score}/10`}
-                </span>
+                <div className="flex shrink-0 items-center gap-2">
+                  <VerdictBadge verdict={turn.verdict} />
+                  <span className="rounded-full bg-white px-2.5 py-1 text-xs font-bold text-indigo-600">
+                    {turn.marksPossible !== undefined
+                      ? `${turn.marksEarned ?? 0}/${turn.marksPossible} marks`
+                      : `${turn.score}/10`}
+                  </span>
+                </div>
               </div>
               <p className="mt-3 whitespace-pre-line text-sm text-gray-700">
                 <span className="font-semibold text-gray-500">Answer: </span>
@@ -344,5 +365,89 @@ function OrgInterviewResult({ session }: { session: InterviewSession }) {
         </p>
       )}
     </Card>
+  );
+}
+
+/**
+ * The model-written report on a completed session. Hidden org interviews carry
+ * an HR decision (shortlist / hold / reject); AI interviews carry the
+ * candidate-facing one (pass / needs improvement).
+ */
+function ReportSummary({ report }: { report: InterviewReport }) {
+  const lists: { title: string; items?: string[] }[] = [
+    { title: "Strengths", items: report.strengths },
+    { title: "Concerns", items: report.concerns },
+  ];
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+          Decision
+        </span>
+        <span
+          className={
+            INTERVIEW_DECISION_BADGE[report.decision] ??
+            INTERVIEW_STATUS_BADGE.completed
+          }
+        >
+          {INTERVIEW_DECISION_LABELS[report.decision] ?? report.decision}
+        </span>
+        {report.generatedBy === "fallback" && (
+          <span className="text-xs text-gray-400">(automatic summary)</span>
+        )}
+      </div>
+
+      {report.summary && (
+        <p className="whitespace-pre-line text-sm leading-relaxed text-indigo-900">
+          {report.summary}
+        </p>
+      )}
+
+      {(report.basicScore !== undefined || report.technicalScore !== undefined) && (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {report.basicScore !== undefined && (
+            <ScoreBar
+              label="Basic"
+              score={Math.round(report.basicScore * 10)}
+              gradient="from-indigo-500 to-purple-600"
+            />
+          )}
+          {report.technicalScore !== undefined && (
+            <ScoreBar
+              label="Technical"
+              score={Math.round(report.technicalScore * 10)}
+              gradient="from-purple-500 to-pink-600"
+            />
+          )}
+        </div>
+      )}
+
+      {lists.map(({ title, items }) =>
+        items && items.length > 0 ? (
+          <div key={title}>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+              {title}
+            </p>
+            <ul className="list-inside list-disc space-y-1 text-sm text-gray-700">
+              {items.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        ) : null,
+      )}
+
+      {report.recommendation && (
+        <div className="rounded-xl bg-gray-50 p-4">
+          <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-gray-500">
+            Recommendation
+          </p>
+          <p className="whitespace-pre-line text-sm text-gray-700">
+            {report.recommendation}
+          </p>
+        </div>
+      )}
+    </div>
   );
 }

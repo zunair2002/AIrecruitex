@@ -13,7 +13,7 @@
 
         <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">1. Who We Are</h2>
         <p className="text-gray-700 mb-4">
-          <strong>AIRECRUITEX LIMITED</strong> ("AiRecruitex", "we", "our", "us") is a company registered in England and Wales.
+          <strong>AIRECRUITEX LIMITED</strong> (&quot;AiRecruitex&quot;, &quot;we&quot;, &quot;our&quot;, &quot;us&quot;) is a company registered in England and Wales.
         </p>
         <ul className="list-disc pl-6 mb-6 text-gray-700 space-y-1">
           <li><strong>Company Number:</strong> 16983568</li>
@@ -22,7 +22,7 @@
         </ul>
         <p className="text-gray-700 mb-6">
           This Privacy Policy explains how we collect, use, and protect personal data when you use our AI-powered recruiting 
-          platform at airecruitex.com (the "Service").
+          platform at airecruitex.com (the &quot;Service&quot;).
         </p>
 
         <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">2. Our Role: Controller vs Processor</h2>
@@ -137,7 +137,7 @@
         </ul>
 
         <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">5. AI Processing</h2>
-        <p className="text-gray-700 mb-4">AiRecruitex uses artificial intelligence (powered by Anthropic's Claude) to:</p>
+        <p className="text-gray-700 mb-4">AiRecruitex uses artificial intelligence (powered by Anthropic&apos;s Claude) to:</p>
         <ul className="list-disc pl-6 mb-6 text-gray-700 space-y-1">
           <li>Conduct automated candidate interviews via chat</li>
           <li>Parse and analyse CV content</li>

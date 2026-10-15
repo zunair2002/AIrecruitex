@@ -8,12 +8,16 @@ import type {
   AuthProvider,
   InterviewHistoryType,
   OrgInterviewStatus,
+  InterviewDecision,
   InterviewLevel,
   InterviewResultVerdict,
+  InterviewSessionStage,
   InterviewStatus,
   JobStatus,
   ResumeStatus,
   SupportTicketStatus,
+  TrackId,
+  TurnVerdict,
   UserRole,
 } from "./types";
 
@@ -105,6 +109,48 @@ export const INTERVIEW_LEVEL_LABELS: Record<InterviewLevel, string> = {
   expert: "Expert",
 };
 
+/** Short track names for compact rows; the track picker uses the backend's labels. */
+export const TRACK_LABELS: Record<TrackId, string> = {
+  frontend: "Frontend",
+  backend: "Backend",
+  fullstack: "Fullstack",
+  data_ai: "Data / AI",
+  software_engineer: "Software Engineer",
+};
+
+/** "Round 1 · Fullstack" for a practice round, "—" for a job interview. */
+export function roundTrackLabel(session: {
+  stage?: InterviewSessionStage;
+  track?: TrackId;
+}): string {
+  const round =
+    session.stage === "basic" ? "Round 1" : session.stage === "technical" ? "Round 2" : null;
+  if (!round) return "—";
+  return session.track
+    ? `${round} · ${TRACK_LABELS[session.track] ?? session.track}`
+    : round;
+}
+
+export const TURN_VERDICT_LABELS: Record<TurnVerdict, string> = {
+  correct: "Correct",
+  partially_correct: "Partially correct",
+  incorrect: "Incorrect",
+  strong: "Strong",
+  adequate: "Adequate",
+  weak: "Weak",
+  off_topic: "Off topic",
+};
+
+export const INTERVIEW_DECISION_LABELS: Record<InterviewDecision, string> = {
+  pass: "Pass",
+  needs_improvement: "Needs improvement",
+  round2_unlocked: "Round 2 unlocked",
+  retry_round1: "Retry Round 1",
+  shortlist: "Shortlist",
+  hold: "Hold",
+  reject: "Reject",
+};
+
 export const ORG_INTERVIEW_STATUS_LABELS: Record<OrgInterviewStatus, string> = {
   invited: "Invited",
   completed: "Completed",
@@ -164,6 +210,26 @@ export const INTERVIEW_STATUS_BADGE: Record<InterviewStatus, string> = {
 export const INTERVIEW_RESULT_BADGE: Record<InterviewResultVerdict, string> = {
   pass: badgeClass("bg-emerald-50 text-emerald-700"),
   fail: badgeClass("bg-red-50 text-red-700"),
+};
+
+export const TURN_VERDICT_BADGE: Record<TurnVerdict, string> = {
+  correct: badgeClass("bg-emerald-50 text-emerald-700"),
+  strong: badgeClass("bg-emerald-50 text-emerald-700"),
+  partially_correct: badgeClass("bg-amber-50 text-amber-700"),
+  adequate: badgeClass("bg-amber-50 text-amber-700"),
+  incorrect: badgeClass("bg-red-50 text-red-700"),
+  weak: badgeClass("bg-red-50 text-red-700"),
+  off_topic: badgeClass("bg-gray-100 text-gray-600"),
+};
+
+export const INTERVIEW_DECISION_BADGE: Record<InterviewDecision, string> = {
+  pass: badgeClass("bg-emerald-50 text-emerald-700"),
+  round2_unlocked: badgeClass("bg-emerald-50 text-emerald-700"),
+  shortlist: badgeClass("bg-emerald-50 text-emerald-700"),
+  hold: badgeClass("bg-amber-50 text-amber-700"),
+  needs_improvement: badgeClass("bg-amber-50 text-amber-700"),
+  retry_round1: badgeClass("bg-red-50 text-red-700"),
+  reject: badgeClass("bg-red-50 text-red-700"),
 };
 
 export const ORG_INTERVIEW_STATUS_BADGE: Record<OrgInterviewStatus, string> = {

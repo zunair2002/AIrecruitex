@@ -58,6 +58,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const stored = getStoredToken();
     if (!stored) {
+      // Nothing to restore — settle the initial loading flag.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsLoading(false);
       return;
     }

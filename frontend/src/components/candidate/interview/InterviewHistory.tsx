@@ -8,12 +8,12 @@ import { resolveSelection, useApiResource } from "@/lib/useApiResource";
 import {
   INTERVIEW_HISTORY_TYPE_BADGE,
   INTERVIEW_HISTORY_TYPE_LABELS,
-  INTERVIEW_LEVEL_LABELS,
   INTERVIEW_RESULT_BADGE,
   INTERVIEW_RESULT_LABELS,
   INTERVIEW_STATUS_BADGE,
   INTERVIEW_STATUS_LABELS,
   formatDate,
+  roundTrackLabel,
   scoreColor,
 } from "@/lib/format";
 import {
@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/Feedback";
 import { compactInputClass, primaryButtonClass } from "@/components/ui/controls";
 import { CertificatePanel } from "./CertificatePanel";
-import { TurnHistory } from "./InterviewRunner";
+import { ReportDetails, TurnHistory } from "./InterviewRunner";
 import { FinalScoreRing } from "./ScoreBreakdown";
 
 const ALL = "all";
@@ -139,7 +139,7 @@ export function InterviewHistory() {
                       <div className="flex-1 text-center sm:text-left">
                         <h2 className="text-2xl font-bold text-gray-900">
                           {selected.jobTitle ??
-                            `${selected.level ? INTERVIEW_LEVEL_LABELS[selected.level] + " " : ""}practice interview`}
+                            `${roundTrackLabel(selected)} practice interview`}
                         </h2>
                         <p className="mt-1 text-sm text-gray-500">
                           {formatDate(selected.createdAt)} ·{" "}
@@ -153,7 +153,8 @@ export function InterviewHistory() {
                           </span>
                         )}
                         <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-gray-600">
-                          {report.data.feedback ??
+                          {report.data.report?.summary ||
+                            report.data.feedback ||
                             (selected.type === "organizational"
                               ? "This interview is graded by the hiring team — your score and feedback aren't shown here."
                               : "No overall feedback was returned.")}
@@ -161,6 +162,10 @@ export function InterviewHistory() {
                       </div>
                     </div>
                   </Card>
+
+                  {report.data.report && (
+                    <ReportDetails report={report.data.report} />
+                  )}
 
                   {report.data.elearningTips &&
                     report.data.elearningTips.length > 0 && (
@@ -182,7 +187,7 @@ export function InterviewHistory() {
                     }
                   />
 
-                  {selected.type !== "organizational" && (
+                  {report.data.certificateEligible && (
                     <CertificatePanel
                       sessionId={selected.sessionId}
                       score={report.data.score}
@@ -245,8 +250,7 @@ function SessionRow({
         <p
           className={`truncate text-sm font-semibold ${isActive ? "text-indigo-900" : "text-gray-900"}`}
         >
-          {session.jobTitle ??
-            `${session.level ? INTERVIEW_LEVEL_LABELS[session.level] + " " : ""}practice`}
+          {session.jobTitle ?? "Practice interview"}
         </p>
         {session.score !== undefined && (
           <span className={`text-sm font-bold ${scoreColor(session.score)}`}>
@@ -265,6 +269,10 @@ function SessionRow({
           {formatDate(session.createdAt)}
         </span>
       </div>
+      <p className="mt-2 text-xs text-gray-500">
+        <span className="font-semibold text-gray-600">Round · Track:</span>{" "}
+        {roundTrackLabel(session)}
+      </p>
     </button>
   );
 }

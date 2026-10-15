@@ -2,25 +2,33 @@
 import { apiRequest } from "./api";
 import type {
   InterviewHistoryType,
-  InterviewLevel,
   InterviewSessionSummary,
   InterviewSessionView,
+  InterviewStage,
+  InterviewTrack,
   ObjectId,
+  TrackId,
 } from "./types";
 
+/** GET /api/interview/tracks — public; the practice tracks to choose from. */
+export function listTracks(signal?: AbortSignal): Promise<InterviewTrack[]> {
+  return apiRequest<InterviewTrack[]>("/api/interview/tracks", { signal });
+}
+
 /**
- * POST /api/interview/start — begins (or resumes) the caller's practice session.
- * The backend reuses any existing non-completed session that has no
- * `applicationId`, so this is safe to call on every page load.
+ * POST /api/interview/start — begins (or resumes) a practice round.
+ * The backend resumes an unfinished session of the same stage and track, so
+ * this is safe to call again. "technical" (Round 2) is refused with 400/403
+ * until the latest completed Round 1 scored at least 50.
  */
 export function startInterview(
-  level: InterviewLevel | undefined,
+  input: { stage: InterviewStage; track: TrackId },
   token: string | null,
   signal?: AbortSignal,
 ): Promise<InterviewSessionView> {
   return apiRequest<InterviewSessionView>("/api/interview/start", {
     method: "POST",
-    body: level ? { level } : {},
+    body: input,
     token,
     signal,
   });

@@ -293,6 +293,18 @@ export type TurnVerdict =
   | "weak"
   | "off_topic";
 
+/** `AnswerEvaluation` in ai/ai.service.ts — POST /api/ai/evaluate. */
+export type AnswerEvaluation = {
+  verdict: TurnVerdict;
+  /** Per-criterion 0-10 scores from the model. */
+  scores: Record<string, number>;
+  feedback: string;
+  improvementTip: string;
+  weakTopics: string[];
+  /** 0-10, the weighted criteria (computed by the backend). */
+  questionScore: number;
+};
+
 /**
  * candidate report: pass | needs_improvement (Round 1: round2_unlocked | retry_round1)
  * hr report (hidden org interviews): shortlist | hold | reject

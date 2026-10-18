@@ -287,6 +287,7 @@ export type TurnVerdict =
   | "correct"
   | "partially_correct"
   | "incorrect"
+  | "no_answer"
   | "strong"
   | "adequate"
   | "weak"

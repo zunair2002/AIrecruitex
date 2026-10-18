@@ -6,6 +6,7 @@ import { useAuth } from "@/context/AuthContext";
 import { toErrorMessage } from "@/lib/api";
 import { submitAnswer } from "@/lib/interviewApi";
 import {
+  INTERVIEW_DECISION_LABELS,
   INTERVIEW_RESULT_BADGE,
   INTERVIEW_RESULT_LABELS,
   TRACK_LABELS,
@@ -181,6 +182,7 @@ function CompletedInterview({
 }) {
   const isRound1 = session.stage === "basic";
   const tips = session.elearningTips ?? [];
+  const decision = session.report?.decision;
 
   return (
     <div className="mx-auto max-w-3xl space-y-6 p-8">
@@ -195,6 +197,15 @@ function CompletedInterview({
                 {INTERVIEW_RESULT_LABELS[session.result]}
               </span>
             )}
+            <p className="mt-3 text-sm font-semibold text-gray-700">
+              Overall score: {session.score ?? 0}%
+              {decision && (
+                <>
+                  <span className="mx-2 text-gray-300">·</span>
+                  Decision: {INTERVIEW_DECISION_LABELS[decision]}
+                </>
+              )}
+            </p>
             <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-gray-600">
               {session.report?.summary ||
                 session.feedback ||

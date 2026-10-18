@@ -7,6 +7,9 @@ import { InlineError } from "@/components/ui/Feedback";
 const joinText = (base: string, spoken: string) =>
   [base.trim(), spoken.trim()].filter(Boolean).join(" ");
 
+// Must match MAX_ANSWER_CHARS in the backend interview controller.
+const MAX_ANSWER_CHARS = 5000;
+
 /**
  * Answer state for one interview question, typed or dictated.
  *
@@ -133,6 +136,7 @@ export function VoiceAnswerField({
         value={answer.value}
         onChange={(event) => answer.onChange(event.target.value)}
         rows={8}
+        maxLength={MAX_ANSWER_CHARS}
         placeholder={
           voice.sttSupported
             ? "Type your answer, or press “Speak answer” to dictate it…"
@@ -143,6 +147,7 @@ export function VoiceAnswerField({
       />
       <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-gray-400">
         <span>{answer.value.split(/\s+/).filter(Boolean).length} words</span>
+        <span>{answer.value.length}/{MAX_ANSWER_CHARS} characters</span>
         {!voice.sttSupported && <span>Voice answers work in Chrome or Edge</span>}
       </div>
 

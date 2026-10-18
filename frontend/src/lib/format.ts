@@ -135,6 +135,7 @@ export const TURN_VERDICT_LABELS: Record<TurnVerdict, string> = {
   correct: "Correct",
   partially_correct: "Partially correct",
   incorrect: "Incorrect",
+  no_answer: "No answer",
   strong: "Strong",
   adequate: "Adequate",
   weak: "Weak",
@@ -218,6 +219,7 @@ export const TURN_VERDICT_BADGE: Record<TurnVerdict, string> = {
   partially_correct: badgeClass("bg-amber-50 text-amber-700"),
   adequate: badgeClass("bg-amber-50 text-amber-700"),
   incorrect: badgeClass("bg-red-50 text-red-700"),
+  no_answer: badgeClass("bg-red-50 text-red-700"),
   weak: badgeClass("bg-red-50 text-red-700"),
   off_topic: badgeClass("bg-gray-100 text-gray-600"),
 };

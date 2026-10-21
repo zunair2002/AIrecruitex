@@ -21,6 +21,7 @@ import {
 import { primaryButtonClass } from "@/components/ui/controls";
 import { LogoMark } from "@/components/layout/Logo";
 import { TurnHistory } from "./InterviewRunner";
+import { VoiceAnswerField, useVoiceAnswer } from "./VoiceAnswer";
 
 /**
  * The organisational interview, opened from the emailed link.
@@ -43,9 +44,11 @@ export function OrgInterviewByToken() {
   );
 
   const [session, setSession] = useState<InterviewSessionView | null>(null);
-  const [answer, setAnswer] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isBusy, setIsBusy] = useState(false);
+  const answer = useVoiceAnswer(
+    session?.status === "in_progress" ? session.question : undefined,
+  );
 
   const handleStart = async () => {
     setIsBusy(true);
@@ -60,12 +63,13 @@ export function OrgInterviewByToken() {
   };
 
   const handleSubmit = async () => {
-    if (!answer.trim()) return;
+    const text = answer.takeAnswer();
+    if (!text) return;
     setIsBusy(true);
     setError(null);
     try {
-      setSession(await submitOrgInterviewAnswerByToken(token, answer.trim()));
-      setAnswer("");
+      setSession(await submitOrgInterviewAnswerByToken(token, text));
+      answer.reset();
     } catch (err) {
       setError(toErrorMessage(err));
     } finally {
@@ -128,7 +132,9 @@ export function OrgInterviewByToken() {
           <div className="mb-2 flex items-center justify-between text-sm text-gray-500">
             <span>{data.jobTitle}</span>
             <span>
-              {answered} answered · Question {session.questionNumber ?? answered + 1}
+              Question {session.questionNumber ?? answered + 1}
+              {session.totalQuestions ? ` of ${session.totalQuestions}` : ""}
+              {answer.voice.speaking && " · speaking…"}
             </span>
           </div>
           <div className="flex items-start gap-4">
@@ -142,20 +148,11 @@ export function OrgInterviewByToken() {
         </Card>
 
         <Card>
-          <label
-            htmlFor="org-answer"
-            className="mb-3 block text-sm font-semibold text-gray-900"
-          >
-            Your answer
-          </label>
-          <textarea
+          <VoiceAnswerField
             id="org-answer"
-            value={answer}
-            onChange={(event) => setAnswer(event.target.value)}
-            rows={8}
+            label="Your answer"
+            answer={answer}
             disabled={isBusy}
-            placeholder="Type your answer here…"
-            className="w-full resize-none rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-gray-50"
           />
           {error && (
             <div className="mt-4">
@@ -165,7 +162,7 @@ export function OrgInterviewByToken() {
           <button
             type="button"
             onClick={handleSubmit}
-            disabled={!answer.trim() || isBusy}
+            disabled={!answer.value.trim() || isBusy}
             className={`${primaryButtonClass} mt-4 w-full`}
           >
             {isBusy ? "Submitting…" : "Submit answer"}

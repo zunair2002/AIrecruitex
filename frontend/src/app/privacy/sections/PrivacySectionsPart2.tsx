@@ -13,7 +13,7 @@
         <ul className="list-disc pl-6 mb-6 text-gray-700 space-y-1">
           <li><strong>Right of Access:</strong> Request a copy of the personal data we hold about you</li>
           <li><strong>Right to Rectification:</strong> Request correction of inaccurate personal data</li>
-          <li><strong>Right to Erasure:</strong> Request deletion of your personal data ("right to be forgotten")</li>
+          <li><strong>Right to Erasure:</strong> Request deletion of your personal data (&quot;right to be forgotten&quot;)</li>
           <li><strong>Right to Restrict Processing:</strong> Request limitation of how we use your data</li>
           <li><strong>Right to Data Portability:</strong> Request transfer of your data in a machine-readable format</li>
           <li><strong>Right to Object:</strong> Object to processing based on legitimate interests</li>
@@ -60,7 +60,7 @@
         <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">14. Changes to This Policy</h2>
         <p className="text-gray-700 mb-6">
           We may update this Privacy Policy from time to time. We will notify registered users of significant changes by email. 
-          The "Last updated" date at the top of this page indicates when the policy was last revised.
+          The &quot;Last updated&quot; date at the top of this page indicates when the policy was last revised.
         </p>
 
         <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">15. Complaints</h2>
@@ -73,7 +73,7 @@
           You also have the right to lodge a complaint with the UK supervisory authority:
         </p>
         <p className="text-gray-700 mb-6">
-          <strong>Information Commissioner's Office (ICO)</strong><br />
+          <strong>Information Commissioner&apos;s Office (ICO)</strong><br />
           Website: <a href="https://ico.org.uk/make-a-complaint/" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">ico.org.uk/make-a-complaint</a><br />
           Telephone: 0303 123 1113
         </p>

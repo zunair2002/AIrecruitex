@@ -18,7 +18,7 @@ export const TermsSectionsPart2 = () => (
         </p>
 
         <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">9. Disclaimer of Warranties</h2>
-        <p className="text-gray-700 mb-4">The Service is provided "as is" and "as available" without warranties of any kind, either express or implied, including but not limited to:</p>
+        <p className="text-gray-700 mb-4">The Service is provided &quot;as is&quot; and &quot;as available&quot; without warranties of any kind, either express or implied, including but not limited to:</p>
         <ul className="list-disc pl-6 mb-6 text-gray-700 space-y-1">
           <li>Warranties of merchantability or fitness for a particular purpose</li>
           <li>Warranties that the Service will be uninterrupted, error-free, or secure</li>
@@ -31,7 +31,7 @@ export const TermsSectionsPart2 = () => (
         <ul className="list-disc pl-6 mb-6 text-gray-700 space-y-1">
           <li>AiRecruitex shall not be liable for any indirect, incidental, special, consequential, or punitive damages</li>
           <li>AiRecruitex shall not be liable for any loss of profits, data, business opportunities, or goodwill</li>
-          <li>AiRecruitex's total liability shall not exceed the amount you paid to us in the 12 months preceding the claim</li>
+          <li>AiRecruitex&apos;s total liability shall not exceed the amount you paid to us in the 12 months preceding the claim</li>
         </ul>
         <p className="text-gray-700 mb-4">This limitation applies regardless of the legal theory on which the claim is based.</p>
         <p className="text-gray-700 mb-6">Nothing in these Terms excludes or limits liability for death or personal injury caused by negligence, fraud, or any other liability that cannot be excluded by law.</p>

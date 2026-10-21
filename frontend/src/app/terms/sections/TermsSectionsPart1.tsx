@@ -4,20 +4,20 @@
         <div className="bg-indigo-50 border-l-4 border-indigo-600 p-6 rounded-lg mb-8">
           <h3 className="text-lg font-bold text-gray-900 mb-2">Summary</h3>
           <p className="text-gray-700">
-            These terms govern your use of AiRecruitex's AI-powered recruiting platform. By using our service, you agree to these terms. 
-            Key points: AiRecruitex is a screening tool (you make hiring decisions), you're responsible for how you use candidate data, 
+            These terms govern your use of AiRecruitex&apos;s AI-powered recruiting platform. By using our service, you agree to these terms. 
+            Key points: AiRecruitex is a screening tool (you make hiring decisions), you&apos;re responsible for how you use candidate data, 
             and we operate on a pay-as-you-go credit system.
           </p>
         </div>
 
         <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">1. Agreement to Terms</h2>
         <p className="text-gray-700 mb-4">
-          These Terms of Service ("Terms") constitute a legally binding agreement between you and{" "}
+          These Terms of Service (&quot;Terms&quot;) constitute a legally binding agreement between you and{" "}
           <strong>AIRECRUITEX LIMITED</strong> (Company Number: 16983568), a company registered in England and Wales with its 
-          registered address at 71-75 Shelton Street, Covent Garden, London, WC2H 9JQ, United Kingdom ("AiRecruitex", "we", "our", "us").
+          registered address at 71-75 Shelton Street, Covent Garden, London, WC2H 9JQ, United Kingdom (&quot;AiRecruitex&quot;, &quot;we&quot;, &quot;our&quot;, &quot;us&quot;).
         </p>
         <p className="text-gray-700 mb-4">
-          By accessing or using our AI-powered recruiting platform at airecruitex.com (the "Service"), you agree to be bound by these Terms. 
+          By accessing or using our AI-powered recruiting platform at airecruitex.com (the &quot;Service&quot;), you agree to be bound by these Terms. 
           If you do not agree to these Terms, do not use the Service.
         </p>
         <p className="text-gray-700 mb-6">

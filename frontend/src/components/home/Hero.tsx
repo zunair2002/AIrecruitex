@@ -13,11 +13,18 @@ export const Hero = () => {
   const [loopNum, setLoopNum] = useState(0);
 
   useEffect(() => {
+    const fullText = words[loopNum % words.length];
     let timer: NodeJS.Timeout;
-    const currentIndex = loopNum % words.length;
-    const fullText = words[currentIndex];
 
-    if (isDeleting) {
+    // Every state change happens in a timer callback, never synchronously in the effect.
+    if (!isDeleting && displayText === fullText) {
+      timer = setTimeout(() => setIsDeleting(true), period);
+    } else if (isDeleting && displayText === "") {
+      timer = setTimeout(() => {
+        setIsDeleting(false);
+        setLoopNum((prev) => prev + 1);
+      }, 100);
+    } else if (isDeleting) {
       timer = setTimeout(() => {
         setDisplayText(fullText.substring(0, displayText.length - 1));
       }, 100);
@@ -25,13 +32,6 @@ export const Hero = () => {
       timer = setTimeout(() => {
         setDisplayText(fullText.substring(0, displayText.length + 1));
       }, 150);
-    }
-
-    if (!isDeleting && displayText === fullText) {
-      timer = setTimeout(() => setIsDeleting(true), period);
-    } else if (isDeleting && displayText === "") {
-      setIsDeleting(false);
-      setLoopNum((prev) => prev + 1);
     }
 
     return () => clearTimeout(timer);

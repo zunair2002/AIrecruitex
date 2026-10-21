@@ -257,7 +257,89 @@ export const INTERVIEW_HISTORY_TYPES: InterviewHistoryType[] = [
 export type InterviewRound = 1 | 2;
 
 /**
- * A turn as the *client* sees it. `feedback` and `score` are omitted while the
+ * Practice is split into two sessions: Round 1 "basic" and Round 2
+ * "technical" (unlocked by the Round 1 score). Job interviews are "combined".
+ */
+export type InterviewStage = "basic" | "technical";
+export type InterviewSessionStage = InterviewStage | "combined";
+
+/** `TRACKS` in ai/topics.ts — the practice track decides the technical topics. */
+export type TrackId =
+  | "frontend"
+  | "backend"
+  | "fullstack"
+  | "data_ai"
+  | "software_engineer";
+
+/** GET /api/interview/tracks */
+export type InterviewTrack = {
+  id: TrackId;
+  label: string;
+  topics: string[];
+};
+
+/**
+ * Per-answer model verdict. Technical answers use correct / partially_correct /
+ * incorrect / off_topic; basic answers use strong / adequate / weak / off_topic.
+ * Stored as a free string on the backend, so it may also be "".
+ */
+export type TurnVerdict =
+  | "correct"
+  | "partially_correct"
+  | "incorrect"
+  | "no_answer"
+  | "strong"
+  | "adequate"
+  | "weak"
+  | "off_topic";
+
+/** `AnswerEvaluation` in ai/ai.service.ts — POST /api/ai/evaluate. */
+export type AnswerEvaluation = {
+  verdict: TurnVerdict;
+  /** Per-criterion 0-10 scores from the model. */
+  scores: Record<string, number>;
+  feedback: string;
+  improvementTip: string;
+  weakTopics: string[];
+  /** 0-10, the weighted criteria (computed by the backend). */
+  questionScore: number;
+};
+
+/**
+ * candidate report: pass | needs_improvement (Round 1: round2_unlocked | retry_round1)
+ * hr report (hidden org interviews): shortlist | hold | reject
+ */
+export type InterviewDecision =
+  | "pass"
+  | "needs_improvement"
+  | "round2_unlocked"
+  | "retry_round1"
+  | "shortlist"
+  | "hold"
+  | "reject";
+
+/** `IInterviewReport` — numbers by the backend, narrative by the model or fallback. */
+export type InterviewReport = {
+  reportType: "candidate" | "hr";
+  /** 0-10 */
+  basicScore?: number;
+  /** 0-10 */
+  technicalScore?: number;
+  /** 0-10 (session.score = overallScore * 10) */
+  overallScore: number;
+  decision: InterviewDecision;
+  summary: string;
+  strengths: string[];
+  areasToImprove?: string[];
+  learningPlan?: string[];
+  concerns?: string[];
+  recommendation?: string;
+  weakTopics: string[];
+  generatedBy: "model" | "fallback";
+};
+
+/**
+ * A turn as the *client* sees it. The judgement fields are omitted while the
  * interview is in progress, and permanently for a hidden (HR-graded) session.
  */
 export type InterviewTurnView = {
@@ -266,6 +348,11 @@ export type InterviewTurnView = {
   answer: string;
   feedback?: string;
   score?: number;
+  verdict?: TurnVerdict | "";
+  /** Per-criterion 0-10 scores from the model. */
+  criteria?: Record<string, number>;
+  improvementTip?: string;
+  stage?: InterviewStage;
   round: InterviewRound;
 };
 
@@ -277,6 +364,12 @@ export type InterviewTurn = {
   feedback: string;
   /** Normalised out of 10. */
   score: number;
+  stage?: InterviewStage;
+  topic?: string;
+  verdict?: TurnVerdict | "";
+  criteria?: Record<string, number>;
+  improvementTip?: string;
+  weakTopics?: string[];
   /** Structured org-interview turns only — HR's exact grading. */
   marksEarned?: number;
   marksPossible?: number;
@@ -306,8 +399,12 @@ export type SelectedQuestion = {
 export type InterviewSessionInProgress = {
   sessionId: ObjectId;
   status: "in_progress";
+  stage?: InterviewSessionStage;
+  track?: TrackId;
   questionNumber?: number;
   question?: string;
+  /** Length of this session's question list (5 for Round 1, 8 for Round 2). */
+  totalQuestions?: number;
   round?: InterviewRound;
   turns: InterviewTurnView[];
 };
@@ -315,11 +412,20 @@ export type InterviewSessionInProgress = {
 export type InterviewSessionCompleted = {
   sessionId: ObjectId;
   status: "completed";
+  stage?: InterviewSessionStage;
+  track?: TrackId;
+  /** 1 for practice Round 1, 2 for Round 2, absent for job interviews. */
+  round?: InterviewRound;
   /** Overall score 0-100; absent for a hidden session. */
   score?: number;
   result?: InterviewResultVerdict;
   feedback?: string;
+  /** Absent for a hidden session. */
+  report?: InterviewReport;
   turns: InterviewTurnView[];
+  /** Round 1 only: true once it scored enough to unlock Round 2. */
+  round2Unlocked?: boolean;
+  certificateEligible: boolean;
   certificatePaid: boolean;
   /** Returned only when a visible interview was failed. */
   elearningTips?: string[];
@@ -336,6 +442,8 @@ export type InterviewSessionSummary = {
   /** Present for application-linked sessions. */
   jobTitle?: string;
   level?: InterviewLevel;
+  stage?: InterviewSessionStage;
+  track?: TrackId;
   status: InterviewStatus;
   score?: number;
   result?: InterviewResultVerdict;
@@ -349,6 +457,8 @@ export type InterviewSession = {
   userId: ObjectId;
   applicationId?: ObjectId;
   level?: InterviewLevel;
+  stage?: InterviewSessionStage;
+  track?: TrackId;
   questionSetId?: ObjectId;
   selectedQuestions?: SelectedQuestion[];
   visibility: InterviewVisibility;
@@ -360,6 +470,7 @@ export type InterviewSession = {
   score?: number;
   result?: InterviewResultVerdict;
   feedback?: string;
+  report?: InterviewReport;
   certificatePayment: CertificatePayment;
   createdAt: string;
   updatedAt: string;

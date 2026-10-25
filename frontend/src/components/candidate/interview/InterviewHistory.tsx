@@ -57,12 +57,19 @@ export function InterviewHistory() {
 
   const list = sessions.data ?? [];
   const selected = resolveSelection(list, requestedId, (s) => s.sessionId);
+  const selectedId = selected?.sessionId ?? null;
 
   // The list rows are summaries; the full report is fetched for the selected one.
+  // The loader guards on `selectedId` itself rather than trusting `enabled` — if
+  // the list empties (e.g. the type filter changes) between a render and the
+  // effect firing, there is simply nothing to fetch.
   const report = useApiResource(
-    (signal) => getInterviewReport(selected!.sessionId, token, signal),
-    [selected?.sessionId, token],
-    { enabled: Boolean(token && selected) },
+    (signal) =>
+      selectedId
+        ? getInterviewReport(selectedId, token, signal)
+        : Promise.resolve(null),
+    [selectedId, token],
+    { enabled: Boolean(token && selectedId) },
   );
 
   if (sessions.isLoading) {

@@ -1,15 +1,15 @@
 /**
  * Every `/api/admin/*` router. All of these are `requireAuth + requireRole("admin")`.
  *
- *   /api/admin/dashboard      admin/dashboard
- *   /api/admin/users          admin/user-management
- *   /api/admin/activity-logs  admin/activity-log
- *   /api/admin/content        admin/content-management
- *   /api/admin/reports        admin/reports
- *   /api/admin/notifications  admin/notification-broadcast
- *   /api/admin/settings       admin/settings
- *   /api/admin/support        admin/support-desk
- *   /api/admin/monitoring     admin/monitoring
+ * /api/admin/dashboard admin/dashboard
+ * /api/admin/users admin/user-management
+ * /api/admin/activity-logs admin/activity-log
+ * /api/admin/content admin/content-management
+ * /api/admin/reports admin/reports
+ * /api/admin/notifications admin/notification-broadcast
+ * /api/admin/settings admin/settings
+ * /api/admin/support admin/support-desk
+ * /api/admin/monitoring admin/monitoring
  */
 import { apiRequest } from "./api";
 import type {
@@ -45,7 +45,11 @@ export function getDashboardOverview(
 
 /** GET /api/admin/users — `search` matches name OR email, case-insensitive. */
 export function listUsers(
-  filter: { role?: UserRole | ""; search?: string; isActive?: "true" | "false" | "" },
+  filter: {
+    role?: UserRole | "";
+    search?: string;
+    isActive?: "true" | "false" | "";
+  },
   token: string | null,
   signal?: AbortSignal,
 ): Promise<User[]> {
@@ -131,10 +135,10 @@ export function deleteJob(
   jobId: ObjectId,
   token: string | null,
 ): Promise<{ message?: string }> {
-  return apiRequest<{ message?: string }>(
-    `/api/admin/content/jobs/${jobId}`,
-    { method: "DELETE", token },
-  );
+  return apiRequest<{ message?: string }>(`/api/admin/content/jobs/${jobId}`, {
+    method: "DELETE",
+    token,
+  });
 }
 
 /** GET /api/admin/content/applications — `candidateId` and `jobId` populated. */
@@ -219,10 +223,11 @@ export function resolveSupportTicket(
   adminReply: string,
   token: string | null,
 ): Promise<SupportTicket> {
-  return apiRequest<SupportTicket>(
-    `/api/admin/support/${ticketId}/resolve`,
-    { method: "PATCH", body: { adminReply }, token },
-  );
+  return apiRequest<SupportTicket>(`/api/admin/support/${ticketId}/resolve`, {
+    method: "PATCH",
+    body: { adminReply },
+    token,
+  });
 }
 
 /* ------------------------------------------------------------ monitoring */

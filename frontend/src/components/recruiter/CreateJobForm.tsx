@@ -108,12 +108,12 @@ export function CreateJobForm() {
         </div>
         <h2 className="text-2xl font-bold text-gray-900">Job posted</h2>
         <p className="mt-3 text-gray-500">
-          <span className="font-semibold text-gray-700">{created.title}</span> is
-          now open. Candidates can apply and will be scored against its required
-          skills.
+          <span className="font-semibold text-gray-700">{created.title}</span>{" "}
+          is now open. Candidates can apply and will be scored against its
+          required skills.
         </p>
 
-        <div className="mt-6 rounded-2xl border border-gray-100 bg-white p-6 text-left shadow-sm">
+        <div className="mt-6 rounded-2xl border border-gray-100 bg-white p-6 text-left ">
           <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
             Required skills stored ({created.requiredSkills.length})
           </p>
@@ -123,7 +123,7 @@ export function CreateJobForm() {
               href={created.jdFileUrl}
               target="_blank"
               rel="noreferrer"
-              className="mt-4 inline-block text-sm font-medium text-indigo-600 hover:text-indigo-800"
+              className="mt-4 inline-block text-sm font-medium text-brand hover:text-brand-dark"
             >
               View uploaded job description
             </a>
@@ -137,7 +137,11 @@ export function CreateJobForm() {
           >
             View applicants
           </Link>
-          <button type="button" onClick={resetForm} className={`${secondaryButtonClass} text-sm`}>
+          <button
+            type="button"
+            onClick={resetForm}
+            className={`${secondaryButtonClass} text-sm`}
+          >
             Post another job
           </button>
         </div>
@@ -154,7 +158,7 @@ export function CreateJobForm() {
 
       <form
         onSubmit={handleSubmit}
-        className="space-y-6 rounded-2xl border border-gray-100 bg-white p-8 shadow-sm"
+        className="space-y-6 rounded-2xl border border-gray-100 bg-white p-8 "
       >
         {error && <InlineError message={error} />}
 
@@ -182,7 +186,7 @@ export function CreateJobForm() {
             value={description}
             onChange={(event) => setDescription(event.target.value)}
             rows={6}
-            placeholder="Describe the role, responsibilities and what you&apos;re looking for…"
+            placeholder="Describe the role, responsibilities and what you're looking for…"
             className={`${inputClass} resize-none`}
             required
           />
@@ -202,7 +206,8 @@ export function CreateJobForm() {
           />
           <p className="mt-2 text-xs text-gray-400">
             Comma separated. These are the exact terms searched in each
-            candidate&apos;s resume text — the match score is the share of them found.
+            candidate&apos;s resume text — the match score is the share of them
+            found.
           </p>
           {uniqueSkills.length > 0 && (
             <div className="mt-3">
@@ -222,11 +227,11 @@ export function CreateJobForm() {
             type="file"
             accept={RESUME_ACCEPT_ATTRIBUTE}
             onChange={(event) => handleFile(event.target.files?.[0])}
-            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-600 file:mr-4 file:rounded-lg file:border-0 file:bg-indigo-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-indigo-700"
+            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-600 file:mr-4 file:rounded-lg file:border-0 file:bg-brand-light file:px-4 file:py-2 file:text-sm file:font-semibold file:text-brand-dark"
           />
           <p className="mt-2 text-xs text-gray-400">
-            PDF or DOCX, max {MAX_SIZE_MB}MB. If you leave the skills field empty,
-            skills are suggested from this file&apos;s text.
+            PDF or DOCX, max {MAX_SIZE_MB}MB. If you leave the skills field
+            empty, skills are suggested from this file&apos;s text.
           </p>
           {jdFile && (
             <p className="mt-2 text-xs font-medium text-gray-600">

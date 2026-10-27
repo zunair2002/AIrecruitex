@@ -1,141 +1,94 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
+import { easeOutExpo } from "@/lib/motion";
 
-const words = ["Find the best talent", "Hire faster", "Screen smarter"];
-const period = 2000;
+const capabilities = [
+  "Structured AI interviews",
+  "Resume-to-role matching",
+  "Ranked shortlists",
+  "Interview reports",
+  "White-label delivery",
+  "Always-on screening",
+];
 
 export const Hero = () => {
-  const [displayText, setDisplayText] = useState("");
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [loopNum, setLoopNum] = useState(0);
-
-  useEffect(() => {
-    const fullText = words[loopNum % words.length];
-    let timer: NodeJS.Timeout;
-
-    // Every state change happens in a timer callback, never synchronously in the effect.
-    if (!isDeleting && displayText === fullText) {
-      timer = setTimeout(() => setIsDeleting(true), period);
-    } else if (isDeleting && displayText === "") {
-      timer = setTimeout(() => {
-        setIsDeleting(false);
-        setLoopNum((prev) => prev + 1);
-      }, 100);
-    } else if (isDeleting) {
-      timer = setTimeout(() => {
-        setDisplayText(fullText.substring(0, displayText.length - 1));
-      }, 100);
-    } else {
-      timer = setTimeout(() => {
-        setDisplayText(fullText.substring(0, displayText.length + 1));
-      }, 150);
-    }
-
-    return () => clearTimeout(timer);
-  }, [displayText, isDeleting, loopNum]);
-
   return (
-    <section className="relative overflow-hidden bg-white pt-24 pb-32">
-      {/* Background decoration */}
-      <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-white to-purple-50 -z-10" />
-      <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 rounded-full bg-purple-100 blur-3xl opacity-50" />
-      <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 rounded-full bg-indigo-100 blur-3xl opacity-50" />
+    <section className="bg-[#f6f3f9] pt-[4.75rem] text-ink">
+      <div className="mx-auto grid max-w-7xl items-stretch lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.65, ease: easeOutExpo }}
+          className="flex flex-col justify-center px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24"
+        >
+          <p className="eyebrow">Recruitment intelligence</p>
+          <h1 className="font-display mt-6 max-w-xl text-[2.6rem] leading-[1.12] text-ink sm:text-5xl lg:text-[3.4rem]">
+            Your shortlist, ready by morning.
+          </h1>
+          <p className="mt-6 max-w-lg text-[1.05rem] leading-relaxed text-[#6b5f7a]">
+            AiRecruitex interviews every applicant, scores them against the role,
+            and returns a ranked shortlist — so hiring teams only meet people
+            worth meeting.
+          </p>
+          <div className="mt-9 flex flex-wrap items-center gap-3">
+            <a href="#contact" className="btn-brand">
+              Request a briefing
+            </a>
+            <Link href="/login/recruiter" className="btn-ghost">
+              Open the HR portal
+            </Link>
+          </div>
 
-      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col lg:flex-row items-center gap-12">
-          {/* Text Content */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="flex-1 text-center lg:text-left z-10"
-          >
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 text-sm font-semibold mb-6">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
-              </span>
-              Next-Gen AI Recruiting
-            </div>
-            
-            <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6 tracking-tight leading-tight">
-              <span className="block mb-2 text-indigo-600 min-h-[80px]">
-                {displayText}
-                <span className="animate-pulse ml-1">|</span>
-              </span>
-            </h1>
-            
-            <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-              AiRecruitex conducts intelligent interviews 24/7, scores candidates against your requirements, and delivers a ranked shortlist &mdash; so you only spend time on the best fits.
-            </p>
-            
-            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4">
-              <a href="#contact" className="px-8 py-4 rounded-full bg-indigo-600 text-white font-semibold shadow-lg shadow-indigo-200 hover:bg-indigo-700 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                Start Hiring Now
-              </a>
-              <a href="#demo" className="px-8 py-4 rounded-full bg-white text-gray-700 font-semibold shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex items-center gap-2">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Watch Demo
-              </a>
-            </div>
-          </motion.div>
-
-          {/* Hero Images Grid / Collage */}
-          <motion.div 
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="flex-1 relative w-full h-[400px] lg:h-[500px]"
-          >
-            <div className="relative w-full h-full">
-              {/* Main Image */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4/5 h-4/5 rounded-2xl shadow-2xl overflow-hidden border border-gray-100 bg-white z-10 flex items-center justify-center p-4">
-                <div className="relative w-full h-full">
-                  <Image
-                    src="/landing/images/hero-3-images.png"
-                    alt="AiRecruitex Dashboard"
-                    fill
-                    className="object-contain"
-                    priority
-                  />
-                </div>
+          <dl className="mt-12 grid max-w-lg grid-cols-3 border-t border-[#e0d6ea] pt-7">
+            {[
+              ["24/7", "Interview coverage"],
+              ["3 steps", "To a shortlist"],
+              ["1 report", "For every candidate"],
+            ].map(([value, label], i) => (
+              <div
+                key={label}
+                className={i === 0 ? "" : "border-l border-[#e0d6ea] pl-5"}
+              >
+                <dt className="font-display text-2xl text-ink">{value}</dt>
+                <dd className="mt-1 text-xs leading-snug text-[#6b5f7a]">
+                  {label}
+                </dd>
               </div>
-              
-              {/* Floating Element 1 - Candidate Score */}
-              <motion.div 
-                animate={{ y: [0, -10, 0] }}
-                transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-                className="absolute top-10 right-0 lg:right-4 bg-white p-4 rounded-xl shadow-xl border border-gray-100 z-20 flex items-center gap-4"
-              >
-                <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600 font-bold text-lg">
-                  98%
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-gray-900">Top Candidate</p>
-                  <p className="text-xs text-gray-500">Match Score</p>
-                </div>
-              </motion.div>
+            ))}
+          </dl>
+        </motion.div>
 
-              {/* Floating Element 2 - AI Interviewing */}
-              <motion.div 
-                animate={{ y: [0, 10, 0] }}
-                transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
-                className="absolute bottom-10 left-0 lg:left-4 bg-white p-4 rounded-xl shadow-xl border border-gray-100 z-20 flex items-center gap-3"
-              >
-                <div className="relative flex h-3 w-3">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-indigo-500"></span>
-                </div>
-                <p className="text-sm font-semibold text-gray-900">AI Interview Active</p>
-              </motion.div>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.12, ease: easeOutExpo }}
+          className="relative min-h-[320px] bg-navy lg:min-h-full"
+        >
+          <Image
+            src="/landing/images/hero-3-images.png"
+            alt="AiRecruitex hiring workspace"
+            fill
+            priority
+            className="object-contain p-6 sm:p-10"
+          />
+        </motion.div>
+      </div>
+
+      <div className="border-t border-[#e0d6ea] bg-white">
+        <div className="mx-auto grid max-w-7xl grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
+          {capabilities.map((item, index) => (
+            <div
+              key={item}
+              className={`px-4 py-5 text-[11px] font-semibold tracking-[0.12em] text-[#6b5f7a] uppercase ${
+                index !== 0 ? "border-l border-[#e0d6ea]" : ""
+              }`}
+            >
+              {item}
             </div>
-          </motion.div>
+          ))}
         </div>
       </div>
     </section>

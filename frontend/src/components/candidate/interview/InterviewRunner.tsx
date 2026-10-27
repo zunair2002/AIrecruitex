@@ -104,7 +104,7 @@ export function InterviewRunner({
         </div>
         <div className="h-2 overflow-hidden rounded-full bg-gray-100">
           <div
-            className="h-full bg-gradient-to-r from-indigo-500 to-purple-600 transition-all duration-300"
+            className="h-full bg-brand transition-all duration-300"
             style={{ width: `${Math.min(100, (answered / totalQuestions) * 100)}%` }}
           />
         </div>
@@ -112,11 +112,11 @@ export function InterviewRunner({
 
       <Card className="mb-6">
         <div className="flex items-start gap-4">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-indigo-100 text-sm font-bold text-indigo-700">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-light text-sm font-bold text-brand-dark">
             AI
           </div>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600">
+            <p className="text-xs font-semibold uppercase tracking-wide text-brand">
               Interviewer · Question {questionNumber}
               {answer.voice.speaking && " · speaking…"}
             </p>
@@ -218,7 +218,7 @@ function CompletedInterview({
       {session.report && <ReportDetails report={session.report} />}
 
       {isRound1 && session.round2Unlocked && (
-        <div className="rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50 to-white p-6 shadow-sm">
+        <div className="rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50 to-white p-6 ">
           <h2 className="text-lg font-bold text-emerald-900">🔓 Round 2 unlocked</h2>
           <p className="mt-1 text-sm text-emerald-800">
             Nice work. The technical interview on your track is ready when you are.
@@ -304,7 +304,7 @@ export function ReportDetails({ report }: { report: InterviewReport }) {
             <ScoreBar
               label="Round 1 — Basic"
               score={Math.round(report.basicScore * 10)}
-              gradient="from-indigo-500 to-purple-600"
+              gradient="bg-brand"
             />
           )}
           {report.technicalScore !== undefined && (
@@ -358,7 +358,7 @@ export function TurnHistory({
               <div className="flex shrink-0 items-center gap-2">
                 <VerdictBadge verdict={turn.verdict} />
                 {turn.score !== undefined && (
-                  <span className="rounded-full bg-white px-2.5 py-1 text-xs font-bold text-indigo-600">
+                  <span className="rounded-full bg-white px-2.5 py-1 text-xs font-bold text-brand">
                     {turn.score}/10
                   </span>
                 )}
@@ -369,8 +369,8 @@ export function TurnHistory({
               {turn.answer}
             </p>
             {turn.feedback && (
-              <p className="mt-2 whitespace-pre-line text-sm text-indigo-900">
-                <span className="font-semibold text-indigo-600">Feedback: </span>
+              <p className="mt-2 whitespace-pre-line text-sm text-zinc-900">
+                <span className="font-semibold text-brand">Feedback: </span>
                 {turn.feedback}
               </p>
             )}

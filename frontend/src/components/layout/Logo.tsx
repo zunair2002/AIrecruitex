@@ -1,24 +1,20 @@
 /**
- * The AiRecruitex brand mark, defined once so the tab icon, the navbar, the
- * footer, the auth cards and the portal sidebars can't drift apart.
- *
- * The gradient matches `src/app/icon.svg`, which the App Router serves as the
- * favicon — change one and change the other.
+ * The AiRecruitex brand mark. Matches `src/app/icon.svg`.
  */
 export function LogoMark({
-  className = "h-10 w-10",
-  rounded = "rounded-xl",
+  className = "h-9 w-9",
+  rounded = "rounded-sm",
 }: {
   className?: string;
   rounded?: string;
 }) {
   return (
     <div
-      className={`${className} ${rounded} flex shrink-0 items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 shadow-md`}
+      className={`${className} ${rounded} flex shrink-0 items-center justify-center bg-brand`}
     >
       <svg
         viewBox="0 0 64 64"
-        className="h-[60%] w-[60%]"
+        className="h-[58%] w-[58%]"
         fill="none"
         aria-hidden="true"
       >
@@ -40,5 +36,4 @@ export function LogoMark({
   );
 }
 
-/** Product name, styled consistently wherever the wordmark appears. */
 export const BRAND_NAME = "AiRecruitex";

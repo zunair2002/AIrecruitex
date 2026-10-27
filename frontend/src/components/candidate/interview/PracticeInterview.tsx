@@ -150,7 +150,7 @@ export function PracticeInterview({ stage }: { stage: InterviewStage }) {
   return (
     <div className="flex min-h-screen items-center justify-center p-8">
       <div className="w-full max-w-3xl text-center">
-        <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-4xl shadow-lg">
+        <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-brand text-4xl ">
           {lockedState ? "🔒" : copy.icon}
         </div>
         <h1 className="text-3xl font-bold text-gray-900">{copy.heading}</h1>
@@ -184,12 +184,12 @@ export function PracticeInterview({ stage }: { stage: InterviewStage }) {
                         aria-pressed={isActive}
                         className={`rounded-xl border p-5 text-left transition-colors ${
                           isActive
-                            ? "border-indigo-300 bg-indigo-50"
-                            : "border-gray-100 bg-white hover:border-indigo-100 hover:bg-gray-50"
+                            ? "border-brand/50 bg-brand-light"
+                            : "border-gray-100 bg-white hover:border-brand-light hover:bg-gray-50"
                         }`}
                       >
                         <p
-                          className={`font-bold ${isActive ? "text-indigo-900" : "text-gray-900"}`}
+                          className={`font-bold ${isActive ? "text-zinc-900" : "text-gray-900"}`}
                         >
                           {option.label}
                         </p>
@@ -249,7 +249,7 @@ function LockedCard({
   cta: string;
 }) {
   return (
-    <div className="rounded-2xl border border-amber-100 bg-gradient-to-br from-amber-50 to-white p-6 shadow-sm">
+    <div className="rounded-2xl border border-amber-100 bg-gradient-to-br from-amber-50 to-white p-6 ">
       <h2 className="text-lg font-bold text-amber-900">{title}</h2>
       <p className="mt-1 text-sm text-amber-800">{body}</p>
       <Link href={href} className={`${primaryButtonClass} mt-4 inline-block text-sm`}>

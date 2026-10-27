@@ -13,7 +13,11 @@ import {
   InlineSuccess,
   PageHeader,
 } from "@/components/ui/Feedback";
-import { inputClass, labelClass, primaryButtonClass } from "@/components/ui/controls";
+import {
+  inputClass,
+  labelClass,
+  primaryButtonClass,
+} from "@/components/ui/controls";
 
 type Target = "role" | "user";
 
@@ -62,7 +66,8 @@ export function BroadcastForm() {
   };
 
   const isValid =
-    message.trim().length > 0 && (target === "role" ? Boolean(role) : Boolean(userId));
+    message.trim().length > 0 &&
+    (target === "role" ? Boolean(role) : Boolean(userId));
 
   return (
     <div className="p-8">
@@ -86,12 +91,14 @@ export function BroadcastForm() {
                     type="button"
                     onClick={() => setTarget(option)}
                     className={`flex-1 rounded-full py-2.5 text-sm font-semibold transition-all ${
-                      target === option
-                        ? "bg-indigo-600 text-white shadow-sm"
-                        : "text-gray-500 hover:text-gray-700"
-                    }`}
+ target === option
+ ? "bg-brand text-white "
+ : "text-gray-500 hover:text-gray-700"
+ }`}
                   >
-                    {option === "role" ? "Everyone with a role" : "A single user"}
+                    {option === "role"
+                      ? "Everyone with a role"
+                      : "A single user"}
                   </button>
                 ))}
               </div>

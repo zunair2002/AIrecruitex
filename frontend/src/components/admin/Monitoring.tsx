@@ -35,7 +35,8 @@ export function Monitoring() {
   // snapshot so a reachable-but-unhealthy API is distinguishable from a down one.
   const liveness = useApiResource(() => health(), [], {});
 
-  if (snapshot.isLoading) return <LoadingBlock label="Loading system status…" />;
+  if (snapshot.isLoading)
+    return <LoadingBlock label="Loading system status…" />;
   if (snapshot.error) {
     return (
       <div className="p-8">
@@ -105,19 +106,18 @@ export function Monitoring() {
           value={data.openTicketCount}
           sub="Awaiting an admin reply"
           icon="🎫"
-          gradient="from-amber-500 to-orange-600"
+          gradient="from-amber-500 to-brand-dark"
         />
       </div>
 
       <Card title="Error reporting">
         <p className="text-sm text-gray-600">
-          Server errors are no longer written to the database — every 5xx used to
-          create a document, which added up quickly whenever a dependency (such as
-          Ollama) was briefly unreachable. They&apos;re captured in the server logs
-          instead.
+          Server errors are no longer written to the database — every 5xx used
+          to create a document, which added up quickly whenever a dependency
+          (such as Ollama) was briefly unreachable. They&apos;re captured in the
+          server logs instead.
         </p>
       </Card>
-
     </div>
   );
 }

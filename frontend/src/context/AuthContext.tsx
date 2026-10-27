@@ -72,7 +72,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setToken(stored);
       })
       .catch((error) => {
-        if (error instanceof DOMException && error.name === "AbortError") return;
+        if (error instanceof DOMException && error.name === "AbortError")
+          return;
         clearStoredToken();
       })
       .finally(() => {
@@ -121,7 +122,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [applySession],
   );
 
-  const resendOtp = useCallback((email: string) => authApi.resendOtp(email), []);
+  const resendOtp = useCallback(
+    (email: string) => authApi.resendOtp(email),
+    [],
+  );
 
   const logout = useCallback(async () => {
     const current = token ?? getStoredToken();

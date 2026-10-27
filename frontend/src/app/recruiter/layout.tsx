@@ -8,7 +8,7 @@ export default function RecruiterLayout({
 }) {
   return (
     <RequireAuth roles={["hr"]} loginPath="/login/recruiter">
-      <div className="flex min-h-screen bg-gray-50">
+      <div className="flex min-h-screen atmosphere">
         <RecruiterSidebar />
         <main className="min-w-0 flex-1 overflow-auto">{children}</main>
       </div>

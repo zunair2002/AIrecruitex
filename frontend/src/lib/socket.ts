@@ -2,9 +2,9 @@
  * Socket.io wiring for the realtime events the backend pushes.
  *
  * Backend contract (Airecruitx-backend/src/config/socket.ts):
- *   - the client emits `join` with its user id
- *   - the server puts that socket in the room `user_<userId>`
- *   - `emitToUser(userId, event, payload)` targets that room
+ * - the client emits `join` with its user id
+ * - the server puts that socket in the room `user_<userId>`
+ * - `emitToUser(userId, event, payload)` targets that room
  *
  * The payload types below are copied from each `emitToUser(...)` call site,
  * so they stay in step with what the server actually sends.

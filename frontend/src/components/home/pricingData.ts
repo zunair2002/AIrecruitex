@@ -3,7 +3,8 @@ export const pricingPlans = [
     name: "Free",
     price: "$0",
     period: "/month",
-    description: "Perfect for candidates getting started with practice interviews.",
+    description:
+      "Perfect for candidates getting started with practice interviews.",
     features: [
       "3 practice interviews per month",
       "Basic interview feedback",

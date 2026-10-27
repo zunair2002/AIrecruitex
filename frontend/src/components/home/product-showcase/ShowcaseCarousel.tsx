@@ -15,7 +15,7 @@ export const ShowcaseCarousel = ({
   onMouseUp,
 }: ShowcaseCarouselProps) => (
   <div
-    className="showcase-carousel overflow-hidden"
+    className="overflow-hidden"
     style={{ cursor: "grab" }}
     onMouseDown={onMouseDown}
     onMouseMove={onMouseMove}
@@ -24,44 +24,24 @@ export const ShowcaseCarousel = ({
   >
     <div
       ref={trackRef}
-      className="carousel-track flex transition-transform duration-500 ease-out"
+      className="flex transition-transform duration-500 ease-out"
     >
       {productShowcaseSlides.map((slide) => (
         <div
           key={slide.id}
-          className="carousel-slide flex-shrink-0 px-3"
-          style={{ width: "33.333%" }}
+          className="w-full shrink-0 px-2 md:w-1/2 lg:w-1/3"
         >
-          <div className="media-card bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 h-full flex flex-col">
-            <div className="media-card-image h-56 w-full relative overflow-hidden bg-slate-50/50 border-b border-slate-100">
+          <article className="framed-card flex h-full flex-col overflow-hidden">
+            <div className="relative h-52 overflow-hidden bg-[#f6f3f9]">
               <FeatureVisual id={slide.id} />
             </div>
-            <div className="media-card-content p-6">
-              <h3
-                className="media-card-title"
-                style={{
-                  fontSize: "20px",
-                  fontFamily: "'Plus Jakarta Sans', sans-serif",
-                  fontWeight: "bold",
-                  color: "#1F2937",
-                  marginBottom: "12px",
-                }}
-              >
-                {slide.title}
-              </h3>
-              <p
-                className="media-card-description"
-                style={{
-                  fontSize: "14px",
-                  fontFamily: "'Inter', sans-serif",
-                  color: "#4B5563",
-                  lineHeight: "1.6",
-                }}
-              >
+            <div className="flex flex-1 flex-col border-t border-[#e0d6ea] bg-white p-6">
+              <h3 className="font-display text-xl text-ink">{slide.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-[#6b5f7a]">
                 {slide.description}
               </p>
             </div>
-          </div>
+          </article>
         </div>
       ))}
     </div>

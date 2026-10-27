@@ -14,16 +14,16 @@ export const MoreFeaturesSection = () => {
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="more-features-toggle mx-auto flex items-center gap-2 px-6 py-3 bg-indigo-50 hover:bg-indigo-100 rounded-full transition-colors"
+        className="more-features-toggle mx-auto flex items-center gap-2 px-6 py-3 bg-[#f6f3f9] hover:bg-[#f3e8ff] rounded-full transition-colors"
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <span className="font-semibold text-indigo-600">
+        <span className="font-semibold text-brand">
           {isExpanded ? "See less features" : "See more features"}
         </span>
         <motion.svg
           animate={{ rotate: isExpanded ? 180 : 0 }}
           transition={{ duration: 0.3 }}
-          className="w-4 h-4 text-indigo-600"
+          className="w-4 h-4 text-brand"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -35,7 +35,10 @@ export const MoreFeaturesSection = () => {
 
       <motion.div
         initial={{ opacity: 0, height: 0 }}
-        animate={{ opacity: isExpanded ? 1 : 0, height: isExpanded ? "auto" : 0 }}
+        animate={{
+          opacity: isExpanded ? 1 : 0,
+          height: isExpanded ? "auto" : 0,
+        }}
         transition={{ duration: 0.5 }}
         className="more-features-content overflow-hidden"
       >
@@ -46,14 +49,25 @@ export const MoreFeaturesSection = () => {
           className="feature-pills grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-8"
         >
           {featurePills.map((pill, index) => (
-            <motion.div key={index} variants={fadeInUp} className="feature-pill-wrapper">
+            <motion.div
+              key={index}
+              variants={fadeInUp}
+              className="feature-pill-wrapper"
+            >
               <motion.button
                 whileHover={{ scale: 1.02, x: 5 }}
-                className="feature-pill w-full text-left px-4 py-3 bg-gray-50 hover:bg-indigo-50 rounded-lg transition-colors flex items-center justify-between"
-                onClick={() => setActivePillDesc(activePillDesc === index ? null : index)}
+                className="feature-pill w-full text-left px-4 py-3 bg-gray-50 hover:bg-[#f6f3f9] rounded-lg transition-colors flex items-center justify-between"
+                onClick={() =>
+                  setActivePillDesc(activePillDesc === index ? null : index)
+                }
               >
                 <span className="flex items-center gap-2">
-                  <motion.span animate={{ rotate: activePillDesc === index ? 180 : 0 }} className="text-indigo-500">✦</motion.span>
+                  <motion.span
+                    animate={{ rotate: activePillDesc === index ? 180 : 0 }}
+                    className="text-ink"
+                  >
+                    ✦
+                  </motion.span>
                   {pill.name}
                 </span>
                 <motion.svg

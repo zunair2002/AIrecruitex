@@ -12,7 +12,11 @@ import {
   uploadResume,
 } from "@/lib/resumeApi";
 import { useApiResource } from "@/lib/useApiResource";
-import { RESUME_STATUS_LABELS, formatDateTime, formatFileSize } from "@/lib/format";
+import {
+  RESUME_STATUS_LABELS,
+  formatDateTime,
+  formatFileSize,
+} from "@/lib/format";
 import {
   Card,
   InlineError,
@@ -104,7 +108,7 @@ export function ResumeUpload() {
                   href={resume.fileUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-2 inline-block text-sm font-semibold text-indigo-600 hover:text-indigo-800"
+                  className="mt-2 inline-block text-sm font-semibold text-brand hover:text-brand-dark"
                 >
                   View uploaded resume
                 </a>
@@ -129,7 +133,7 @@ export function ResumeUpload() {
             />
 
             {selectedFile && (
-              <div className="mt-6 flex items-center justify-between rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+              <div className="mt-6 flex items-center justify-between rounded-2xl border border-gray-100 bg-white p-5 ">
                 <div className="flex items-center gap-4">
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-50 text-xs font-bold text-red-600">
                     {selectedFile.name.toLowerCase().endsWith(".docx")

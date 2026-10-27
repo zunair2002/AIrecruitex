@@ -136,7 +136,10 @@ export function ShortlistedList() {
           title="No jobs posted yet."
           description="Post a job, then mark strong applicants as Selected to see them here."
           action={
-            <Link href="/recruiter/jobs/create" className={`${primaryButtonClass} text-sm`}>
+            <Link
+              href="/recruiter/jobs/create"
+              className={`${primaryButtonClass} text-sm`}
+            >
               Create job
             </Link>
           }
@@ -176,7 +179,10 @@ export function ShortlistedList() {
       {applications.isLoading ? (
         <LoadingBlock label="Loading candidates…" />
       ) : applications.error ? (
-        <ErrorBlock message={applications.error} onRetry={applications.reload} />
+        <ErrorBlock
+          message={applications.error}
+          onRetry={applications.reload}
+        />
       ) : selected.length === 0 ? (
         <EmptyState
           title="No selected candidates for this job yet."
@@ -197,7 +203,7 @@ export function ShortlistedList() {
             return (
               <Card key={application._id}>
                 <div className="flex items-start gap-4">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-sm font-bold text-indigo-700">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-light text-sm font-bold text-brand-dark">
                     {initials(candidate?.name ?? "?")}
                   </div>
                   <div className="min-w-0 flex-1">

@@ -13,7 +13,8 @@ export function useWhiteLabelCarousel() {
   const slideCount = whiteLabelSlides.length;
 
   const nextSlide = () => setCurrentIndex((prev) => (prev + 1) % slideCount);
-  const prevSlide = () => setCurrentIndex((prev) => (prev - 1 + slideCount) % slideCount);
+  const prevSlide = () =>
+    setCurrentIndex((prev) => (prev - 1 + slideCount) % slideCount);
   const goToSlide = (index: number) => setCurrentIndex(index);
 
   useEffect(() => {

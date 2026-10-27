@@ -15,7 +15,11 @@ import {
   LoadingBlock,
   PageHeader,
 } from "@/components/ui/Feedback";
-import { inputClass, labelClass, primaryButtonClass } from "@/components/ui/controls";
+import {
+  inputClass,
+  labelClass,
+  primaryButtonClass,
+} from "@/components/ui/controls";
 
 /**
  * GET + PATCH /api/admin/settings — the four fields on the singleton settings
@@ -131,13 +135,15 @@ function SettingsFields({
                 max={100}
                 step={1}
                 value={matchThreshold}
-                onChange={(event) => setMatchThreshold(Number(event.target.value))}
-                className="w-full accent-indigo-600"
+                onChange={(event) =>
+                  setMatchThreshold(Number(event.target.value))
+                }
+                className="w-full accent-brand"
               />
               <p className="mt-2 text-xs text-gray-400">
-                An application is flagged as matched when its match score reaches
-                this percentage. Applied at apply time — existing applications
-                keep the flag they were given.
+                An application is flagged as matched when its match score
+                reaches this percentage. Applied at apply time — existing
+                applications keep the flag they were given.
               </p>
             </div>
 
@@ -151,12 +157,14 @@ function SettingsFields({
                 min={1}
                 max={50}
                 value={maxResumeSizeMB}
-                onChange={(event) => setMaxResumeSizeMB(Number(event.target.value))}
+                onChange={(event) =>
+                  setMaxResumeSizeMB(Number(event.target.value))
+                }
                 className={inputClass}
               />
               <p className="mt-2 text-xs text-gray-400">
-                Stored for reference — the upload middleware&apos;s own 5MB limit
-                applies to actual uploads.
+                Stored for reference — the upload middleware&apos;s own 5MB
+                limit applies to actual uploads.
               </p>
             </div>
 
@@ -165,20 +173,25 @@ function SettingsFields({
                 type="checkbox"
                 checked={allowSignups}
                 onChange={(event) => setAllowSignups(event.target.checked)}
-                className="mt-1 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                className="mt-1 h-4 w-4 rounded border-gray-300 text-brand focus:ring-brand"
               />
               <span>
                 <span className="block text-sm font-semibold text-gray-900">
                   Allow new sign-ups
                 </span>
                 <span className="block text-xs text-gray-400">
-                  Stored on the settings document for the platform&apos;s sign-up policy.
+                  Stored on the settings document for the platform&apos;s
+                  sign-up policy.
                 </span>
               </span>
             </label>
 
             <div className="flex items-center gap-4">
-              <button type="submit" disabled={isSaving} className={primaryButtonClass}>
+              <button
+                type="submit"
+                disabled={isSaving}
+                className={primaryButtonClass}
+              >
                 {isSaving ? "Saving…" : "Save settings"}
               </button>
               <p className="text-xs text-gray-400">

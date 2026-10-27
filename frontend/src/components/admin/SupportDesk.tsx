@@ -62,9 +62,7 @@ export function SupportDesk() {
       const updated = await resolveSupportTicket(ticketId, reply, token);
       tickets.setData((current) =>
         (current ?? []).map((item) =>
-          item._id === updated._id
-            ? { ...updated, userId: item.userId }
-            : item,
+          item._id === updated._id ? { ...updated, userId: item.userId } : item,
         ),
       );
       setReplies((current) => ({ ...current, [ticketId]: "" }));
@@ -75,7 +73,9 @@ export function SupportDesk() {
     }
   };
 
-  const openCount = (tickets.data ?? []).filter((t) => t.status === "open").length;
+  const openCount = (tickets.data ?? []).filter(
+    (t) => t.status === "open",
+  ).length;
 
   return (
     <div className="p-8">
@@ -115,11 +115,13 @@ export function SupportDesk() {
             return (
               <div
                 key={ticket._id}
-                className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm"
+                className="rounded-2xl border border-gray-100 bg-white p-6 "
               >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <h2 className="font-bold text-gray-900">{ticket.subject}</h2>
+                    <h2 className="font-bold text-gray-900">
+                      {ticket.subject}
+                    </h2>
                     <p className="mt-1 text-xs text-gray-500">
                       {author?.name ?? "Unknown user"}
                       {author?.email ? ` · ${author.email}` : ""} ·{" "}

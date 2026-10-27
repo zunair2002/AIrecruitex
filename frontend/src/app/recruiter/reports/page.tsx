@@ -4,7 +4,8 @@ import { LoadingBlock } from "@/components/ui/Feedback";
 
 export const metadata = {
   title: "Interview Reports | AiRecruitex HR",
-  description: "AI interview scores and per-answer feedback for your applicants",
+  description:
+    "AI interview scores and per-answer feedback for your applicants",
 };
 
 export default function InterviewReportsPage() {

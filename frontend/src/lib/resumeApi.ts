@@ -11,7 +11,8 @@ export const RESUME_ACCEPTED_MIME_TYPES = [
   "application/pdf",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ];
-export const RESUME_ACCEPT_ATTRIBUTE = ".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+export const RESUME_ACCEPT_ATTRIBUTE =
+  ".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
 /**
  * POST /api/resume/upload — multipart. Uploading again overwrites the previous

@@ -158,7 +158,10 @@ export const ORG_INTERVIEW_STATUS_LABELS: Record<OrgInterviewStatus, string> = {
   expired: "Expired",
 };
 
-export const INTERVIEW_HISTORY_TYPE_LABELS: Record<InterviewHistoryType, string> = {
+export const INTERVIEW_HISTORY_TYPE_LABELS: Record<
+  InterviewHistoryType,
+  string
+> = {
   practice: "Practice",
   ai_interview: "AI interview",
   organizational: "Organisational",
@@ -188,8 +191,8 @@ export const badgeClass = (tone: string) => `${BADGE_BASE} ${tone}`;
 
 export const ROLE_BADGE: Record<UserRole, string> = {
   candidate: badgeClass("bg-blue-50 text-blue-700"),
-  hr: badgeClass("bg-indigo-50 text-indigo-700"),
-  admin: badgeClass("bg-purple-50 text-purple-700"),
+  hr: badgeClass("bg-brand-light text-brand-dark"),
+  admin: badgeClass("bg-zinc-100 text-zinc-700"),
 };
 
 export const APPLICATION_STATUS_BADGE: Record<ApplicationStatus, string> = {
@@ -240,10 +243,13 @@ export const ORG_INTERVIEW_STATUS_BADGE: Record<OrgInterviewStatus, string> = {
   expired: badgeClass("bg-gray-100 text-gray-600"),
 };
 
-export const INTERVIEW_HISTORY_TYPE_BADGE: Record<InterviewHistoryType, string> = {
+export const INTERVIEW_HISTORY_TYPE_BADGE: Record<
+  InterviewHistoryType,
+  string
+> = {
   practice: badgeClass("bg-sky-50 text-sky-700"),
-  ai_interview: badgeClass("bg-indigo-50 text-indigo-700"),
-  organizational: badgeClass("bg-purple-50 text-purple-700"),
+  ai_interview: badgeClass("bg-brand-light text-brand-dark"),
+  organizational: badgeClass("bg-zinc-50 text-zinc-800"),
 };
 
 export const SUPPORT_STATUS_BADGE: Record<SupportTicketStatus, string> = {
@@ -280,7 +286,7 @@ export function humanizeAction(action: string): string {
 }
 
 /** True once an invite's validity window has passed, even if the server-side
- *  sweeper hasn't yet flipped its status to "expired". */
+ * sweeper hasn't yet flipped its status to "expired". */
 export function isInviteExpired(expiresAt?: string): boolean {
   return Boolean(expiresAt && new Date(expiresAt).getTime() < Date.now());
 }

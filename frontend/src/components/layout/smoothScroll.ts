@@ -9,10 +9,13 @@ export function smoothScrollToHash(hash: string) {
 
   const navbarHeight =
     parseFloat(
-      getComputedStyle(document.documentElement).getPropertyValue("--navbar-height"),
+      getComputedStyle(document.documentElement).getPropertyValue(
+        "--navbar-height",
+      ),
     ) || 80;
 
-  const top = target.getBoundingClientRect().top + window.scrollY - navbarHeight;
+  const top =
+    target.getBoundingClientRect().top + window.scrollY - navbarHeight;
 
   window.scrollTo({ top, behavior: "smooth" });
 }

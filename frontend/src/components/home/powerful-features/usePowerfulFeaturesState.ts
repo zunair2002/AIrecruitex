@@ -16,7 +16,10 @@ export function usePowerfulFeaturesState() {
   const isSectionInView = useInView(sectionRef, { once: true, amount: 0.2 });
   const isHeaderInView = useInView(headerRef, { once: true, amount: 0.3 });
   const isCarouselInView = useInView(carouselRef, { once: true, amount: 0.3 });
-  const isMoreFeaturesInView = useInView(moreFeaturesRef, { once: true, amount: 0.3 });
+  const isMoreFeaturesInView = useInView(moreFeaturesRef, {
+    once: true,
+    amount: 0.3,
+  });
 
   const sectionControls = useAnimation();
   const headerControls = useAnimation();
@@ -44,7 +47,11 @@ export function usePowerfulFeaturesState() {
   };
 
   const prevScene = () => {
-    setActiveScene((prev) => (prev - 1 + powerfulFeaturesScenes.length) % powerfulFeaturesScenes.length);
+    setActiveScene(
+      (prev) =>
+        (prev - 1 + powerfulFeaturesScenes.length) %
+        powerfulFeaturesScenes.length,
+    );
   };
 
   useEffect(() => {

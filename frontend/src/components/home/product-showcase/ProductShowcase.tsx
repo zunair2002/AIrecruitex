@@ -10,9 +10,9 @@ export const ProductShowcase = () => {
   const carousel = useProductShowcaseCarousel();
 
   return (
-    <section className="product-showcase py-20 bg-white">
+    <section className="bg-white py-24" id="features">
       <ShowcaseStyles />
-      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <ShowcaseHeader />
         <ShowcaseCarousel
           trackRef={carousel.trackRef}

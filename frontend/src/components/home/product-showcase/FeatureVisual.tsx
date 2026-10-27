@@ -1,6 +1,12 @@
 import { BrandBrandingVisual, AIHumanVisual } from "./visuals/brandingAndAi";
-import { AutopilotVisual, SmartScoringVisual } from "./visuals/autopilotAndScoring";
-import { DiscrepancyVisual, AntiCheatVisual } from "./visuals/discrepancyAndAntiCheat";
+import {
+  AutopilotVisual,
+  SmartScoringVisual,
+} from "./visuals/autopilotAndScoring";
+import {
+  DiscrepancyVisual,
+  AntiCheatVisual,
+} from "./visuals/discrepancyAndAntiCheat";
 import {
   CVParsingVisual,
   CandidateInsightsVisual,

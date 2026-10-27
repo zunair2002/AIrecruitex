@@ -22,10 +22,16 @@ export const WhiteLabelCarousel = ({
     onMouseUp={onMouseUp}
     onMouseLeave={onMouseUp}
   >
-    <div ref={trackRef} className="carousel-track flex transition-transform duration-500 ease-out">
+    <div
+      ref={trackRef}
+      className="carousel-track flex transition-transform duration-500 ease-out"
+    >
       {whiteLabelSlides.map((slide) => (
-        <div key={slide.id} className="carousel-slide flex-shrink-0 px-3 w-full md:w-1/2 lg:w-1/4">
-          <div className="media-card bg-white rounded-2xl border border-slate-100 shadow-md overflow-hidden hover:shadow-lg hover:border-slate-200 transition-all duration-300 h-full flex flex-col items-center p-6 justify-between">
+        <div
+          key={slide.id}
+          className="carousel-slide flex-shrink-0 px-3 w-full md:w-1/2 lg:w-1/4"
+        >
+          <div className="media-card bg-white rounded-2xl border border-slate-100 overflow-hidden hover:border-slate-200 transition-all duration-300 h-full flex flex-col items-center p-6 justify-between">
             <div className="w-full flex justify-center mb-6 mt-2">
               <BrandedPhoneMockup id={slide.id} />
             </div>

@@ -10,24 +10,24 @@ import { LogoMark } from "@/components/layout/Logo";
 
 export function AuthBrand() {
   return (
-    <div className="flex flex-col items-center text-center mb-8">
+    <div className="mb-8 flex flex-col items-center text-center">
       <Link
         href="/"
-        className="flex items-center gap-2 mb-2 group transition-opacity hover:opacity-80"
+        className="group mb-2 flex items-center gap-2.5 transition-opacity hover:opacity-80"
       >
-        <LogoMark className="w-10 h-10 group-hover:scale-105 transition-transform" />
-        <span className="text-2xl font-bold text-indigo-600">AiRecruitex</span>
+        <LogoMark className="h-10 w-10 transition-transform group-hover:scale-105" />
+        <span className="font-display text-2xl text-ink">AiRecruitex</span>
       </Link>
-      <p className="text-sm text-gray-500">AI-Powered Recruiting</p>
+      <p className="text-sm text-slate-500">AI-powered recruiting</p>
     </div>
   );
 }
 
 export const authInputClass =
-  "w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all";
+  "w-full rounded-sm border border-[#e0d6ea] bg-white px-4 py-3 text-ink placeholder:text-zinc-400 transition-colors focus:border-ink focus:outline-none";
 
 export const authSubmitClass =
-  "w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-colors";
+  "w-full rounded-sm bg-brand px-4 py-3 font-semibold text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50";
 
 export type AuthTab = "login" | "register";
 
@@ -39,12 +39,14 @@ export function AuthTabs({
   onChange: (tab: AuthTab) => void;
 }) {
   return (
-    <div className="flex p-1 mb-8 bg-gray-100 rounded-full">
+    <div className="mb-8 grid grid-cols-2 border border-[#e0d6ea]">
       <button
         type="button"
         onClick={() => onChange("login")}
-        className={`flex-1 py-2.5 text-sm font-semibold rounded-full transition-all ${
-          activeTab === "login" ? "bg-indigo-600 text-white shadow-sm" : "text-gray-500 hover:text-gray-700"
+        className={`py-2.5 text-sm font-semibold transition-colors ${
+          activeTab === "login"
+            ? "bg-brand text-white"
+            : "bg-white text-[#6b5f7a] hover:text-ink"
         }`}
       >
         Login
@@ -52,8 +54,10 @@ export function AuthTabs({
       <button
         type="button"
         onClick={() => onChange("register")}
-        className={`flex-1 py-2.5 text-sm font-semibold rounded-full transition-all ${
-          activeTab === "register" ? "bg-indigo-600 text-white shadow-sm" : "text-gray-500 hover:text-gray-700"
+        className={`border-l border-[#e0d6ea] py-2.5 text-sm font-semibold transition-colors ${
+          activeTab === "register"
+            ? "bg-brand text-white"
+            : "bg-white text-[#6b5f7a] hover:text-ink"
         }`}
       >
         Register
@@ -100,9 +104,10 @@ export function RegisterForm({
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   // Set once signup succeeds; swaps this form for the OTP step.
-  const [pending, setPending] = useState<{ email: string; devOtp?: string } | null>(
-    null,
-  );
+  const [pending, setPending] = useState<{
+    email: string;
+    devOtp?: string;
+  } | null>(null);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -244,7 +249,10 @@ export function LoginForm() {
     <form className="space-y-5" onSubmit={handleSubmit} noValidate>
       <AuthError message={error} />
       <div>
-        <label htmlFor="login-email" className="block text-sm font-medium text-gray-700 mb-2">
+        <label
+          htmlFor="login-email"
+          className="block text-sm font-medium text-gray-700 mb-2"
+        >
           Email
         </label>
         <input
@@ -260,7 +268,10 @@ export function LoginForm() {
         />
       </div>
       <div>
-        <label htmlFor="login-password" className="block text-sm font-medium text-gray-700 mb-2">
+        <label
+          htmlFor="login-password"
+          className="block text-sm font-medium text-gray-700 mb-2"
+        >
           Password
         </label>
         <input
@@ -279,7 +290,7 @@ export function LoginForm() {
         {isSubmitting ? "Signing in…" : "Login"}
       </button>
       <div className="text-center">
-        <a href="#" className="text-sm font-medium text-indigo-500 hover:text-indigo-600">
+        <a href="#" className="text-sm font-medium text-brand hover:text-brand">
           Forgot password?
         </a>
       </div>
@@ -300,19 +311,19 @@ export function AuthCardLayout({
   googleButton?: ReactNode;
 }) {
   return (
-    <main className="min-h-screen flex items-center justify-center bg-white px-4 py-12">
-      <div className="w-full max-w-md bg-white rounded-2xl border border-gray-100 shadow-xl shadow-gray-200/60 p-8 sm:p-10">
+    <main className="flex min-h-screen items-center justify-center bg-[#f6f3f9] px-4 py-12">
+      <div className="relative w-full max-w-md border border-[#e0d6ea] bg-white p-8 sm:p-10">
         <AuthBrand />
         <AuthTabs activeTab={activeTab} onChange={onTabChange} />
         {activeTab === "login" ? <LoginForm /> : registerForm}
         {googleButton && <div className="mt-6">{googleButton}</div>}
         {activeTab === "register" && (
-          <p className="mt-6 text-center text-sm text-gray-500">
+          <p className="mt-6 text-center text-sm text-slate-500">
             Already have an account?{" "}
             <button
               type="button"
               onClick={() => onTabChange("login")}
-              className="font-semibold text-indigo-600 hover:text-indigo-500"
+              className="font-semibold text-brand hover:text-brand"
             >
               Sign in
             </button>

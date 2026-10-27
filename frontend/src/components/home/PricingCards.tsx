@@ -1,48 +1,70 @@
+"use client";
+
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { pricingPlans } from "./pricingData";
+import { fadeUp, stagger } from "@/lib/motion";
 
 export const PricingCards = ({ compact = false }: { compact?: boolean }) => (
-  <div className={`grid grid-cols-1 ${compact ? "md:grid-cols-3" : "lg:grid-cols-3"} gap-8`}>
+  <motion.div
+    initial="hidden"
+    whileInView="visible"
+    viewport={{ once: true, amount: 0.2 }}
+    variants={stagger}
+    className={`grid grid-cols-1 gap-px bg-[#e0d6ea] ${compact ? "md:grid-cols-3" : "lg:grid-cols-3"}`}
+  >
     {pricingPlans.map((plan) => (
-      <div
+      <motion.div
         key={plan.name}
-        className={`rounded-2xl p-8 flex flex-col ${
-          plan.highlighted
-            ? "bg-indigo-600 text-white shadow-xl shadow-indigo-200 scale-105 border-2 border-indigo-600"
-            : "bg-white text-gray-900 border border-gray-200 shadow-sm"
+        variants={fadeUp}
+        className={`relative flex flex-col p-8 ${
+          plan.highlighted ? "bg-navy text-white" : "bg-white text-ink"
         }`}
       >
-        <h3 className="text-xl font-bold mb-1">{plan.name}</h3>
-        <div className="mb-4">
-          <span className="text-4xl font-black">{plan.price}</span>
+        {plan.highlighted && (
+          <span className="mb-4 text-[11px] font-semibold tracking-[0.16em] text-[#d4b8f0] uppercase">
+            Most selected
+          </span>
+        )}
+        <h3 className="font-display text-2xl">{plan.name}</h3>
+        <div className="mt-3 mb-4">
+          <span className="font-display text-4xl">{plan.price}</span>
           {plan.period && (
-            <span className={`text-sm ${plan.highlighted ? "text-indigo-200" : "text-gray-500"}`}>
+            <span
+              className={`text-sm ${plan.highlighted ? "text-[#9aa6c2]" : "text-[#6b5f7a]"}`}
+            >
               {plan.period}
             </span>
           )}
         </div>
-        <p className={`text-sm mb-6 ${plan.highlighted ? "text-indigo-100" : "text-gray-500"}`}>
+        <p
+          className={`mb-6 text-sm leading-relaxed ${
+            plan.highlighted ? "text-[#9aa6c2]" : "text-[#6b5f7a]"
+          }`}
+        >
           {plan.description}
         </p>
-        <ul className="space-y-3 mb-8 flex-1">
+        <ul className="mb-8 flex-1 space-y-3">
           {plan.features.map((feature) => (
             <li key={feature} className="flex items-start gap-2 text-sm">
-              <span className={plan.highlighted ? "text-indigo-200" : "text-indigo-600"}>✓</span>
+              <span className={plan.highlighted ? "text-[#d4b8f0]" : "text-ink"}>
+                —
+              </span>
               {feature}
             </li>
           ))}
         </ul>
         <Link
           href={plan.href}
-          className={`block text-center py-3 px-6 rounded-xl font-semibold transition-colors ${
+          className={`block px-6 py-3 text-center text-sm font-semibold transition ${
             plan.highlighted
-              ? "bg-white text-indigo-600 hover:bg-indigo-50"
-              : "bg-indigo-600 text-white hover:bg-indigo-700"
+              ? "bg-white text-ink hover:bg-[#f6f3f9]"
+              : "bg-navy text-white hover:bg-brand"
           }`}
         >
           {plan.cta}
         </Link>
-      </div>
+      </motion.div>
     ))}
-  </div>
+  </motion.div>
 );

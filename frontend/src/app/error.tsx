@@ -23,7 +23,7 @@ export default function RouteError({
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md rounded-2xl border border-gray-100 bg-white p-8 text-center shadow-sm">
+      <div className="w-full max-w-md rounded-2xl border border-gray-100 bg-white p-8 text-center ">
         <div className="mb-6 flex items-center justify-center gap-2">
           <LogoMark className="h-9 w-9" rounded="rounded-lg" />
           <span className="text-xl font-bold text-gray-900">AiRecruitex</span>
@@ -35,14 +35,14 @@ export default function RouteError({
           Something went wrong on this page
         </h1>
         <p className="mt-2 text-sm text-gray-500">
-          This is usually temporary. Try again, and if it keeps happening go back
-          to your dashboard.
+          This is usually temporary. Try again, and if it keeps happening go
+          back to your dashboard.
         </p>
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
           <button
             type="button"
             onClick={reset}
-            className="rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-700"
+            className="rounded-xl bg-brand px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
           >
             Try again
           </button>

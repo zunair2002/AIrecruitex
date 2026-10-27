@@ -50,11 +50,8 @@ export function InterviewReportsList() {
   );
 
   const selectedApplicationId =
-    resolveSelection(
-      interviewed,
-      requestedApplicationId,
-      (item) => item._id,
-    )?._id ?? null;
+    resolveSelection(interviewed, requestedApplicationId, (item) => item._id)
+      ?._id ?? null;
 
   const report = useApiResource(
     (signal) => getApplicationReport(selectedApplicationId!, token, signal),
@@ -79,7 +76,10 @@ export function InterviewReportsList() {
           title="No jobs posted yet."
           description="Reports appear once you schedule AI interviews for applicants on your jobs."
           action={
-            <Link href="/recruiter/jobs/create" className={`${primaryButtonClass} text-sm`}>
+            <Link
+              href="/recruiter/jobs/create"
+              className={`${primaryButtonClass} text-sm`}
+            >
               Create job
             </Link>
           }
@@ -106,7 +106,10 @@ export function InterviewReportsList() {
       {applications.isLoading ? (
         <LoadingBlock label="Loading applicants…" />
       ) : applications.error ? (
-        <ErrorBlock message={applications.error} onRetry={applications.reload} />
+        <ErrorBlock
+          message={applications.error}
+          onRetry={applications.reload}
+        />
       ) : interviewed.length === 0 ? (
         <EmptyState
           title="No AI interviews scheduled for this job yet."
@@ -132,10 +135,10 @@ export function InterviewReportsList() {
                   type="button"
                   onClick={() => setSelectedApplicationId(application._id)}
                   className={`w-full rounded-xl border p-5 text-left transition-all ${
-                    isActive
-                      ? "border-indigo-300 bg-indigo-50 shadow-sm"
-                      : "border-gray-100 bg-white hover:border-indigo-100 hover:bg-gray-50"
-                  }`}
+ isActive
+ ? "border-brand/50 bg-brand-light "
+ : "border-gray-100 bg-white hover:border-brand-light hover:bg-gray-50"
+ }`}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">

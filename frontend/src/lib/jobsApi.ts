@@ -1,7 +1,7 @@
 /**
  * `/api/jobs` — served by two routers mounted on the same prefix:
- *   candidate/job-board/routes/job-board.routes.ts  (GET /open)
- *   hr/job-posting/routes/job-posting.routes.ts     (POST /, GET /mine)
+ * candidate/job-board/routes/job-board.routes.ts (GET /open)
+ * hr/job-posting/routes/job-posting.routes.ts (POST /, GET /mine)
  */
 import { apiRequest } from "./api";
 import type { Job, ObjectId, OrgInterviewQuestionSet } from "./types";
@@ -70,7 +70,10 @@ export function uploadQuestionSet(
   const formData = new FormData();
   formData.append(QUESTION_POOL_FILE_FIELD, input.file);
   if (input.questionsPerInterview !== undefined) {
-    formData.append("questionsPerInterview", String(input.questionsPerInterview));
+    formData.append(
+      "questionsPerInterview",
+      String(input.questionsPerInterview),
+    );
   }
   return apiRequest<OrgInterviewQuestionSet>(
     `/api/jobs/${jobId}/interview-questions`,

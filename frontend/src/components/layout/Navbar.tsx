@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { handleNavClick } from "./smoothScroll";
-import { LogoMark } from "./Logo";
+import { BrandWordmark } from "./Logo";
 
 const navLinks = [
   { href: "#how-it-works", label: "How it works", isPage: false },
@@ -15,19 +15,16 @@ const navLinks = [
 ] as const;
 
 const linkClass =
-  "text-[13px] font-medium tracking-wide text-zinc-600 transition-colors hover:text-ink";
+  "text-[13px] font-medium tracking-wide text-zinc-600 transition-colors hover:text-brand";
 
 export const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <nav className="fixed top-0 right-0 left-0 z-50 border-b border-[#e0d6ea] bg-white">
+    <nav className="fixed top-0 right-0 left-0 z-50 border-t-[3px] border-t-brand border-b border-[#e0d6ea] bg-white">
       <div className="mx-auto flex h-[4.75rem] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="z-50 flex items-center gap-3">
-          <LogoMark className="h-8 w-8" />
-          <span className="text-[1.2rem] font-semibold tracking-tight text-ink">
-            AiRecruitex
-          </span>
+        <Link href="/" className="z-50 transition-opacity hover:opacity-80">
+          <BrandWordmark className="text-[1.65rem]" />
         </Link>
 
         <div className="hidden items-center gap-9 lg:flex">
@@ -52,7 +49,7 @@ export const Navbar = () => {
         <div className="hidden items-center gap-6 lg:flex">
           <Link
             href="/login/candidate"
-            className="text-[13px] font-medium text-zinc-600 transition-colors hover:text-ink"
+            className="text-[13px] font-medium text-zinc-600 transition-colors hover:text-brand"
           >
             Candidate
           </Link>

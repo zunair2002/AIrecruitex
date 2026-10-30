@@ -19,7 +19,7 @@ import {
   LoadingBlock,
 } from "@/components/ui/Feedback";
 import { primaryButtonClass } from "@/components/ui/controls";
-import { LogoMark } from "@/components/layout/Logo";
+import { BrandWordmark } from "@/components/layout/Logo";
 import { TurnHistory } from "./InterviewRunner";
 import { VoiceAnswerField, useVoiceAnswer } from "./VoiceAnswer";
 
@@ -264,9 +264,8 @@ function Shell({ children }: { children: React.ReactNode }) {
   return (
     <main className="min-h-screen bg-gray-50 px-4 py-12">
       <div className="mx-auto max-w-3xl">
-        <div className="mb-8 flex items-center justify-center gap-2">
-          <LogoMark className="h-9 w-9" rounded="rounded-lg" />
-          <span className="text-xl font-bold text-gray-900">AiRecruitex</span>
+        <div className="mb-8 flex justify-center">
+          <BrandWordmark className="text-[1.5rem]" />
         </div>
         {children}
       </div>

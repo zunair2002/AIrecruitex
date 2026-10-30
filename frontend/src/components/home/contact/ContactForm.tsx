@@ -29,13 +29,13 @@ export const ContactForm = ({
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="form-success bg-white rounded-2xl p-8 text-center"
+        className="form-success border border-[#e0d6ea] bg-white p-8 text-center"
       >
         <motion.svg
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: "spring", delay: 0.2 }}
-          className="w-16 h-16 text-green-500 mx-auto mb-4"
+          className="mx-auto mb-4 h-12 w-12 text-brand"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -46,8 +46,8 @@ export const ContactForm = ({
           <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
           <polyline points="22 4 12 14.01 9 11.01"></polyline>
         </motion.svg>
-        <h3 className="text-2xl font-bold text-gray-900 mb-2">Thank you!</h3>
-        <p className="text-gray-600">We&apos;ll be in touch within 24 hours.</p>
+        <h3 className="font-display mb-2 text-2xl text-ink">Thank you</h3>
+        <p className="text-[#6b5f7a]">We&apos;ll be in touch within 24 hours.</p>
       </motion.div>
     );
   }

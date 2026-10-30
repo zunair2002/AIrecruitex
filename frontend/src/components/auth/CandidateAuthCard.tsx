@@ -11,6 +11,9 @@ export function CandidateAuthCard() {
     <AuthCardLayout
       activeTab={activeTab}
       onTabChange={setActiveTab}
+      portalLabel="Candidate portal"
+      tagline="Walk in prepared."
+      support="Practice interviews, resume matching, and scored feedback — so the real round is never the first round."
       registerForm={
         <RegisterForm
           role="candidate"

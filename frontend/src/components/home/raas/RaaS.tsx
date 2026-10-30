@@ -32,7 +32,7 @@ export const RaaS = () => {
         >
           <motion.p
             variants={fadeInUp}
-            className="text-[11px] font-semibold tracking-[0.18em] text-[#d4b8f0] uppercase"
+            className="inline-flex items-center gap-3 text-[11px] font-semibold tracking-[0.18em] text-[#d4b8f0] uppercase before:block before:h-px before:w-7 before:bg-[#d4b8f0]"
           >
             Recruitment as a service
           </motion.p>

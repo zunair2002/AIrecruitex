@@ -105,8 +105,8 @@ export const WhiteLabel = () => {
                 className="w-full shrink-0 px-2 md:w-1/2"
               >
                 <article className="framed-card overflow-hidden">
-                  <div className="flex h-56 flex-col justify-between bg-navy p-8">
-                    <p className="text-[11px] font-semibold tracking-[0.18em] text-brand uppercase">
+                  <div className="flex h-56 flex-col justify-between border-t-4 border-[#d4b8f0] bg-navy p-8">
+                    <p className="text-[11px] font-semibold tracking-[0.18em] text-[#d4b8f0] uppercase">
                       {slide.sector}
                     </p>
                     <h3 className="font-display text-3xl text-white">

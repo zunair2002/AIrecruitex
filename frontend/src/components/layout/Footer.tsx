@@ -2,19 +2,16 @@
 
 import Link from "next/link";
 import { handleNavClick } from "./smoothScroll";
-import { LogoMark } from "./Logo";
+import { BrandWordmark } from "./Logo";
 
 export const Footer = () => {
   return (
-    <footer className="bg-navy py-16 text-[#b8c2d9]">
+    <footer className="border-t-[3px] border-t-[#d4b8f0] bg-navy py-16 text-[#b8c2d9]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-12 grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4">
           <div className="flex flex-col gap-5 lg:col-span-2">
-            <Link href="/" className="flex items-center gap-3">
-              <LogoMark className="h-8 w-8" rounded="rounded-sm bg-white/10" />
-              <span className="font-display text-2xl text-white">
-                AiRecruitex
-              </span>
+            <Link href="/" className="transition-opacity hover:opacity-80">
+              <BrandWordmark className="text-[1.85rem]" tone="dark" />
             </Link>
             <p className="max-w-sm text-sm leading-relaxed text-[#9aa6c2]">
               AI interviews around the clock. Ranked shortlists by morning. Hire

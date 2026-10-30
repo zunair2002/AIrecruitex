@@ -6,28 +6,26 @@ import { useRouter } from "next/navigation";
 import { useAuth, homePathForRole } from "@/context/AuthContext";
 import type { UserRole } from "@/lib/types";
 import { VerifyEmailForm } from "./VerifyEmailForm";
-import { LogoMark } from "@/components/layout/Logo";
+import { BrandWordmark } from "@/components/layout/Logo";
 
 export function AuthBrand() {
   return (
-    <div className="mb-8 flex flex-col items-center text-center">
-      <Link
-        href="/"
-        className="group mb-2 flex items-center gap-2.5 transition-opacity hover:opacity-80"
-      >
-        <LogoMark className="h-10 w-10 transition-transform group-hover:scale-105" />
-        <span className="font-display text-2xl text-ink">AiRecruitex</span>
+    <div className="mb-8">
+      <Link href="/" className="inline-block transition-opacity hover:opacity-80">
+        <BrandWordmark className="text-[1.85rem]" />
       </Link>
-      <p className="text-sm text-slate-500">AI-powered recruiting</p>
+      <p className="mt-2.5 text-[11px] font-semibold tracking-[0.16em] text-brand uppercase">
+        Screen with evidence
+      </p>
     </div>
   );
 }
 
 export const authInputClass =
-  "w-full rounded-sm border border-[#e0d6ea] bg-white px-4 py-3 text-ink placeholder:text-zinc-400 transition-colors focus:border-ink focus:outline-none";
+  "w-full rounded-sm border border-[#e0d6ea] bg-[#f6f3f9] px-4 py-3.5 text-ink placeholder:text-zinc-400 transition-colors focus:border-brand focus:bg-white focus:outline-none";
 
 export const authSubmitClass =
-  "w-full rounded-sm bg-brand px-4 py-3 font-semibold text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50";
+  "w-full rounded-sm bg-brand px-4 py-3.5 font-semibold text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50";
 
 export type AuthTab = "login" | "register";
 
@@ -39,28 +37,28 @@ export function AuthTabs({
   onChange: (tab: AuthTab) => void;
 }) {
   return (
-    <div className="mb-8 grid grid-cols-2 border border-[#e0d6ea]">
+    <div className="mb-8 grid grid-cols-2 bg-[#f6f3f9] p-1">
       <button
         type="button"
         onClick={() => onChange("login")}
         className={`py-2.5 text-sm font-semibold transition-colors ${
           activeTab === "login"
             ? "bg-brand text-white"
-            : "bg-white text-[#6b5f7a] hover:text-ink"
+            : "text-[#6b5f7a] hover:text-ink"
         }`}
       >
-        Login
+        Sign in
       </button>
       <button
         type="button"
         onClick={() => onChange("register")}
-        className={`border-l border-[#e0d6ea] py-2.5 text-sm font-semibold transition-colors ${
+        className={`py-2.5 text-sm font-semibold transition-colors ${
           activeTab === "register"
             ? "bg-brand text-white"
-            : "bg-white text-[#6b5f7a] hover:text-ink"
+            : "text-[#6b5f7a] hover:text-ink"
         }`}
       >
-        Register
+        Create account
       </button>
     </div>
   );
@@ -71,7 +69,7 @@ export function AuthError({ message }: { message: string | null }) {
   return (
     <p
       role="alert"
-      className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700"
+      className="rounded-sm border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700"
     >
       {message}
     </p>
@@ -154,7 +152,7 @@ export function RegisterForm({
       <div>
         <label
           htmlFor={`${role}-name`}
-          className="block text-sm font-medium text-gray-700 mb-2"
+          className="mb-2 block text-sm font-medium text-ink"
         >
           Full name
         </label>
@@ -173,7 +171,7 @@ export function RegisterForm({
       <div>
         <label
           htmlFor={`${role}-email`}
-          className="block text-sm font-medium text-gray-700 mb-2"
+          className="mb-2 block text-sm font-medium text-ink"
         >
           {emailLabel}
         </label>
@@ -192,7 +190,7 @@ export function RegisterForm({
       <div>
         <label
           htmlFor={`${role}-password`}
-          className="block text-sm font-medium text-gray-700 mb-2"
+          className="mb-2 block text-sm font-medium text-ink"
         >
           Password
         </label>
@@ -251,7 +249,7 @@ export function LoginForm() {
       <div>
         <label
           htmlFor="login-email"
-          className="block text-sm font-medium text-gray-700 mb-2"
+          className="mb-2 block text-sm font-medium text-ink"
         >
           Email
         </label>
@@ -270,7 +268,7 @@ export function LoginForm() {
       <div>
         <label
           htmlFor="login-password"
-          className="block text-sm font-medium text-gray-700 mb-2"
+          className="mb-2 block text-sm font-medium text-ink"
         >
           Password
         </label>
@@ -303,32 +301,77 @@ export function AuthCardLayout({
   onTabChange,
   registerForm,
   googleButton,
+  portalLabel,
+  tagline,
+  support,
 }: {
   activeTab: AuthTab;
   onTabChange: (tab: AuthTab) => void;
   registerForm: ReactNode;
   /** Rendered under whichever form is showing; omitted when unconfigured. */
   googleButton?: ReactNode;
+  portalLabel: string;
+  tagline: string;
+  support: string;
 }) {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#f6f3f9] px-4 py-12">
-      <div className="relative w-full max-w-md border border-[#e0d6ea] bg-white p-8 sm:p-10">
-        <AuthBrand />
-        <AuthTabs activeTab={activeTab} onChange={onTabChange} />
-        {activeTab === "login" ? <LoginForm /> : registerForm}
-        {googleButton && <div className="mt-6">{googleButton}</div>}
-        {activeTab === "register" && (
-          <p className="mt-6 text-center text-sm text-slate-500">
-            Already have an account?{" "}
-            <button
-              type="button"
-              onClick={() => onTabChange("login")}
-              className="font-semibold text-brand hover:text-brand"
-            >
-              Sign in
-            </button>
+    <main className="min-h-screen bg-[#f6f3f9]">
+      <div className="grid min-h-screen lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
+        <aside className="hidden flex-col justify-between border-r-4 border-brand bg-navy px-12 py-14 text-white lg:flex">
+          <Link href="/" className="transition-opacity hover:opacity-80">
+            <BrandWordmark className="text-[2rem]" tone="dark" />
+          </Link>
+          <div>
+            <p className="text-[11px] font-semibold tracking-[0.18em] text-[#d4b8f0] uppercase">
+              {portalLabel}
+            </p>
+            <h1 className="font-display mt-5 max-w-sm text-4xl leading-[1.15]">
+              {tagline}
+            </h1>
+            <p className="mt-5 max-w-sm text-sm leading-relaxed text-[#9aa6c2]">
+              {support}
+            </p>
+          </div>
+          <p className="text-[11px] font-medium tracking-[0.16em] text-[#9aa6c2] uppercase">
+            Screen with evidence
           </p>
-        )}
+        </aside>
+
+        <section className="flex items-center justify-center px-4 py-12 sm:px-8">
+          <div className="w-full max-w-md border border-[#e0d6ea] bg-white p-8 sm:p-10">
+            <div className="mb-8 lg:hidden">
+              <Link href="/" className="inline-block">
+                <BrandWordmark className="text-[1.7rem]" />
+              </Link>
+              <p className="mt-3 text-[11px] font-semibold tracking-[0.16em] text-brand uppercase">
+                {portalLabel}
+              </p>
+            </div>
+            <h2 className="font-display mb-1 text-2xl text-ink">
+              {activeTab === "login" ? "Welcome back" : "Create your account"}
+            </h2>
+            <p className="mb-7 text-sm text-[#6b5f7a]">
+              {activeTab === "login"
+                ? "Sign in to continue screening."
+                : "A short form. Then a code in your inbox."}
+            </p>
+            <AuthTabs activeTab={activeTab} onChange={onTabChange} />
+            {activeTab === "login" ? <LoginForm /> : registerForm}
+            {googleButton && <div className="mt-6">{googleButton}</div>}
+            {activeTab === "register" && (
+              <p className="mt-6 text-center text-sm text-[#6b5f7a]">
+                Already have an account?{" "}
+                <button
+                  type="button"
+                  onClick={() => onTabChange("login")}
+                  className="font-semibold text-brand hover:text-brand-dark"
+                >
+                  Sign in
+                </button>
+              </p>
+            )}
+          </div>
+        </section>
       </div>
     </main>
   );

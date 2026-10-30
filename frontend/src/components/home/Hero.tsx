@@ -25,7 +25,7 @@ export const Hero = () => {
           className="flex flex-col justify-center px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24"
         >
           <p className="eyebrow">Recruitment intelligence</p>
-          <h1 className="font-display mt-6 max-w-xl text-[2.6rem] leading-[1.12] text-ink sm:text-5xl lg:text-[3.4rem]">
+          <h1 className="font-display mt-6 max-w-xl text-[2.85rem] leading-[1.08] text-ink sm:text-5xl lg:text-[3.65rem]">
             Your shortlist, ready by morning.
           </h1>
           <p className="mt-6 max-w-lg text-[1.05rem] leading-relaxed text-[#6b5f7a]">
@@ -52,7 +52,7 @@ export const Hero = () => {
                 key={label}
                 className={i === 0 ? "" : "border-l border-[#e0d6ea] pl-5"}
               >
-                <dt className="font-display text-2xl text-ink">{value}</dt>
+                <dt className="font-display text-2xl text-brand">{value}</dt>
                 <dd className="mt-1 text-xs leading-snug text-[#6b5f7a]">
                   {label}
                 </dd>
@@ -65,7 +65,7 @@ export const Hero = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.12, ease: easeOutExpo }}
-          className="relative min-h-[320px] bg-navy lg:min-h-full"
+          className="relative min-h-[320px] border-t-4 border-brand bg-navy lg:min-h-full lg:border-t-0 lg:border-l-4"
         >
           <Image
             src="/landing/images/hero-3-images.png"
@@ -82,9 +82,9 @@ export const Hero = () => {
           {capabilities.map((item, index) => (
             <div
               key={item}
-              className={`px-4 py-5 text-[11px] font-semibold tracking-[0.12em] text-[#6b5f7a] uppercase ${
-                index !== 0 ? "border-l border-[#e0d6ea]" : ""
-              }`}
+              className={`px-4 py-5 text-[11px] font-semibold tracking-[0.12em] uppercase ${
+                index === 0 ? "text-brand" : "text-[#6b5f7a]"
+              } ${index !== 0 ? "border-l border-[#e0d6ea]" : ""}`}
             >
               {item}
             </div>

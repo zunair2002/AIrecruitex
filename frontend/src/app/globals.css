@@ -63,6 +63,52 @@ body {
   letter-spacing: -0.02em;
 }
 
+.brand-wordmark {
+  display: inline-flex;
+  align-items: baseline;
+  font-family: var(--font-display);
+  line-height: 0.92;
+  white-space: nowrap;
+  color: var(--ink);
+}
+
+.brand-wordmark .ai {
+  position: relative;
+  color: #6d28d9;
+  font-weight: 800;
+  letter-spacing: -0.06em;
+}
+
+.brand-wordmark .i {
+  position: relative;
+  display: inline-block;
+}
+
+.brand-wordmark .i::after {
+  content: "";
+  position: absolute;
+  bottom: 0.78em;
+  left: 50%;
+  width: 0.2em;
+  height: 0.2em;
+  background: currentColor;
+  transform: translateX(-50%);
+}
+
+.brand-wordmark .rest {
+  color: var(--ink);
+  font-weight: 700;
+  letter-spacing: -0.055em;
+}
+
+.brand-wordmark.is-on-dark .ai {
+  color: #e4c7ff;
+}
+
+.brand-wordmark.is-on-dark .rest {
+  color: #fff;
+}
+
 .eyebrow {
   display: inline-flex;
   align-items: center;
@@ -85,7 +131,7 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 0.2rem;
+  border-radius: 0.25rem;
   background: var(--brand);
   color: #fff;
   font-size: 0.875rem;
@@ -102,7 +148,7 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 0.2rem;
+  border-radius: 0.25rem;
   background: var(--navy);
   color: #fff;
   font-size: 0.875rem;
@@ -119,7 +165,7 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 0.2rem;
+  border-radius: 0.25rem;
   border: 1px solid var(--ink);
   background: transparent;
   color: var(--ink);
@@ -201,6 +247,11 @@ body {
 .framed-card {
   border: 1px solid var(--line);
   background: #fff;
+  transition: border-color 0.2s ease;
+}
+
+.framed-card:hover {
+  border-color: var(--brand);
 }
 
 .focus-brand:focus {

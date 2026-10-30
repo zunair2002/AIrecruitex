@@ -66,7 +66,7 @@ export const CandidateBenefits = () => (
             variants={fadeUp}
             className="framed-card p-7"
           >
-            <p className="text-[11px] font-bold tracking-[0.16em] text-accent uppercase">
+            <p className="inline-flex bg-brand-light px-2.5 py-1 text-[11px] font-bold tracking-[0.16em] text-brand uppercase">
               {String(index + 1).padStart(2, "0")}
             </p>
             <h3 className="font-display mt-4 text-xl text-ink">{item.title}</h3>

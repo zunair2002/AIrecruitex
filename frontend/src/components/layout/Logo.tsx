@@ -1,38 +1,27 @@
 /**
- * The AiRecruitex brand mark. Matches `src/app/icon.svg`.
+ * Site wordmark. "Ai" is the mark — extra-bold purple, square tittle —
+ * then Recruitex. No boxed icon.
  */
-export function LogoMark({
-  className = "h-9 w-9",
-  rounded = "rounded-sm",
+export function BrandWordmark({
+  className = "text-[1.35rem]",
+  tone = "light",
 }: {
   className?: string;
-  rounded?: string;
+  tone?: "light" | "dark";
 }) {
   return (
-    <div
-      className={`${className} ${rounded} flex shrink-0 items-center justify-center bg-brand`}
+    <span
+      className={`brand-wordmark ${tone === "dark" ? "is-on-dark" : ""} ${className}`}
+      aria-label="AiRecruitex"
     >
-      <svg
-        viewBox="0 0 64 64"
-        className="h-[58%] w-[58%]"
-        fill="none"
-        aria-hidden="true"
-      >
-        <path
-          d="M17 47 L32 17 L47 47"
-          stroke="white"
-          strokeWidth="6.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M23.5 38.5 L40.5 38.5"
-          stroke="white"
-          strokeWidth="6.5"
-          strokeLinecap="round"
-        />
-      </svg>
-    </div>
+      <span className="ai" aria-hidden="true">
+        A
+        <span className="i">ı</span>
+      </span>
+      <span className="rest" aria-hidden="true">
+        Recruitex
+      </span>
+    </span>
   );
 }
 

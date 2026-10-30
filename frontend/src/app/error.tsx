@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import { LogoMark } from "@/components/layout/Logo";
+import { BrandWordmark } from "@/components/layout/Logo";
 
 /**
  * Catches any runtime error thrown while rendering a route, so a bug shows a
@@ -24,9 +24,8 @@ export default function RouteError({
   return (
     <main className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-md rounded-2xl border border-gray-100 bg-white p-8 text-center ">
-        <div className="mb-6 flex items-center justify-center gap-2">
-          <LogoMark className="h-9 w-9" rounded="rounded-lg" />
-          <span className="text-xl font-bold text-gray-900">AiRecruitex</span>
+        <div className="mb-6 flex justify-center">
+          <BrandWordmark className="text-[1.5rem]" />
         </div>
         <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 text-xl">
           !

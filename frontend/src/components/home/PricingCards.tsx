@@ -18,7 +18,9 @@ export const PricingCards = ({ compact = false }: { compact?: boolean }) => (
         key={plan.name}
         variants={fadeUp}
         className={`relative flex flex-col p-8 ${
-          plan.highlighted ? "bg-navy text-white" : "bg-white text-ink"
+          plan.highlighted
+            ? "border-t-4 border-[#d4b8f0] bg-navy text-white"
+            : "bg-white text-ink"
         }`}
       >
         {plan.highlighted && (

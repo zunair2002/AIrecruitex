@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Navbar } from "@/components/layout/Navbar";
-import { AuthError } from "@/components/auth/AuthCardParts";
+import { AuthError, authInputClass, authSubmitClass } from "@/components/auth/AuthCardParts";
 import { VerifyEmailForm } from "@/components/auth/VerifyEmailForm";
+import { BrandWordmark } from "@/components/layout/Logo";
 import { useAuth } from "@/context/AuthContext";
 import { toErrorMessage } from "@/lib/api";
 import { ROLE_LABELS } from "@/lib/format";
@@ -37,9 +37,6 @@ export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const inputClass =
-    "w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-zinc-500 transition-all";
-
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
@@ -69,47 +66,42 @@ export default function RegisterPage() {
   };
 
   return (
-    <>
-      <Navbar />
-      <main className="min-h-screen flex items-center justify-center bg-gray-50 pt-20">
-        <div className="flex w-full max-w-6xl mx-auto bg-white rounded-3xl overflow-hidden min-h-[600px] m-4">
-          {/* Left Side - Graphic */}
-          <div className="hidden lg:flex w-1/2 bg-zinc-50 items-center justify-center relative p-12 overflow-hidden">
-            <div className="absolute inset-0 bg-zinc-700 opacity-90"></div>
-            <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-white opacity-10"></div>
-            <div className="absolute -bottom-24 -right-24 w-96 h-96 rounded-full bg-white opacity-10"></div>
-
-            <div className="relative z-10 text-white max-w-lg">
-              <h3 className="text-4xl font-bold mb-6">Build Your Dream Team</h3>
-              <p className="text-zinc-100 text-lg leading-relaxed mb-8">
-                Join thousands of companies using AiRecruitex to screen smarter
-                and hire faster. Create your account today.
-              </p>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white/10 rounded-2xl p-6 border border-white/20 ">
-                  <div className="h-10 w-10 bg-white/20 rounded-xl mb-4"></div>
-                  <div className="h-3 w-16 bg-white/20 rounded-full mb-2"></div>
-                  <div className="h-2 w-24 bg-white/10 rounded-full"></div>
-                </div>
-                <div className="bg-white/10 rounded-2xl p-6 border border-white/20 mt-8">
-                  <div className="h-10 w-10 bg-white/20 rounded-xl mb-4"></div>
-                  <div className="h-3 w-16 bg-white/20 rounded-full mb-2"></div>
-                  <div className="h-2 w-24 bg-white/10 rounded-full"></div>
-                </div>
-              </div>
-            </div>
+    <main className="min-h-screen bg-[#f6f3f9]">
+      <div className="grid min-h-screen lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
+        <aside className="hidden flex-col justify-between border-r-4 border-brand bg-navy px-12 py-14 text-white lg:flex">
+          <Link href="/" className="transition-opacity hover:opacity-80">
+            <BrandWordmark className="text-[2rem]" tone="dark" />
+          </Link>
+          <div>
+            <p className="text-[11px] font-semibold tracking-[0.18em] text-[#d4b8f0] uppercase">
+              Get started
+            </p>
+            <h1 className="font-display mt-5 max-w-sm text-4xl leading-[1.15]">
+              One account. The whole hiring loop.
+            </h1>
+            <p className="mt-5 max-w-sm text-sm leading-relaxed text-[#9aa6c2]">
+              Recruiters screen overnight. Candidates practice and apply. Same
+              platform, same evidence.
+            </p>
           </div>
+          <p className="text-[11px] font-medium tracking-[0.16em] text-[#9aa6c2] uppercase">
+            Screen with evidence
+          </p>
+        </aside>
 
-          {/* Right Side - Form */}
-          <div className="w-full lg:w-1/2 flex flex-col justify-center px-8 sm:px-16 py-12">
-            <div className="max-w-md w-full mx-auto">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                Create an account
-              </h2>
-              <p className="text-gray-500 mb-8">
-                Start streamlining your hiring process today.
-              </p>
+        <section className="flex items-center justify-center px-4 py-12 sm:px-8">
+          <div className="w-full max-w-md border border-[#e0d6ea] bg-white p-8 sm:p-10">
+            <div className="mb-8 lg:hidden">
+              <Link href="/" className="inline-block">
+                <BrandWordmark className="text-[1.7rem]" />
+              </Link>
+            </div>
+            <h2 className="font-display mb-1 text-2xl text-ink">
+              Create an account
+            </h2>
+            <p className="mb-8 text-sm text-[#6b5f7a]">
+              A short form. Then a code in your inbox.
+            </p>
 
               {pending ? (
                 <VerifyEmailForm
@@ -121,7 +113,7 @@ export default function RegisterPage() {
                   <AuthError message={error} />
 
                   <div>
-                    <span className="block text-sm font-medium text-gray-700 mb-2">
+                    <span className="mb-2 block text-sm font-medium text-ink">
                       I am signing up as
                     </span>
                     <div className="grid grid-cols-2 gap-3">
@@ -130,14 +122,14 @@ export default function RegisterPage() {
                           key={option}
                           type="button"
                           onClick={() => setRole(option)}
-                          className={`rounded-xl border p-4 text-left transition-colors ${
- role === option
- ? "border-zinc-400 bg-zinc-50"
- : "border-gray-200 bg-white hover:bg-gray-50"
- }`}
+                          className={`border p-4 text-left transition-colors ${
+                            role === option
+                              ? "border-brand bg-brand-light"
+                              : "border-[#e0d6ea] bg-white hover:border-brand"
+                          }`}
                         >
                           <span
-                            className={`block text-sm font-semibold ${role === option ? "text-zinc-950" : "text-gray-900"}`}
+                            className={`block text-sm font-semibold ${role === option ? "text-brand-dark" : "text-ink"}`}
                           >
                             {ROLE_LABELS[option]}
                           </span>
@@ -152,7 +144,7 @@ export default function RegisterPage() {
                   <div>
                     <label
                       htmlFor="register-name"
-                      className="block text-sm font-medium text-gray-700 mb-2"
+                      className="mb-2 block text-sm font-medium text-ink"
                     >
                       Full name
                     </label>
@@ -165,14 +157,14 @@ export default function RegisterPage() {
                       value={name}
                       onChange={(event) => setName(event.target.value)}
                       placeholder="Jane Doe"
-                      className={inputClass}
+                      className={authInputClass}
                     />
                   </div>
 
                   <div>
                     <label
                       htmlFor="register-email"
-                      className="block text-sm font-medium text-gray-700 mb-2"
+                      className="mb-2 block text-sm font-medium text-ink"
                     >
                       Email
                     </label>
@@ -185,14 +177,14 @@ export default function RegisterPage() {
                       value={email}
                       onChange={(event) => setEmail(event.target.value)}
                       placeholder="jane@acme.com"
-                      className={inputClass}
+                      className={authInputClass}
                     />
                   </div>
 
                   <div>
                     <label
                       htmlFor="register-password"
-                      className="block text-sm font-medium text-gray-700 mb-2"
+                      className="mb-2 block text-sm font-medium text-ink"
                     >
                       Password
                     </label>
@@ -206,14 +198,14 @@ export default function RegisterPage() {
                       value={password}
                       onChange={(event) => setPassword(event.target.value)}
                       placeholder="At least 6 characters"
-                      className={inputClass}
+                      className={authInputClass}
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="mt-4 w-full rounded-xl bg-brand px-4 py-3 font-semibold text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50"
+                    className={`mt-4 ${authSubmitClass}`}
                   >
                     {isSubmitting ? "Creating account…" : "Create Account"}
                   </button>
@@ -224,20 +216,19 @@ export default function RegisterPage() {
               )}
 
               <div className="mt-8 text-center">
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-[#6b5f7a]">
                   Already have an account?{" "}
                   <Link
                     href="/login"
-                    className="font-semibold text-zinc-700 hover:text-zinc-500"
+                    className="font-semibold text-brand hover:text-brand-dark"
                   >
                     Sign in
                   </Link>
                 </p>
               </div>
-            </div>
           </div>
-        </div>
-      </main>
-    </>
+        </section>
+      </div>
+    </main>
   );
 }

@@ -14,8 +14,8 @@ export const HowItWorksHeader = () => (
 );
 
 export const StepCard = ({ step }: { step: HowItWorksStep }) => (
-  <div className="framed-card h-full p-8">
-    <p className="text-[11px] font-bold tracking-[0.16em] text-accent uppercase">
+  <div className="framed-card h-full border-l-[3px] border-l-brand p-8">
+    <p className="inline-flex bg-brand-light px-2.5 py-1 text-[11px] font-bold tracking-[0.16em] text-brand uppercase">
       Step {String(step.number).padStart(2, "0")}
     </p>
     <h3 className="font-display mt-5 text-2xl text-ink">{step.title}</h3>

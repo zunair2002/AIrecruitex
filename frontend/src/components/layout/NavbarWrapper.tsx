@@ -8,6 +8,7 @@ export function NavbarWrapper() {
 
   if (
     pathname?.startsWith("/login") ||
+    pathname?.startsWith("/register") ||
     pathname?.startsWith("/candidate") ||
     pathname?.startsWith("/recruiter")
   ) {

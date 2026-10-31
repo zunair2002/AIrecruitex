@@ -4,17 +4,17 @@
  * verbatim from the backend so the UI can never drift from the schema.
  *
  * Backend source of truth:
- *   shared/user/model/user.model.ts
- *   shared/job/model/job.model.ts
- *   shared/application/model/application.model.ts
- *   candidate/resume/model/resume.model.ts
- *   candidate/interview/model/interviewSession.model.ts
- *   candidate/certificate/model/certificate.model.ts
- *   shared/notification/model/notification.model.ts
- *   shared/support/model/supportTicket.model.ts
- *   admin/activity-log/model/auditLog.model.ts
- *   admin/monitoring/model/errorLog.model.ts
- *   admin/settings/model/settings.model.ts
+ * shared/user/model/user.model.ts
+ * shared/job/model/job.model.ts
+ * shared/application/model/application.model.ts
+ * candidate/resume/model/resume.model.ts
+ * candidate/interview/model/interviewSession.model.ts
+ * candidate/certificate/model/certificate.model.ts
+ * shared/notification/model/notification.model.ts
+ * shared/support/model/supportTicket.model.ts
+ * admin/activity-log/model/auditLog.model.ts
+ * admin/monitoring/model/errorLog.model.ts
+ * admin/settings/model/settings.model.ts
  */
 
 /** Mongo ObjectId as serialized over JSON. */
@@ -239,13 +239,16 @@ export const INTERVIEW_LEVELS: InterviewLevel[] = [
 
 /**
  * "candidate" — practice and AI interviews; the candidate sees their own score.
- * "hidden"    — HR-graded organisational interviews; the candidate can answer but
- *               never sees feedback, score or result. The server strips them.
+ * "hidden" — HR-graded organisational interviews; the candidate can answer but
+ * never sees feedback, score or result. The server strips them.
  */
 export type InterviewVisibility = "candidate" | "hidden";
 
 /** How the backend classifies a session in GET /api/interview/mine. */
-export type InterviewHistoryType = "practice" | "ai_interview" | "organizational";
+export type InterviewHistoryType =
+  | "practice"
+  | "ai_interview"
+  | "organizational";
 
 export const INTERVIEW_HISTORY_TYPES: InterviewHistoryType[] = [
   "practice",
@@ -542,7 +545,10 @@ export type Notification = {
 /* -------------------------------------------------------- support ticket */
 
 export type SupportTicketStatus = "open" | "resolved";
-export const SUPPORT_TICKET_STATUSES: SupportTicketStatus[] = ["open", "resolved"];
+export const SUPPORT_TICKET_STATUSES: SupportTicketStatus[] = [
+  "open",
+  "resolved",
+];
 
 export type SupportTicket = {
   _id: ObjectId;
@@ -585,7 +591,10 @@ export type Settings = {
 };
 
 export type SettingsUpdate = Partial<
-  Pick<Settings, "siteName" | "matchThreshold" | "allowSignups" | "maxResumeSizeMB">
+  Pick<
+    Settings,
+    "siteName" | "matchThreshold" | "allowSignups" | "maxResumeSizeMB"
+  >
 >;
 
 /* ------------------------------------------------------- admin aggregates */

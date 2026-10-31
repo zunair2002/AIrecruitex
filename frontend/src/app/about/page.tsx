@@ -3,64 +3,65 @@ import { Footer } from "@/components/layout/Footer";
 
 export const metadata = {
   title: "About | AiRecruitex",
-  description: "Learn about AiRecruitex - Virtual Interview Platform for candidates and HR teams",
+  description:
+    "Learn about AiRecruitex - Virtual Interview Platform for candidates and HR teams",
 };
 
 export default function AboutPage() {
   return (
     <main>
-      <section className="pt-32 pb-20 bg-gradient-to-br from-indigo-50 via-white to-purple-50">
-        <div className="container mx-auto max-w-4xl px-4 sm:px-6 text-center">
-          <h1 className="text-5xl font-bold text-gray-900 mb-6">About AiRecruitex</h1>
-          <p className="text-xl text-gray-600 leading-relaxed">
-            AiRecruitex is a Virtual Interview Platform that connects job seekers with companies
-            through AI-powered interviews, resume matching, and intelligent hiring tools.
+      <section className="bg-[#f6f3f9] pt-32 pb-20">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6">
+          <p className="eyebrow">About</p>
+          <h1 className="font-display mt-5 text-5xl text-ink md:text-6xl">
+            Built for hiring that has to stand up to scrutiny.
+          </h1>
+          <p className="mt-6 text-lg leading-relaxed text-[#6b5f7a]">
+            AiRecruitex connects job seekers and companies through structured
+            interviews, resume matching, and a ranked shortlist — not a stack of
+            unread CVs.
           </p>
         </div>
       </section>
 
-      <section className="py-20 bg-white">
-        <div className="container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 space-y-16">
+      <section className="bg-white py-20">
+        <div className="mx-auto max-w-3xl space-y-16 px-4 sm:px-6">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Our Mission</h2>
-            <p className="text-gray-600 leading-relaxed">
-              We make hiring fair, fast, and accessible. Candidates get AI coaching to improve their
-              interview skills, while HR teams automate screening and find the best talent without
-              spending hours on manual resume reviews.
+            <h2 className="font-display text-2xl text-ink">Our purpose</h2>
+            <p className="mt-4 leading-relaxed text-[#6b5f7a]">
+              Make hiring fair, fast, and defensible. Candidates get structured
+              practice and feedback. Hiring teams automate first-stage screening
+              and spend time only on people who clear the bar.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="p-8 rounded-2xl bg-indigo-50 border border-indigo-100">
-              <h3 className="text-xl font-bold text-indigo-900 mb-3">For Candidates</h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Practice interviews, upload your resume, get AI feedback, learning recommendations,
-                and career guidance — all in one platform.
+          <div className="grid grid-cols-1 gap-px bg-[#e0d6ea] md:grid-cols-2">
+            <div className="bg-white p-8">
+              <h3 className="font-display text-xl text-ink">For candidates</h3>
+              <p className="mt-3 text-sm leading-relaxed text-[#6b5f7a]">
+                Practice interviews, resume matching, scored feedback, and
+                guidance — in one place.
               </p>
-              <Link href="/login/candidate" className="inline-block mt-4 text-sm font-semibold text-indigo-600 hover:text-indigo-500">
-                Join as Candidate →
+              <Link
+                href="/login/candidate"
+                className="mt-5 inline-block text-sm font-semibold text-ink underline underline-offset-4"
+              >
+                Join as a candidate
               </Link>
             </div>
-            <div className="p-8 rounded-2xl bg-purple-50 border border-purple-100">
-              <h3 className="text-xl font-bold text-purple-900 mb-3">For HR Teams</h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Create jobs, receive applications, match resumes with AI, review interview reports,
-                and shortlist the best candidates effortlessly.
+            <div className="bg-white p-8">
+              <h3 className="font-display text-xl text-ink">For hiring teams</h3>
+              <p className="mt-3 text-sm leading-relaxed text-[#6b5f7a]">
+                Create roles, match resumes, review interview reports, and
+                shortlist with evidence.
               </p>
-              <Link href="/login/recruiter" className="inline-block mt-4 text-sm font-semibold text-purple-600 hover:text-purple-500">
-                Join as HR →
+              <Link
+                href="/login/recruiter"
+                className="mt-5 inline-block text-sm font-semibold text-ink underline underline-offset-4"
+              >
+                Join as HR
               </Link>
             </div>
-          </div>
-
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">How It Works</h2>
-            <ol className="space-y-4 text-gray-600">
-              <li className="flex gap-3"><span className="font-bold text-indigo-600">1.</span> Candidates upload resumes and practice AI interviews.</li>
-              <li className="flex gap-3"><span className="font-bold text-indigo-600">2.</span> HR posts jobs with required skills and experience.</li>
-              <li className="flex gap-3"><span className="font-bold text-indigo-600">3.</span> AI matches resumes to jobs and conducts interviews.</li>
-              <li className="flex gap-3"><span className="font-bold text-indigo-600">4.</span> HR reviews scores and shortlists top candidates.</li>
-            </ol>
           </div>
         </div>
       </section>

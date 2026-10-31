@@ -16,6 +16,9 @@ export function RecruiterAuthCard() {
     <AuthCardLayout
       activeTab={activeTab}
       onTabChange={setActiveTab}
+      portalLabel="Hiring portal"
+      tagline="Your shortlist, ready by morning."
+      support="AI interviews run overnight. Ranked candidates are waiting when you sit down."
       registerForm={
         <RegisterForm
           role="hr"

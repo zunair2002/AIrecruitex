@@ -1,22 +1,19 @@
 import type { Metadata } from "next";
-import { Inter, Plus_Jakarta_Sans } from "next/font/google";
+import { Raleway } from "next/font/google";
 import "./globals.css";
 import { NavbarWrapper } from "@/components/layout/NavbarWrapper";
 import { AuthProvider } from "@/context/AuthContext";
 import { RealtimeProvider } from "@/context/RealtimeContext";
 
-const inter = Inter({
+const raleway = Raleway({
   subsets: ["latin"],
-  variable: "--font-inter",
-});
-
-const plusJakarta = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  variable: "--font-plus-jakarta",
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-raleway",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "AiRecruitex - AI-Powered Recruitment Platform",
+  title: "AiRecruitex — AI-Powered Recruitment Platform",
   description: "Your shortlist, ready by morning",
 };
 
@@ -26,8 +23,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${plusJakarta.variable}`}>
-      <body className={inter.className}>
+    <html lang="en" className={raleway.variable}>
+      <body className={`${raleway.className} antialiased`}>
         <AuthProvider>
           <RealtimeProvider>
             <NavbarWrapper />

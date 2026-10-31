@@ -34,11 +34,9 @@ type JobWithApplications = { job: Job; applications: Application[] };
  */
 export function RecruiterDashboard() {
   const { user, token } = useAuth();
-  const jobs = useApiResource(
-    (signal) => listMyJobs(token, signal),
-    [token],
-    { enabled: Boolean(token) },
-  );
+  const jobs = useApiResource((signal) => listMyJobs(token, signal), [token], {
+    enabled: Boolean(token),
+  });
 
   // One applicants request per job — the backend scopes applicants to a job, so
   // there is no single endpoint that returns an HR user's whole pipeline.
@@ -49,7 +47,11 @@ export function RecruiterDashboard() {
           try {
             return {
               job,
-              applications: await listApplicationsForJob(job._id, token, signal),
+              applications: await listApplicationsForJob(
+                job._id,
+                token,
+                signal,
+              ),
             };
           } catch {
             // One unreadable job shouldn't blank the whole dashboard.
@@ -99,7 +101,10 @@ export function RecruiterDashboard() {
             : "Here's your hiring pipeline."
         }
         action={
-          <Link href="/recruiter/jobs/create" className={`${primaryButtonClass} text-sm`}>
+          <Link
+            href="/recruiter/jobs/create"
+            className={`${primaryButtonClass} text-sm`}
+          >
             Create job
           </Link>
         }
@@ -117,7 +122,7 @@ export function RecruiterDashboard() {
           value={summary.totalApplicants}
           sub={`${summary.pending} pending review`}
           icon="👥"
-          gradient="from-purple-500 to-purple-600"
+          gradient="from-zinc-500 to-zinc-700"
         />
         <StatCard
           label="Above match threshold"
@@ -140,7 +145,10 @@ export function RecruiterDashboard() {
           title="You haven't posted any jobs yet."
           description="Post your first job and candidates can start applying right away."
           action={
-            <Link href="/recruiter/jobs/create" className={`${primaryButtonClass} text-sm`}>
+            <Link
+              href="/recruiter/jobs/create"
+              className={`${primaryButtonClass} text-sm`}
+            >
               Create your first job
             </Link>
           }
@@ -152,7 +160,7 @@ export function RecruiterDashboard() {
             action={
               <Link
                 href="/recruiter/jobs"
-                className="text-sm font-semibold text-indigo-600 hover:text-indigo-800"
+                className="text-sm font-semibold text-brand hover:text-brand-dark"
               >
                 View all
               </Link>
@@ -189,7 +197,7 @@ export function RecruiterDashboard() {
             action={
               <Link
                 href="/recruiter/applicants"
-                className="text-sm font-semibold text-indigo-600 hover:text-indigo-800"
+                className="text-sm font-semibold text-brand hover:text-brand-dark"
               >
                 Review
               </Link>
@@ -207,7 +215,9 @@ export function RecruiterDashboard() {
                 {summary.recent.map((application) => {
                   const candidate = populated(application.candidateId);
                   const job = rows.find((row) =>
-                    row.applications.some((item) => item._id === application._id),
+                    row.applications.some(
+                      (item) => item._id === application._id,
+                    ),
                   )?.job;
                   return (
                     <div
@@ -229,7 +239,9 @@ export function RecruiterDashboard() {
                           {application.matchScore}% match
                         </p>
                         <span
-                          className={APPLICATION_STATUS_BADGE[application.status]}
+                          className={
+                            APPLICATION_STATUS_BADGE[application.status]
+                          }
                         >
                           {APPLICATION_STATUS_LABELS[application.status]}
                         </span>

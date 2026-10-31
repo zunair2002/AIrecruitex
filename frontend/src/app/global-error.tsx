@@ -56,7 +56,7 @@ export default function GlobalError({
               padding: "12px 24px",
               borderRadius: 12,
               border: "none",
-              background: "#4f46e5",
+              background: "#4a148c",
               color: "#fff",
               fontWeight: 600,
               cursor: "pointer",

@@ -89,7 +89,10 @@ export function NotificationsPanel() {
       {notifications.isLoading ? (
         <LoadingBlock label="Loading notifications…" />
       ) : notifications.error ? (
-        <ErrorBlock message={notifications.error} onRetry={notifications.reload} />
+        <ErrorBlock
+          message={notifications.error}
+          onRetry={notifications.reload}
+        />
       ) : list.length === 0 ? (
         <EmptyState
           title="No notifications yet."
@@ -100,15 +103,15 @@ export function NotificationsPanel() {
           {list.map((notification) => (
             <div
               key={notification._id}
-              className={`flex items-start justify-between gap-4 rounded-2xl border p-5 shadow-sm ${
-                notification.read
-                  ? "border-gray-100 bg-white"
-                  : "border-indigo-100 bg-indigo-50"
-              }`}
+              className={`flex items-start justify-between gap-4 rounded-2xl border p-5 ${
+ notification.read
+ ? "border-gray-100 bg-white"
+ : "border-brand-light bg-brand-light"
+ }`}
             >
               <div className="min-w-0">
                 <p
-                  className={`text-sm ${notification.read ? "text-gray-700" : "font-semibold text-indigo-900"}`}
+                  className={`text-sm ${notification.read ? "text-gray-700" : "font-semibold text-zinc-900"}`}
                 >
                   {notification.message}
                 </p>

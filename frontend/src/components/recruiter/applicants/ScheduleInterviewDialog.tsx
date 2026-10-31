@@ -25,8 +25,8 @@ const VALIDITY_PRESETS = [1, 2, 3, 7];
 
 /**
  * Collects exactly what each backend endpoint accepts:
- *   POST /:id/ai-interview        -> { dateTime, message? }   (a booked slot)
- *   POST /:id/org-interview-invite -> { validityDays? }        (an emailed link)
+ * POST /:id/ai-interview -> { dateTime, message? } (a booked slot)
+ * POST /:id/org-interview-invite -> { validityDays? } (an emailed link)
  *
  * The organisational interview is no longer a slot: the candidate receives a
  * token link and takes it whenever they like inside the validity window, so the
@@ -65,7 +65,10 @@ export function ScheduleInterviewDialog({
       setError("Pick a date and time.");
       return;
     }
-    if (kind === "org" && (!Number.isFinite(validityDays) || validityDays <= 0)) {
+    if (
+      kind === "org" &&
+      (!Number.isFinite(validityDays) || validityDays <= 0)
+    ) {
       setError("Validity must be a positive number of days.");
       return;
     }
@@ -88,7 +91,7 @@ export function ScheduleInterviewDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 p-4">
-      <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
+      <div className="w-full max-w-lg rounded-2xl bg-white p-6 ">
         <h2 className="text-xl font-bold text-gray-900">
           {kind === "ai"
             ? "Schedule AI interview"
@@ -131,8 +134,8 @@ export function ScheduleInterviewDialog({
                   className={`${inputClass} resize-none`}
                 />
                 <p className="mt-2 text-xs text-gray-400">
-                  Scheduling creates the candidate&apos;s interview session and a
-                  30-minute Google Calendar link.
+                  Scheduling creates the candidate&apos;s interview session and
+                  a 30-minute Google Calendar link.
                 </p>
               </div>
             </>
@@ -148,10 +151,10 @@ export function ScheduleInterviewDialog({
                     type="button"
                     onClick={() => setValidityDays(days)}
                     className={`rounded-xl border px-4 py-2 text-sm font-semibold transition-colors ${
-                      validityDays === days
-                        ? "border-indigo-300 bg-indigo-50 text-indigo-800"
-                        : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
-                    }`}
+ validityDays === days
+ ? "border-brand/50 bg-brand-light text-brand-dark"
+ : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+ }`}
                   >
                     {days} day{days === 1 ? "" : "s"}
                   </button>
@@ -163,20 +166,26 @@ export function ScheduleInterviewDialog({
                 min={1}
                 max={60}
                 value={validityDays}
-                onChange={(event) => setValidityDays(Number(event.target.value))}
+                onChange={(event) =>
+                  setValidityDays(Number(event.target.value))
+                }
                 className={inputClass}
                 required
               />
               <p className="mt-2 text-xs text-gray-400">
-                The candidate is emailed a private link and can take the interview
-                any time inside this window. Questions come from the job&apos;s
-                question pool, drawn at random per candidate.
+                The candidate is emailed a private link and can take the
+                interview any time inside this window. Questions come from the
+                job&apos;s question pool, drawn at random per candidate.
               </p>
             </div>
           )}
 
           <div className="flex items-center gap-3">
-            <button type="submit" disabled={isSaving} className={primaryButtonClass}>
+            <button
+              type="submit"
+              disabled={isSaving}
+              className={primaryButtonClass}
+            >
               {isSaving
                 ? kind === "ai"
                   ? "Scheduling…"

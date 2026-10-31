@@ -56,11 +56,16 @@ export async function getGoogleIdToken(): Promise<string> {
     return idToken;
   } catch (error) {
     const code = (error as { code?: string })?.code ?? "";
-    if (code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
+    if (
+      code === "auth/popup-closed-by-user" ||
+      code === "auth/cancelled-popup-request"
+    ) {
       throw new Error("Google sign-in was cancelled.");
     }
     if (code === "auth/popup-blocked") {
-      throw new Error("Your browser blocked the sign-in popup. Allow popups and try again.");
+      throw new Error(
+        "Your browser blocked the sign-in popup. Allow popups and try again.",
+      );
     }
     if (code === "auth/unauthorized-domain") {
       throw new Error(

@@ -183,7 +183,7 @@ export function InterviewReportDetail({
         </Card>
       ) : (
         <Card title="AI feedback">
-          <p className="whitespace-pre-line text-sm leading-relaxed text-indigo-900">
+          <p className="whitespace-pre-line text-sm leading-relaxed text-zinc-900">
             {interviewSession.feedback ?? "No overall feedback was returned."}
           </p>
         </Card>
@@ -211,7 +211,7 @@ export function InterviewReportDetail({
                   </p>
                   <div className="flex shrink-0 items-center gap-2">
                     <VerdictBadge verdict={turn.verdict} />
-                    <span className="rounded-full bg-white px-2.5 py-1 text-xs font-bold text-indigo-600">
+                    <span className="rounded-full bg-white px-2.5 py-1 text-xs font-bold text-brand">
                       {turn.marksPossible !== undefined
                         ? `${turn.marksEarned ?? 0}/${turn.marksPossible} marks`
                         : `${turn.score}/10`}
@@ -222,8 +222,8 @@ export function InterviewReportDetail({
                   <span className="font-semibold text-gray-500">Answer: </span>
                   {turn.answer}
                 </p>
-                <p className="mt-2 whitespace-pre-line text-sm text-indigo-900">
-                  <span className="font-semibold text-indigo-600">Feedback: </span>
+                <p className="mt-2 whitespace-pre-line text-sm text-zinc-900">
+                  <span className="font-semibold text-brand">Feedback: </span>
                   {turn.feedback}
                 </p>
               </div>
@@ -254,7 +254,7 @@ function Transcript({
       <button
         type="button"
         onClick={() => setIsOpen((value) => !value)}
-        className="text-sm font-semibold text-indigo-600 hover:text-indigo-800"
+        className="text-sm font-semibold text-brand hover:text-brand-dark"
       >
         {isOpen ? "Hide" : "Show"} raw conversation ({messages.length} messages)
       </button>
@@ -266,7 +266,7 @@ function Transcript({
               key={index}
               className={`rounded-xl p-3 text-sm ${
                 message.role === "assistant"
-                  ? "bg-indigo-50 text-indigo-900"
+                  ? "bg-brand-light text-zinc-900"
                   : "bg-gray-50 text-gray-700"
               }`}
             >
@@ -339,7 +339,7 @@ function OrgInterviewResult({ session }: { session: InterviewSession }) {
                 </p>
                 <div className="flex shrink-0 items-center gap-2">
                   <VerdictBadge verdict={turn.verdict} />
-                  <span className="rounded-full bg-white px-2.5 py-1 text-xs font-bold text-indigo-600">
+                  <span className="rounded-full bg-white px-2.5 py-1 text-xs font-bold text-brand">
                     {turn.marksPossible !== undefined
                       ? `${turn.marksEarned ?? 0}/${turn.marksPossible} marks`
                       : `${turn.score}/10`}
@@ -351,8 +351,8 @@ function OrgInterviewResult({ session }: { session: InterviewSession }) {
                 {turn.answer}
               </p>
               {turn.feedback && (
-                <p className="mt-2 whitespace-pre-line text-sm text-indigo-900">
-                  <span className="font-semibold text-indigo-600">Grading: </span>
+                <p className="mt-2 whitespace-pre-line text-sm text-zinc-900">
+                  <span className="font-semibold text-brand">Grading: </span>
                   {turn.feedback}
                 </p>
               )}
@@ -399,7 +399,7 @@ function ReportSummary({ report }: { report: InterviewReport }) {
       </div>
 
       {report.summary && (
-        <p className="whitespace-pre-line text-sm leading-relaxed text-indigo-900">
+        <p className="whitespace-pre-line text-sm leading-relaxed text-zinc-900">
           {report.summary}
         </p>
       )}
@@ -410,7 +410,7 @@ function ReportSummary({ report }: { report: InterviewReport }) {
             <ScoreBar
               label="Basic"
               score={Math.round(report.basicScore * 10)}
-              gradient="from-indigo-500 to-purple-600"
+              gradient="bg-brand"
             />
           )}
           {report.technicalScore !== undefined && (

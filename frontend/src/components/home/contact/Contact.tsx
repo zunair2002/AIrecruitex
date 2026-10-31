@@ -22,13 +22,19 @@ export const Contact = () => {
       initial="hidden"
       animate={sectionControls}
       variants={fadeInUp}
-      className="contact py-20 bg-gray-50 min-h-screen flex items-center"
+      className="bg-[#f6f3f9] py-24"
       id="contact"
     >
-      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="contact-wrapper grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <motion.div variants={fadeInLeft} className="contact-info flex flex-col justify-center h-full">
-            <ContactInfoPanel activeMode={form.activeMode} onModeChange={form.handleModeChange} />
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="contact-wrapper grid grid-cols-1 items-stretch gap-10 lg:grid-cols-2">
+          <motion.div
+            variants={fadeInLeft}
+            className="contact-info flex h-full flex-col justify-center"
+          >
+            <ContactInfoPanel
+              activeMode={form.activeMode}
+              onModeChange={form.handleModeChange}
+            />
           </motion.div>
           <motion.div variants={fadeInRight} className="contact-form-card">
             <ContactForm

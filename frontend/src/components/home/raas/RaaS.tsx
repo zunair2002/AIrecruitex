@@ -2,60 +2,92 @@
 
 import { motion } from "framer-motion";
 import { raasFeatures } from "./raasFeaturesData";
-import { fadeInUp, fadeInLeft, staggerContainer, scaleUp } from "./animationVariants";
+import {
+  fadeInUp,
+  fadeInLeft,
+  staggerContainer,
+  scaleUp,
+} from "./animationVariants";
 import { useRaasAnimations } from "./useRaasAnimations";
 
 export const RaaS = () => {
-  const {
-    sectionRef,
-    sectionControls,
-    contentRef,
-    contentControls,
-    featuresRef,
-    featuresControls,
-    ctaRef,
-    ctaControls,
-  } = useRaasAnimations();
+  const anim = useRaasAnimations();
 
   return (
     <motion.section
-      ref={sectionRef}
+      ref={anim.sectionRef}
       initial="hidden"
-      animate={sectionControls}
+      animate={anim.sectionControls}
       variants={fadeInUp}
-      className="raas-section py-20 bg-gradient-to-br from-indigo-900 to-purple-900"
+      className="bg-navy py-24"
       id="recruitment-service"
     >
-      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <motion.div ref={contentRef} initial="hidden" animate={contentControls} variants={fadeInUp} className="raas-content text-center">
-          <motion.p variants={fadeInUp} className="carousel-headline-small" style={{ color: "#FFFFFF", fontSize: "24px", fontFamily: "'Plus Jakarta Sans', sans-serif", margin: "0px 0px 8px", fontWeight: "400" }}>
-            <span className="hw" style={{ fontWeight: "600" }}>We&apos;ll</span> Handle It
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <motion.div
+          ref={anim.contentRef}
+          initial="hidden"
+          animate={anim.contentControls}
+          variants={fadeInUp}
+          className="max-w-3xl"
+        >
+          <motion.p
+            variants={fadeInUp}
+            className="inline-flex items-center gap-3 text-[11px] font-semibold tracking-[0.18em] text-[#d4b8f0] uppercase before:block before:h-px before:w-7 before:bg-[#d4b8f0]"
+          >
+            Recruitment as a service
           </motion.p>
-          <motion.h2 variants={fadeInUp} style={{ color: "#FFFFFF", fontSize: "40px", fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: "bold", margin: "0px 0px 16px" }}>
+          <motion.h2
+            variants={fadeInUp}
+            className="font-display mt-5 text-4xl text-white md:text-5xl"
+          >
             Don&apos;t have a recruitment team?
           </motion.h2>
-          <motion.p variants={fadeInUp} className="raas-subtitle mx-auto" style={{ color: "#FFFFFFCC", fontSize: "18px", fontFamily: "'Inter', sans-serif", maxWidth: "700px", margin: "0 auto 48px auto", lineHeight: "1.6" }}>
-            AiRecruitex isn&apos;t just software — we also run the entire first-stage process for you.
-            We post the role, screen every applicant with AI interviews, and deliver a scored
-            shortlist of candidates actually worth meeting.
+          <motion.p
+            variants={fadeInUp}
+            className="mt-4 text-lg leading-relaxed text-[#9aa6c2]"
+          >
+            AiRecruitex can also run the first-stage process: post the role,
+            screen every applicant, and deliver a scored shortlist of people
+            worth meeting.
           </motion.p>
+        </motion.div>
 
-          <motion.div ref={featuresRef} initial="hidden" animate={featuresControls} variants={staggerContainer} className="raas-features grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            {raasFeatures.map((feature, index) => (
-              <motion.div key={index} variants={fadeInLeft} whileHover={{ scale: 1.05, y: -5 }} className="raas-feature bg-white/10 backdrop-blur-sm rounded-xl p-6 text-center hover:bg-white/15 transition-all duration-300">
-                <motion.div whileHover={{ rotate: 360 }} transition={{ duration: 0.5 }} className="raas-feature-icon w-12 h-12 mx-auto mb-4 text-indigo-300">
-                  {feature.icon}
-                </motion.div>
-                <span className="text-white font-medium text-sm sm:text-base">{feature.text}</span>
-              </motion.div>
-            ))}
-          </motion.div>
+        <motion.div
+          ref={anim.featuresRef}
+          initial="hidden"
+          animate={anim.featuresControls}
+          variants={staggerContainer}
+          className="mt-12 grid grid-cols-1 border-t border-white/15 md:grid-cols-2 lg:grid-cols-4"
+        >
+          {raasFeatures.map((feature, index) => (
+            <motion.div
+              key={index}
+              variants={fadeInLeft}
+              className={`border-b border-white/15 py-8 md:px-6 ${
+                index === 0 ? "md:pl-0" : ""
+              }`}
+            >
+              <div className="mb-5 text-brand">{feature.icon}</div>
+              <span className="text-sm leading-relaxed text-white">
+                {feature.text}
+              </span>
+            </motion.div>
+          ))}
+        </motion.div>
 
-          <motion.div ref={ctaRef} initial="hidden" animate={ctaControls} variants={scaleUp} className="raas-cta">
-            <motion.a whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} href="#contact" className="btn btn-primary btn-large inline-block px-8 py-4 bg-white text-indigo-600 hover:bg-indigo-50 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl" style={{ fontSize: "18px", fontFamily: "'Inter', sans-serif" }}>
-              Get in Touch
-            </motion.a>
-          </motion.div>
+        <motion.div
+          ref={anim.ctaRef}
+          initial="hidden"
+          animate={anim.ctaControls}
+          variants={scaleUp}
+          className="mt-12"
+        >
+          <a
+            href="#contact"
+            className="inline-flex items-center bg-white px-6 py-3 text-sm font-semibold text-ink transition hover:bg-[#f6f3f9]"
+          >
+            Speak with us
+          </a>
         </motion.div>
       </div>
     </motion.section>

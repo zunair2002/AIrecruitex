@@ -8,57 +8,53 @@ type ContactInfoPanelProps = {
   onModeChange: (mode: ContactMode) => void;
 };
 
-export const ContactInfoPanel = ({ activeMode, onModeChange }: ContactInfoPanelProps) => (
-  <div className="contact-info flex flex-col justify-center h-full">
-    <div className="contact-toggle flex flex-wrap gap-3 mb-8">
+export const ContactInfoPanel = ({
+  activeMode,
+  onModeChange,
+}: ContactInfoPanelProps) => (
+  <div className="flex h-full flex-col justify-center">
+    <p className="eyebrow">Contact</p>
+    <div className="mt-8 mb-8 flex flex-wrap gap-2">
       {(["demo", "recruit"] as ContactMode[]).map((mode) => (
         <button
           key={mode}
-          className={`contact-toggle-btn px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
-            activeMode === mode ? "bg-indigo-600 text-white shadow-lg" : "bg-white text-gray-600 hover:bg-gray-100"
+          className={`px-4 py-2.5 text-sm font-semibold transition-colors ${
+            activeMode === mode
+              ? "bg-navy text-white"
+              : "border border-[#e0d6ea] bg-white text-[#6b5f7a] hover:border-ink hover:text-ink"
           }`}
           onClick={() => onModeChange(mode)}
         >
-          {mode === "demo" ? "Book a Demo" : "We Need Recruitment Help"}
+          {mode === "demo" ? "Book a briefing" : "Recruitment support"}
         </button>
       ))}
     </div>
 
     <motion.h2
       key={activeMode}
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4"
+      className="font-display text-3xl text-ink sm:text-4xl"
     >
       {contactInfo[activeMode].heading}
     </motion.h2>
 
     <motion.p
       key={activeMode + "text"}
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: 0.1 }}
-      className="text-gray-600 mb-8 leading-relaxed"
+      transition={{ duration: 0.3, delay: 0.05 }}
+      className="mt-4 leading-relaxed text-[#6b5f7a]"
     >
       {contactInfo[activeMode].subtext}
     </motion.p>
 
-    <div className="contact-details space-y-4">
-      <div className="contact-item flex items-center gap-3 text-gray-600">
-        <svg className="w-5 h-5 text-indigo-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-          <polyline points="22,6 12,13 2,6"></polyline>
-        </svg>
-        <a href="mailto:hello@airecruitex.com" className="hover:text-indigo-600 transition-colors">hello@airecruitex.com</a>
-      </div>
-      <div className="contact-item flex items-center gap-3 text-gray-600">
-        <svg className="w-5 h-5 text-indigo-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-          <circle cx="12" cy="10" r="3"></circle>
-        </svg>
-        <span>London, United Kingdom</span>
-      </div>
+    <div className="mt-8 space-y-3 text-sm text-[#6b5f7a]">
+      <a href="mailto:hello@airecruitex.com" className="block hover:text-ink">
+        hello@airecruitex.com
+      </a>
+      <p>London, United Kingdom</p>
     </div>
   </div>
 );

@@ -14,11 +14,9 @@ import type { Job, ObjectId } from "@/lib/types";
  */
 export function useMyJobs(initialJobId?: string | null) {
   const { token } = useAuth();
-  const jobs = useApiResource(
-    (signal) => listMyJobs(token, signal),
-    [token],
-    { enabled: Boolean(token) },
-  );
+  const jobs = useApiResource((signal) => listMyJobs(token, signal), [token], {
+    enabled: Boolean(token),
+  });
   const [requestedJobId, setSelectedJobId] = useState<ObjectId | null>(
     initialJobId ?? null,
   );

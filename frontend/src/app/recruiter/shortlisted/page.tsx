@@ -4,7 +4,8 @@ import { LoadingBlock } from "@/components/ui/Feedback";
 
 export const metadata = {
   title: "Selected Candidates | AiRecruitex HR",
-  description: "Applicants marked Selected, ready for an organisation interview",
+  description:
+    "Applicants marked Selected, ready for an organisation interview",
 };
 
 export default function ShortlistedPage() {

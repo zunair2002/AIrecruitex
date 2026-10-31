@@ -61,7 +61,7 @@ export function AdminReports() {
           value={data.applicationsByStatus.reduce((sum, b) => sum + b.count, 0)}
           sub="Sum of all status buckets"
           icon="📨"
-          gradient="from-purple-500 to-purple-600"
+          gradient="from-zinc-500 to-zinc-700"
         />
       </div>
 
@@ -76,7 +76,7 @@ export function AdminReports() {
           title="Applications by status"
           buckets={data.applicationsByStatus}
           labels={APPLICATION_STATUS_LABELS}
-          gradient="from-indigo-500 to-indigo-600"
+          gradient="from-brand to-brand"
         />
         <BucketCard
           title="Jobs by status"
@@ -93,12 +93,11 @@ function BucketCard<T extends UserRole | ApplicationStatus | JobStatus>({
   title,
   buckets,
   labels,
-  gradient,
 }: {
   title: string;
   buckets: CountBucket<T>[];
   labels: Record<T, string>;
-  gradient: string;
+  gradient?: string;
 }) {
   const total = buckets.reduce((sum, bucket) => sum + bucket.count, 0);
 
@@ -109,7 +108,9 @@ function BucketCard<T extends UserRole | ApplicationStatus | JobStatus>({
       ) : (
         <div className="space-y-4">
           {buckets.map((bucket) => {
-            const percent = total ? Math.round((bucket.count / total) * 100) : 0;
+            const percent = total
+              ? Math.round((bucket.count / total) * 100)
+              : 0;
             return (
               <div key={String(bucket._id)}>
                 <div className="mb-1.5 flex items-center justify-between text-sm">
@@ -125,7 +126,7 @@ function BucketCard<T extends UserRole | ApplicationStatus | JobStatus>({
                 </div>
                 <div className="h-2.5 overflow-hidden rounded-full bg-gray-100">
                   <div
-                    className={`h-full rounded-full bg-gradient-to-r ${gradient} transition-all duration-500`}
+                    className="h-full rounded-full bg-brand transition-all duration-500"
                     style={{ width: `${percent}%` }}
                   />
                 </div>

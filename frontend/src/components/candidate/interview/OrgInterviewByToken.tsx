@@ -19,7 +19,7 @@ import {
   LoadingBlock,
 } from "@/components/ui/Feedback";
 import { primaryButtonClass } from "@/components/ui/controls";
-import { LogoMark } from "@/components/layout/Logo";
+import { BrandWordmark } from "@/components/layout/Logo";
 import { TurnHistory } from "./InterviewRunner";
 import { VoiceAnswerField, useVoiceAnswer } from "./VoiceAnswer";
 
@@ -88,14 +88,20 @@ export function OrgInterviewByToken() {
     );
   }
 
-  if (invite.isLoading) return <Shell><LoadingBlock label="Checking your invitation…" /></Shell>;
+  if (invite.isLoading)
+    return (
+      <Shell>
+        <LoadingBlock label="Checking your invitation…" />
+      </Shell>
+    );
 
   if (invite.error) {
     return (
       <Shell>
         <ErrorBlock message={invite.error} onRetry={invite.reload} />
         <p className="mt-4 text-center text-sm text-gray-500">
-          Invitation links expire. If yours has, ask the hiring team to send a new one.
+          Invitation links expire. If yours has, ask the hiring team to send a
+          new one.
         </p>
       </Shell>
     );
@@ -109,12 +115,14 @@ export function OrgInterviewByToken() {
     return (
       <Shell>
         <Card>
-          <h1 className="text-2xl font-bold text-gray-900">Interview submitted</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Interview submitted
+          </h1>
           <p className="mt-2 text-sm text-gray-600">
             Thank you, {data.candidateName ?? "there"}. Your answers for{" "}
-            <span className="font-semibold">{data.jobTitle}</span> have been sent to
-            the hiring team. They review and score them, so there&apos;s no result
-            to show here.
+            <span className="font-semibold">{data.jobTitle}</span> have been
+            sent to the hiring team. They review and score them, so there&apos;s
+            no result to show here.
           </p>
         </Card>
         <div className="mt-6">
@@ -138,7 +146,7 @@ export function OrgInterviewByToken() {
             </span>
           </div>
           <div className="flex items-start gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-indigo-100 text-sm font-bold text-indigo-700">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-light text-sm font-bold text-brand-dark">
               Q{session.questionNumber ?? answered + 1}
             </div>
             <h2 className="mt-1 text-xl font-bold text-gray-900">
@@ -168,7 +176,8 @@ export function OrgInterviewByToken() {
             {isBusy ? "Submitting…" : "Submit answer"}
           </button>
           <p className="mt-2 text-center text-xs text-gray-400">
-            Your answers are scored by the hiring team — you won&apos;t see a score here.
+            Your answers are scored by the hiring team — you won&apos;t see a
+            score here.
           </p>
         </Card>
 
@@ -188,8 +197,8 @@ export function OrgInterviewByToken() {
           {data.jobTitle} — interview
         </h1>
         <p className="mt-2 text-sm text-gray-600">
-          Hello {data.candidateName ?? "there"}. The hiring team has invited you to
-          complete a short set of questions for this role.
+          Hello {data.candidateName ?? "there"}. The hiring team has invited you
+          to complete a short set of questions for this role.
         </p>
 
         <dl className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -209,8 +218,8 @@ export function OrgInterviewByToken() {
               How it works
             </dt>
             <dd className="mt-1 text-sm text-gray-700">
-              Questions are asked one at a time. Answers are reviewed by the hiring
-              team.
+              Questions are asked one at a time. Answers are reviewed by the
+              hiring team.
             </dd>
           </div>
         </dl>
@@ -255,9 +264,8 @@ function Shell({ children }: { children: React.ReactNode }) {
   return (
     <main className="min-h-screen bg-gray-50 px-4 py-12">
       <div className="mx-auto max-w-3xl">
-        <div className="mb-8 flex items-center justify-center gap-2">
-          <LogoMark className="h-9 w-9" rounded="rounded-lg" />
-          <span className="text-xl font-bold text-gray-900">AiRecruitex</span>
+        <div className="mb-8 flex justify-center">
+          <BrandWordmark className="text-[1.5rem]" />
         </div>
         {children}
       </div>

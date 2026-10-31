@@ -1,131 +1,99 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { handleNavClick } from "./smoothScroll";
-import { LogoMark } from "./Logo";
+import { BrandWordmark } from "./Logo";
 
 const navLinks = [
-  { href: "#how-it-works", label: "How It Works", isPage: false },
-  { href: "#features", label: "Features", isPage: false },
+  { href: "#how-it-works", label: "How it works", isPage: false },
+  { href: "#features", label: "Platform", isPage: false },
   { href: "/about", label: "About", isPage: true },
   { href: "/pricing", label: "Pricing", isPage: true },
   { href: "/contact", label: "Contact", isPage: true },
 ] as const;
 
+const linkClass =
+  "text-[13px] font-medium tracking-wide text-zinc-600 transition-colors hover:text-brand";
+
 export const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 20) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   return (
-    <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? "bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100"
-          : "bg-transparent"
-      }`}
-    >
-      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 lg:h-20">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group z-50">
-            <LogoMark className="w-10 h-10 transform group-hover:scale-105 transition-transform" />
-            <span className="text-2xl font-black bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent tracking-tight">
-              AiRecruitex
-            </span>
-          </Link>
+    <nav className="fixed top-0 right-0 left-0 z-50 border-t-[3px] border-t-brand border-b border-[#e0d6ea] bg-white">
+      <div className="mx-auto flex h-[4.75rem] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <Link href="/" className="z-50 transition-opacity hover:opacity-80">
+          <BrandWordmark className="text-[1.65rem]" />
+        </Link>
 
-          {/* Desktop Navigation Links */}
-          <div className="hidden lg:flex items-center gap-6 bg-white/50 backdrop-blur-sm px-6 py-2.5 rounded-full border border-gray-200/50 shadow-sm">
-            {navLinks.map((link) =>
-              link.isPage ? (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="text-sm font-semibold text-gray-600 hover:text-indigo-600 transition-colors"
-                >
-                  {link.label}
-                </Link>
-              ) : (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  onClick={(e) => handleNavClick(e, link.href)}
-                  className="text-sm font-semibold text-gray-600 hover:text-indigo-600 transition-colors"
-                >
-                  {link.label}
-                </a>
-              ),
-            )}
-          </div>
-
-          {/* Desktop Action Buttons */}
-          <div className="hidden lg:flex items-center gap-3">
-            <Link
-              href="/login/candidate"
-              className="px-5 py-2.5 text-sm rounded-full font-semibold text-gray-700 bg-white border border-gray-200 hover:border-indigo-300 hover:text-indigo-600 transition-all"
-            >
-              Candidate Login
-            </Link>
-            <Link
-              href="/login/recruiter"
-              className="px-5 py-2.5 text-sm rounded-full font-bold bg-gray-900 text-white hover:bg-indigo-600 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
-            >
-              Recruiter Login
-            </Link>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            className="lg:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors z-50"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            aria-label="Menu"
-          >
-            {!isMobileMenuOpen ? (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
+        <div className="hidden items-center gap-9 lg:flex">
+          {navLinks.map((link) =>
+            link.isPage ? (
+              <Link key={link.href} href={link.href} className={linkClass}>
+                {link.label}
+              </Link>
             ) : (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            )}
-          </button>
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={(e) => handleNavClick(e, link.href)}
+                className={linkClass}
+              >
+                {link.label}
+              </a>
+            ),
+          )}
         </div>
+
+        <div className="hidden items-center gap-6 lg:flex">
+          <Link
+            href="/login/candidate"
+            className="text-[13px] font-medium text-zinc-600 transition-colors hover:text-brand"
+          >
+            Candidate
+          </Link>
+          <Link
+            href="/login/recruiter"
+            className="rounded-sm bg-brand px-4 py-2.5 text-[13px] font-semibold text-white transition-colors hover:bg-brand-dark"
+          >
+            Recruiter login
+          </Link>
+        </div>
+
+        <button
+          className="z-50 rounded-sm p-2 text-ink hover:bg-zinc-100 lg:hidden"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label="Menu"
+        >
+          {!isMobileMenuOpen ? (
+            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M4 7h16M4 12h16M4 17h16" />
+            </svg>
+          ) : (
+            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          )}
+        </button>
       </div>
 
-      {/* Mobile Menu Overlay */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.2 }}
-            className="absolute top-full left-0 w-full bg-white shadow-xl border-t border-gray-100 lg:hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute top-full left-0 w-full border-b border-[#e0d6ea] bg-white lg:hidden"
           >
-            <div className="container mx-auto px-4 py-6 flex flex-col gap-4">
+            <div className="flex flex-col gap-1 px-4 py-5">
               {navLinks.map((link) =>
                 link.isPage ? (
                   <Link
                     key={link.href}
                     href={link.href}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="text-lg font-semibold text-gray-800 hover:text-indigo-600 p-2 rounded-lg hover:bg-gray-50"
+                    className="px-2 py-3 text-base text-ink"
                   >
                     {link.label}
                   </Link>
@@ -136,27 +104,26 @@ export const Navbar = () => {
                     onClick={(e) =>
                       handleNavClick(e, link.href, () => setIsMobileMenuOpen(false))
                     }
-                    className="text-lg font-semibold text-gray-800 hover:text-indigo-600 p-2 rounded-lg hover:bg-gray-50"
+                    className="px-2 py-3 text-base text-ink"
                   >
                     {link.label}
                   </a>
                 ),
               )}
-              <hr className="border-gray-100 my-2" />
-              <div className="flex flex-col gap-3 pt-2">
+              <div className="mt-3 flex flex-col gap-2 border-t border-[#e0d6ea] pt-4">
                 <Link
                   href="/login/candidate"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-full py-3 text-center rounded-xl font-bold text-gray-700 bg-gray-50 border border-gray-200"
+                  className="border border-[#e0d6ea] py-3 text-center text-sm font-semibold text-ink"
                 >
-                  Candidate Login
+                  Candidate login
                 </Link>
                 <Link
                   href="/login/recruiter"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-full py-3 text-center rounded-xl font-bold text-white bg-indigo-600 shadow-md"
+                  className="bg-brand py-3 text-center text-sm font-semibold text-white"
                 >
-                  Recruiter Login
+                  Recruiter login
                 </Link>
               </div>
             </div>

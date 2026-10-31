@@ -7,14 +7,14 @@ export function Spinner({ className = "h-8 w-8" }: { className?: string }) {
     <div
       role="status"
       aria-label="Loading"
-      className={`${className} animate-spin rounded-full border-2 border-gray-200 border-t-indigo-600`}
+      className={`${className} animate-spin rounded-full border-2 border-zinc-200 border-t-brand`}
     />
   );
 }
 
 export function LoadingBlock({ label = "Loading…" }: { label?: string }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 py-16 text-sm text-gray-500">
+    <div className="flex flex-col items-center justify-center gap-3 py-16 text-sm text-zinc-500">
       <Spinner />
       {label}
     </div>
@@ -78,10 +78,12 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-12 text-center shadow-sm">
-      <p className="font-medium text-gray-600">{title}</p>
+    <div className="rounded-2xl border border-dashed border-zinc-200 bg-white/80 p-12 text-center ">
+      <p className="font-medium text-zinc-700">{title}</p>
       {description && (
-        <p className="mx-auto mt-2 max-w-md text-sm text-gray-500">{description}</p>
+        <p className="mx-auto mt-2 max-w-md text-sm text-zinc-500">
+          {description}
+        </p>
       )}
       {action && <div className="mt-6">{action}</div>}
     </div>
@@ -100,38 +102,67 @@ export function PageHeader({
   return (
     <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">{title}</h1>
-        {description && <p className="mt-1 text-gray-500">{description}</p>}
+        <h1 className="font-display text-3xl font-bold tracking-tight text-ink">
+          {title}
+        </h1>
+        {description && <p className="mt-1.5 text-zinc-500">{description}</p>}
       </div>
       {action}
     </div>
   );
 }
 
+const toneSolid: Record<string, string> = {
+  brand: "bg-brand",
+  ink: "bg-navy",
+  emerald: "bg-emerald-600",
+  sky: "bg-sky-600",
+  amber: "bg-amber-500",
+};
+
 export function StatCard({
   label,
   value,
   sub,
   icon,
-  gradient = "from-indigo-500 to-indigo-600",
+  gradient,
+  tone = "brand",
 }: {
   label: string;
   value: string | number;
   sub?: string;
   icon: string;
+  /** @deprecated kept for callers — maps to solid tone instead of gradient */
   gradient?: string;
+  tone?: keyof typeof toneSolid;
 }) {
+  const solid =
+    toneSolid[tone] ??
+    (gradient?.includes("emerald")
+      ? toneSolid.emerald
+      : gradient?.includes("sky") || gradient?.includes("blue")
+        ? toneSolid.sky
+        : gradient?.includes("amber")
+          ? toneSolid.amber
+          : toneSolid.brand);
+
   return (
-    <div className="flex items-start gap-4 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-      <div
-        className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${gradient} text-xl shadow-sm`}
-      >
-        {icon}
-      </div>
-      <div className="min-w-0">
-        <p className="text-sm text-gray-500">{label}</p>
-        <p className="mt-1 text-3xl font-bold text-gray-900">{value}</p>
-        {sub && <p className="mt-1 text-xs font-medium text-indigo-600">{sub}</p>}
+    <div className="lift-card relative border border-[#e0d6ea] bg-white p-6">
+      <div className="flex items-start gap-4">
+        <div
+          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-sm ${solid} text-lg text-white`}
+        >
+          {icon}
+        </div>
+        <div className="min-w-0">
+          <p className="text-sm text-zinc-500">{label}</p>
+          <p className="mt-1 font-display text-3xl font-bold tracking-tight text-ink">
+            {value}
+          </p>
+          {sub && (
+            <p className="mt-1 text-xs font-semibold text-brand">{sub}</p>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -150,11 +181,15 @@ export function Card({
 }) {
   return (
     <section
-      className={`rounded-2xl border border-gray-100 bg-white p-6 shadow-sm ${className}`}
+      className={`rounded-2xl border border-zinc-200/90 bg-white p-6 ${className}`}
     >
       {(title || action) && (
         <div className="mb-4 flex items-center justify-between gap-3">
-          {title && <h2 className="text-lg font-bold text-gray-900">{title}</h2>}
+          {title && (
+            <h2 className="font-display text-lg font-bold tracking-tight text-ink">
+              {title}
+            </h2>
+          )}
           {action}
         </div>
       )}
@@ -173,18 +208,18 @@ export function SkillChips({
   tone?: "indigo" | "gray";
 }) {
   if (skills.length === 0) {
-    return <span className="text-xs text-gray-400">{emptyLabel}</span>;
+    return <span className="text-xs text-zinc-400">{emptyLabel}</span>;
   }
   const toneClass =
     tone === "indigo"
-      ? "border-indigo-100 bg-indigo-50 text-indigo-700"
-      : "border-gray-200 bg-gray-50 text-gray-600";
+      ? "border-brand-light bg-brand-light text-brand-dark"
+      : "border-zinc-200 bg-zinc-50 text-zinc-600";
   return (
     <div className="flex flex-wrap gap-1.5">
       {skills.map((skill) => (
         <span
           key={skill}
-          className={`rounded-full border px-2.5 py-1 text-xs font-medium ${toneClass}`}
+          className={`rounded-lg border px-2.5 py-1 text-xs font-medium ${toneClass}`}
         >
           {skill}
         </span>

@@ -1,58 +1,81 @@
+"use client";
+
+import { motion } from "framer-motion";
+import { fadeUp, stagger } from "@/lib/motion";
+
 const benefits = [
   {
-    icon: "🎯",
-    title: "Practice Interviews",
-    description: "Basic and advanced AI interviews to prepare for real job applications.",
+    title: "Practice interviews",
+    description:
+      "Basic and advanced AI interviews to prepare for real job applications.",
   },
   {
-    icon: "📄",
-    title: "Resume Upload",
-    description: "Upload your PDF resume and get matched with relevant job opportunities.",
+    title: "Resume matching",
+    description:
+      "Upload a PDF resume and get matched to relevant open roles.",
   },
   {
-    icon: "📊",
-    title: "AI Feedback & Scoring",
-    description: "Get scores on communication, technical skills, and confidence after every interview.",
+    title: "Scored feedback",
+    description:
+      "Communication, technical skill, and confidence after every interview.",
   },
   {
-    icon: "📚",
-    title: "Learning Recommendations",
-    description: "AI suggests videos and resources based on your weak areas.",
+    title: "Learning paths",
+    description: "Resources suggested from the areas you need to strengthen.",
   },
   {
-    icon: "💬",
-    title: "Career Guidance",
-    description: "Chat with an AI assistant for personalized career advice anytime.",
+    title: "Career guidance",
+    description: "On-demand advice whenever you need a second opinion.",
   },
   {
-    icon: "📈",
-    title: "Track Progress",
-    description: "Dashboard shows your interview history, average score, and improvements.",
+    title: "Progress tracking",
+    description: "Interview history, average score, and improvement over time.",
   },
 ];
 
 export const CandidateBenefits = () => (
-  <section className="py-20 bg-white" id="candidate-benefits">
-    <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div className="text-center mb-16">
-        <p className="text-sm font-bold text-indigo-600 uppercase tracking-wider mb-2">For Job Seekers</p>
-        <h2 className="text-4xl font-bold text-gray-900 mb-4">Candidate Benefits</h2>
-        <p className="text-gray-500 max-w-2xl mx-auto">
-          Everything you need to practice, improve, and land your dream job with AI-powered coaching.
+  <section className="bg-[#f6f3f9] py-24" id="candidate-benefits">
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <motion.div
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+        variants={fadeUp}
+        className="mb-12 max-w-2xl"
+      >
+        <p className="eyebrow">For candidates</p>
+        <h2 className="font-display mt-5 text-4xl text-ink md:text-5xl">
+          Prepared before the first real interview
+        </h2>
+        <p className="mt-4 text-lg leading-relaxed text-[#6b5f7a]">
+          Practice, improve, and apply with structured coaching from resume to
+          offer.
         </p>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {benefits.map((item) => (
-          <div
+      </motion.div>
+
+      <motion.div
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.15 }}
+        variants={stagger}
+        className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
+      >
+        {benefits.map((item, index) => (
+          <motion.div
             key={item.title}
-            className="p-6 rounded-2xl border border-gray-100 bg-gray-50 hover:shadow-md hover:border-indigo-100 transition-all"
+            variants={fadeUp}
+            className="framed-card p-7"
           >
-            <div className="text-3xl mb-4">{item.icon}</div>
-            <h3 className="text-lg font-bold text-gray-900 mb-2">{item.title}</h3>
-            <p className="text-gray-500 text-sm leading-relaxed">{item.description}</p>
-          </div>
+            <p className="inline-flex bg-brand-light px-2.5 py-1 text-[11px] font-bold tracking-[0.16em] text-brand uppercase">
+              {String(index + 1).padStart(2, "0")}
+            </p>
+            <h3 className="font-display mt-4 text-xl text-ink">{item.title}</h3>
+            <p className="mt-2 text-sm leading-relaxed text-[#6b5f7a]">
+              {item.description}
+            </p>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
     </div>
   </section>
 );

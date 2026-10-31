@@ -13,18 +13,19 @@ import { QuestionSetPanel } from "./QuestionSetPanel";
  */
 export function QuestionSetGate({ jobId }: { jobId: ObjectId }) {
   const { token } = useAuth();
-  const jobs = useApiResource(
-    (signal) => listMyJobs(token, signal),
-    [token],
-    { enabled: Boolean(token) },
-  );
+  const jobs = useApiResource((signal) => listMyJobs(token, signal), [token], {
+    enabled: Boolean(token),
+  });
 
   if (jobs.isLoading) return <LoadingBlock label="Loading job…" />;
-  if (jobs.error) return <ErrorBlock message={jobs.error} onRetry={jobs.reload} />;
+  if (jobs.error)
+    return <ErrorBlock message={jobs.error} onRetry={jobs.reload} />;
 
   const job = (jobs.data ?? []).find((item) => item._id === jobId);
   if (!job) {
-    return <ErrorBlock message="That job isn't one of yours, or no longer exists." />;
+    return (
+      <ErrorBlock message="That job isn't one of yours, or no longer exists." />
+    );
   }
 
   return (

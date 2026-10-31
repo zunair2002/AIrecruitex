@@ -18,7 +18,11 @@ import {
   InlineSuccess,
   LoadingBlock,
 } from "@/components/ui/Feedback";
-import { inputClass, labelClass, primaryButtonClass } from "@/components/ui/controls";
+import {
+  inputClass,
+  labelClass,
+  primaryButtonClass,
+} from "@/components/ui/controls";
 
 const MAX_SIZE_MB = RESUME_MAX_BYTES / (1024 * 1024);
 
@@ -79,7 +83,9 @@ export function QuestionSetPanel({
         jobId,
         {
           file,
-          questionsPerInterview: perInterview ? Number(perInterview) : undefined,
+          questionsPerInterview: perInterview
+            ? Number(perInterview)
+            : undefined,
         },
         token,
       );
@@ -96,7 +102,8 @@ export function QuestionSetPanel({
     }
   };
 
-  if (questionSet.isLoading) return <LoadingBlock label="Loading question pool…" />;
+  if (questionSet.isLoading)
+    return <LoadingBlock label="Loading question pool…" />;
 
   // `questions` is defensive: the endpoint answers `data: null` when no pool
   // exists yet, and a partial payload shouldn't take the whole page down.
@@ -126,8 +133,8 @@ export function QuestionSetPanel({
           </div>
         ) : (
           <p className="text-sm text-gray-600">
-            No question pool yet. Until one is uploaded, candidates can&apos;t be
-            given an organisational interview for this job.
+            No question pool yet. Until one is uploaded, candidates can&apos;t
+            be given an organisational interview for this job.
           </p>
         )}
       </Card>
@@ -147,14 +154,16 @@ export function QuestionSetPanel({
               type="file"
               accept={RESUME_ACCEPT_ATTRIBUTE}
               onChange={(event) => handleFile(event.target.files?.[0])}
-              className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-600 file:mr-4 file:rounded-lg file:border-0 file:bg-indigo-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-indigo-700"
+              className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-600 file:mr-4 file:rounded-lg file:border-0 file:bg-brand-light file:px-4 file:py-2 file:text-sm file:font-semibold file:text-brand-dark"
             />
             <p className="mt-2 text-xs text-gray-400">
               PDF or DOCX, max {MAX_SIZE_MB}MB. One block per question:
-              <code className="mx-1 rounded bg-gray-100 px-1">Q:</code> the question,
-              <code className="mx-1 rounded bg-gray-100 px-1">A:</code> the model
-              answer it&apos;s graded against, and
-              <code className="mx-1 rounded bg-gray-100 px-1">Marks:</code> its weight.
+              <code className="mx-1 rounded bg-gray-100 px-1">Q:</code> the
+              question,
+              <code className="mx-1 rounded bg-gray-100 px-1">A:</code> the
+              model answer it&apos;s graded against, and
+              <code className="mx-1 rounded bg-gray-100 px-1">Marks:</code> its
+              weight.
             </p>
             {file && (
               <p className="mt-2 text-xs font-medium text-gray-600">
@@ -177,8 +186,8 @@ export function QuestionSetPanel({
               className={inputClass}
             />
             <p className="mt-2 text-xs text-gray-400">
-              Drawn at random and shuffled for each candidate — e.g. 10 from a pool of
-              20 means no two candidates get the same set.
+              Drawn at random and shuffled for each candidate — e.g. 10 from a
+              pool of 20 means no two candidates get the same set.
             </p>
           </div>
 
@@ -195,8 +204,8 @@ export function QuestionSetPanel({
           </button>
           {existing && (
             <p className="text-xs text-gray-400">
-              Uploading replaces the entire pool. Interviews already in progress keep
-              the questions they were given.
+              Uploading replaces the entire pool. Interviews already in progress
+              keep the questions they were given.
             </p>
           )}
         </form>
@@ -209,7 +218,7 @@ export function QuestionSetPanel({
             <button
               type="button"
               onClick={() => setShowAnswers((value) => !value)}
-              className="text-sm font-semibold text-indigo-600 hover:text-indigo-800"
+              className="text-sm font-semibold text-brand hover:text-brand-dark"
             >
               {showAnswers ? "Hide" : "Show"} model answers
             </button>
@@ -225,7 +234,7 @@ export function QuestionSetPanel({
                   <p className="text-sm font-semibold text-gray-900">
                     {index + 1}. {question.question}
                   </p>
-                  <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-xs font-bold text-indigo-600">
+                  <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-xs font-bold text-brand">
                     {question.marks} mark{question.marks === 1 ? "" : "s"}
                   </span>
                 </div>
@@ -241,7 +250,8 @@ export function QuestionSetPanel({
             ))}
           </ol>
           <p className="mt-4 text-xs text-gray-400">
-            Model answers are used for grading only and are never shown to candidates.
+            Model answers are used for grading only and are never shown to
+            candidates.
           </p>
         </Card>
       )}

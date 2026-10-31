@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LogoMark } from "@/components/layout/Logo";
+import { BrandWordmark } from "@/components/layout/Logo";
 
 /**
  * Shown for any URL that doesn't match a route — replaces Next.js's bare
@@ -8,12 +8,11 @@ import { LogoMark } from "@/components/layout/Logo";
 export default function NotFound() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md rounded-2xl border border-gray-100 bg-white p-8 text-center shadow-sm">
-        <div className="mb-6 flex items-center justify-center gap-2">
-          <LogoMark className="h-9 w-9" rounded="rounded-lg" />
-          <span className="text-xl font-bold text-gray-900">AiRecruitex</span>
+      <div className="w-full max-w-md rounded-2xl border border-gray-100 bg-white p-8 text-center ">
+        <div className="mb-6 flex justify-center">
+          <BrandWordmark className="text-[1.5rem]" />
         </div>
-        <p className="text-5xl font-bold text-indigo-600">404</p>
+        <p className="text-5xl font-bold text-brand">404</p>
         <h1 className="mt-4 text-xl font-bold text-gray-900">
           We couldn&apos;t find that page
         </h1>
@@ -23,7 +22,7 @@ export default function NotFound() {
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
           <Link
             href="/"
-            className="rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-700"
+            className="rounded-xl bg-brand px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
           >
             Go to homepage
           </Link>

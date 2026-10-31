@@ -97,7 +97,9 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <RealtimeContext.Provider value={value}>{children}</RealtimeContext.Provider>
+    <RealtimeContext.Provider value={value}>
+      {children}
+    </RealtimeContext.Provider>
   );
 }
 

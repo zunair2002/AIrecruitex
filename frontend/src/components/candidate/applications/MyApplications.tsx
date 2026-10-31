@@ -28,13 +28,18 @@ import {
   PageHeader,
   SkillChips,
 } from "@/components/ui/Feedback";
-import { compactInputClass, primaryButtonClass } from "@/components/ui/controls";
+import {
+  compactInputClass,
+  primaryButtonClass,
+} from "@/components/ui/controls";
 
 const ALL = "all";
 
 export function MyApplications() {
   const { token } = useAuth();
-  const [statusFilter, setStatusFilter] = useState<ApplicationStatus | typeof ALL>(ALL);
+  const [statusFilter, setStatusFilter] = useState<
+    ApplicationStatus | typeof ALL
+  >(ALL);
 
   const applications = useApiResource(
     (signal) => listMyApplications(token, signal),
@@ -60,7 +65,10 @@ export function MyApplications() {
         title="My Applications"
         description="Match score, HR decision, and any interview HR has scheduled for you."
         action={
-          <Link href="/candidate/jobs" className={`${primaryButtonClass} text-sm`}>
+          <Link
+            href="/candidate/jobs"
+            className={`${primaryButtonClass} text-sm`}
+          >
             Browse jobs
           </Link>
         }
@@ -69,13 +77,19 @@ export function MyApplications() {
       {applications.isLoading ? (
         <LoadingBlock label="Loading your applications…" />
       ) : applications.error ? (
-        <ErrorBlock message={applications.error} onRetry={applications.reload} />
+        <ErrorBlock
+          message={applications.error}
+          onRetry={applications.reload}
+        />
       ) : (applications.data ?? []).length === 0 ? (
         <EmptyState
           title="You haven't applied to any jobs yet."
           description="Upload your resume, then apply from the job board — your match score is computed on apply."
           action={
-            <Link href="/candidate/jobs" className={`${primaryButtonClass} text-sm`}>
+            <Link
+              href="/candidate/jobs"
+              className={`${primaryButtonClass} text-sm`}
+            >
               Browse open jobs
             </Link>
           }
@@ -85,7 +99,9 @@ export function MyApplications() {
           <select
             value={statusFilter}
             onChange={(event) =>
-              setStatusFilter(event.target.value as ApplicationStatus | typeof ALL)
+              setStatusFilter(
+                event.target.value as ApplicationStatus | typeof ALL,
+              )
             }
             className={`${compactInputClass} mb-6`}
           >
@@ -99,13 +115,19 @@ export function MyApplications() {
 
           <div className="space-y-5">
             {filtered.map((application) => (
-              <ApplicationCard key={application._id} application={application} />
+              <ApplicationCard
+                key={application._id}
+                application={application}
+              />
             ))}
           </div>
 
           {filtered.length === 0 && (
             <p className="py-12 text-center text-gray-500">
-              No {APPLICATION_STATUS_LABELS[statusFilter as ApplicationStatus]?.toLowerCase()}{" "}
+              No{" "}
+              {APPLICATION_STATUS_LABELS[
+                statusFilter as ApplicationStatus
+              ]?.toLowerCase()}{" "}
               applications.
             </p>
           )}
@@ -133,7 +155,9 @@ function ApplicationCard({ application }: { application: Application }) {
         </div>
         <div className="flex items-center gap-3">
           <div className="text-right">
-            <p className={`text-2xl font-bold ${scoreColor(application.matchScore)}`}>
+            <p
+              className={`text-2xl font-bold ${scoreColor(application.matchScore)}`}
+            >
               {application.matchScore}%
             </p>
             <p className="text-xs text-gray-500">Match score</p>
@@ -173,21 +197,23 @@ function ApplicationCard({ application }: { application: Application }) {
       </div>
 
       {aiInterview.scheduled && (
-        <div className="mt-4 rounded-xl border border-indigo-100 bg-indigo-50 p-4">
-          <p className="text-xs font-bold uppercase tracking-wide text-indigo-600">
+        <div className="mt-4 rounded-xl border border-brand-light bg-brand-light p-4">
+          <p className="text-xs font-bold uppercase tracking-wide text-brand">
             AI interview scheduled
           </p>
-          <p className="mt-2 text-sm text-indigo-900">
+          <p className="mt-2 text-sm text-zinc-900">
             {formatDateTime(aiInterview.dateTime)}
           </p>
           {aiInterview.message && (
-            <p className="mt-2 text-sm text-indigo-800">{aiInterview.message}</p>
+            <p className="mt-2 text-sm text-brand-dark">
+              {aiInterview.message}
+            </p>
           )}
           <div className="mt-3 flex flex-wrap gap-3">
             {application.interviewSessionId && (
               <Link
                 href={`/candidate/interview/session/${application.interviewSessionId}`}
-                className="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-indigo-700"
+                className="rounded-xl bg-brand px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
               >
                 Open AI interview
               </Link>
@@ -197,7 +223,7 @@ function ApplicationCard({ application }: { application: Application }) {
                 href={aiInterview.calendarLink}
                 target="_blank"
                 rel="noreferrer"
-                className="rounded-xl border border-indigo-200 bg-white px-5 py-2.5 text-sm font-semibold text-indigo-700 transition-colors hover:bg-indigo-50"
+                className="rounded-xl border border-brand/30 bg-white px-5 py-2.5 text-sm font-semibold text-brand-dark transition-colors hover:bg-brand-light"
               >
                 Add to Google Calendar
               </a>
@@ -211,7 +237,6 @@ function ApplicationCard({ application }: { application: Application }) {
           <OrgInterviewPanel orgInterview={orgInterview} audience="candidate" />
         </div>
       )}
-
     </Card>
   );
 }

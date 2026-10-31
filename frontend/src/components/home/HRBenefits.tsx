@@ -1,58 +1,82 @@
+"use client";
+
+import { motion } from "framer-motion";
+import { fadeUp, stagger } from "@/lib/motion";
+
 const benefits = [
   {
-    icon: "📋",
-    title: "Create Job Posts",
-    description: "Post jobs with title, description, required skills, and experience level.",
+    title: "Role intake",
+    description:
+      "Post jobs with title, description, required skills, and experience.",
   },
   {
-    icon: "🔍",
-    title: "AI Resume Matching",
-    description: "Automatically compare candidate resumes against job requirements with match scores.",
+    title: "Resume matching",
+    description:
+      "Every application scored against the role — without a manual sift.",
   },
   {
-    icon: "🤖",
-    title: "AI Interviews",
-    description: "AI conducts technical and HR interviews so your team saves hours of screening time.",
+    title: "AI interviews",
+    description:
+      "Technical and HR interviews run around the clock, on your criteria.",
   },
   {
-    icon: "📑",
-    title: "Interview Reports",
-    description: "View detailed AI evaluation reports with confidence, communication, and technical scores.",
+    title: "Interview reports",
+    description:
+      "Confidence, communication, and technical scores in one briefing.",
   },
   {
-    icon: "⭐",
-    title: "Shortlist Candidates",
-    description: "Quickly identify and shortlist the best candidates from your applicant pool.",
+    title: "Shortlists",
+    description: "Select the candidates who clear your bar, in one view.",
   },
   {
-    icon: "📊",
-    title: "HR Dashboard",
-    description: "Track total jobs, applicants, and selected candidates all in one place.",
+    title: "Hiring dashboard",
+    description: "Open roles, pipeline, and selected candidates in one place.",
   },
 ];
 
 export const HRBenefits = () => (
-  <section className="py-20 bg-gray-50" id="hr-benefits">
-    <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div className="text-center mb-16">
-        <p className="text-sm font-bold text-indigo-600 uppercase tracking-wider mb-2">For Companies</p>
-        <h2 className="text-4xl font-bold text-gray-900 mb-4">HR Benefits</h2>
-        <p className="text-gray-500 max-w-2xl mx-auto">
-          Hire faster and smarter with AI-powered resume screening, interviews, and candidate evaluation.
+  <section className="bg-white py-24" id="hr-benefits">
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <motion.div
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+        variants={fadeUp}
+        className="mb-12 max-w-2xl"
+      >
+        <p className="eyebrow">For hiring teams</p>
+        <h2 className="font-display mt-5 text-4xl text-ink md:text-5xl">
+          Hire with a brief, not a pile of CVs
+        </h2>
+        <p className="mt-4 text-lg leading-relaxed text-[#6b5f7a]">
+          Screening, interviews, and ranked shortlists — so the team meets only
+          the strongest fits.
         </p>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {benefits.map((item) => (
-          <div
+      </motion.div>
+
+      <motion.div
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.15 }}
+        variants={stagger}
+        className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
+      >
+        {benefits.map((item, index) => (
+          <motion.div
             key={item.title}
-            className="p-6 rounded-2xl bg-white border border-gray-100 hover:shadow-md hover:border-indigo-100 transition-all"
+            variants={fadeUp}
+            className="framed-card p-7"
           >
-            <div className="text-3xl mb-4">{item.icon}</div>
-            <h3 className="text-lg font-bold text-gray-900 mb-2">{item.title}</h3>
-            <p className="text-gray-500 text-sm leading-relaxed">{item.description}</p>
-          </div>
+            <p className="inline-flex bg-brand-light px-2.5 py-1 text-[11px] font-bold tracking-[0.16em] text-brand uppercase">
+              {String(index + 1).padStart(2, "0")}
+            </p>
+            <h3 className="font-display mt-4 text-xl text-ink">{item.title}</h3>
+            <p className="mt-2 text-sm leading-relaxed text-[#6b5f7a]">
+              {item.description}
+            </p>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
     </div>
   </section>
 );

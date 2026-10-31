@@ -9,49 +9,49 @@ import { FeaturesCarouselNav } from "./FeaturesCarouselNav";
 import { MoreFeaturesSection } from "./MoreFeaturesSection";
 
 export const PowerfulFeatures = () => {
-  const {
-    sectionRef,
-    sectionControls,
-    headerRef,
-    headerControls,
-    carouselRef,
-    carouselControls,
-    wrapperRef,
-    activeScene,
-    prevScene,
-    nextScene,
-    setActiveScene,
-    moreFeaturesRef,
-    moreFeaturesControls,
-  } = usePowerfulFeaturesState();
+  const state = usePowerfulFeaturesState();
 
   return (
     <motion.section
-      ref={sectionRef}
+      ref={state.sectionRef}
       initial="hidden"
-      animate={sectionControls}
+      animate={state.sectionControls}
       variants={fadeInUp}
-      className="features-animated py-20 bg-white overflow-hidden"
-      id="features"
+      className="overflow-hidden bg-white py-24"
     >
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="features-collapsible-content">
-          <motion.div ref={headerRef} initial="hidden" animate={headerControls} variants={fadeInUp}>
+          <motion.div
+            ref={state.headerRef}
+            initial="hidden"
+            animate={state.headerControls}
+            variants={fadeInUp}
+          >
             <PowerfulFeaturesHeader />
           </motion.div>
 
-          <motion.div ref={carouselRef} initial="hidden" animate={carouselControls} variants={fadeInUp}>
-            <FeaturesCarousel wrapperRef={wrapperRef} />
+          <motion.div
+            ref={state.carouselRef}
+            initial="hidden"
+            animate={state.carouselControls}
+            variants={fadeInUp}
+          >
+            <FeaturesCarousel wrapperRef={state.wrapperRef} />
           </motion.div>
 
           <FeaturesCarouselNav
-            activeScene={activeScene}
-            onPrev={prevScene}
-            onNext={nextScene}
-            onGoTo={setActiveScene}
+            activeScene={state.activeScene}
+            onPrev={state.prevScene}
+            onNext={state.nextScene}
+            onGoTo={state.setActiveScene}
           />
 
-          <motion.div ref={moreFeaturesRef} initial="hidden" animate={moreFeaturesControls} variants={fadeInUp}>
+          <motion.div
+            ref={state.moreFeaturesRef}
+            initial="hidden"
+            animate={state.moreFeaturesControls}
+            variants={fadeInUp}
+          >
             <MoreFeaturesSection />
           </motion.div>
         </div>

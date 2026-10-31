@@ -9,17 +9,20 @@ export const metadata = {
 export default function PricingPage() {
   return (
     <main>
-      <section className="pt-32 pb-12 bg-gradient-to-br from-indigo-50 via-white to-purple-50">
-        <div className="container mx-auto max-w-7xl px-4 sm:px-6 text-center">
-          <h1 className="text-5xl font-bold text-gray-900 mb-4">Pricing</h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Simple plans for candidates and HR teams. Start free and upgrade as you grow.
+      <section className="bg-[#f6f3f9] pt-32 pb-12">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <p className="eyebrow">Pricing</p>
+          <h1 className="font-display mt-5 max-w-2xl text-5xl text-ink">
+            Clear plans for serious hiring.
+          </h1>
+          <p className="mt-4 max-w-xl text-lg text-[#6b5f7a]">
+            Start free. Upgrade when the pipeline grows.
           </p>
         </div>
       </section>
 
-      <section className="py-16 bg-white">
-        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <section className="bg-[#f6f3f9] pb-20">
+        <div className="mx-auto max-w-7xl border border-[#e0d6ea] px-0 sm:mx-6 lg:mx-auto">
           <PricingCards />
         </div>
       </section>

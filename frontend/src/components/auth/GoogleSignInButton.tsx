@@ -49,11 +49,11 @@ export function GoogleSignInButton({
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-3">
-        <span className="h-px flex-1 bg-gray-200" />
-        <span className="text-xs font-medium uppercase tracking-wide text-gray-400">
+        <span className="h-px flex-1 bg-[#e0d6ea]" />
+        <span className="text-xs font-medium uppercase tracking-[0.14em] text-[#6b5f7a]">
           or
         </span>
-        <span className="h-px flex-1 bg-gray-200" />
+        <span className="h-px flex-1 bg-[#e0d6ea]" />
       </div>
 
       <InlineError message={error} />
@@ -62,7 +62,7 @@ export function GoogleSignInButton({
         type="button"
         onClick={handleClick}
         disabled={isSigningIn}
-        className="flex w-full items-center justify-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 font-semibold text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+        className="flex w-full items-center justify-center gap-3 rounded-sm border border-[#e0d6ea] bg-white px-4 py-3.5 font-semibold text-ink transition-colors hover:bg-[#f6f3f9] disabled:cursor-not-allowed disabled:opacity-60"
       >
         <GoogleMark />
         {isSigningIn ? "Opening Google…" : label}

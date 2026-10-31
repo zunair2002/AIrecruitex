@@ -3,7 +3,8 @@ import { LegalPageFooter } from "./LegalPageFooter";
 
 export const metadata = {
   title: "Privacy Policy | AiRecruitex",
-  description: "AiRecruitex's Privacy Policy - How we collect, use, and protect your personal data",
+  description:
+    "AiRecruitex's Privacy Policy - How we collect, use, and protect your personal data",
 };
 
 export default function PrivacyPolicy() {
@@ -14,7 +15,9 @@ export default function PrivacyPolicy() {
       </div>
 
       <div className="container mx-auto max-w-4xl px-4 py-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">Privacy Policy</h1>
+        <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          Privacy Policy
+        </h1>
         <p className="text-gray-500 mb-8">Last updated: 11 February 2026</p>
         <PrivacyContent />
       </div>

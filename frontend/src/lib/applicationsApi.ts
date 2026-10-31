@@ -1,7 +1,7 @@
 /**
  * `/api/applications` — served by two routers mounted on the same prefix:
- *   candidate/applications/routes/application.routes.ts (POST /:jobId/apply, GET /mine)
- *   hr/applicant-review/routes/applicant-review.routes.ts (the rest)
+ * candidate/applications/routes/application.routes.ts (POST /:jobId/apply, GET /mine)
+ * hr/applicant-review/routes/applicant-review.routes.ts (the rest)
  */
 import { apiRequest } from "./api";
 import type {
@@ -87,10 +87,11 @@ export function updateApplicationStatus(
   status: ApplicationStatus,
   token: string | null,
 ): Promise<Application> {
-  return apiRequest<Application>(
-    `/api/applications/${applicationId}/status`,
-    { method: "PATCH", body: { status }, token },
-  );
+  return apiRequest<Application>(`/api/applications/${applicationId}/status`, {
+    method: "PATCH",
+    body: { status },
+    token,
+  });
 }
 
 /**

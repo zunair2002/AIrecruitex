@@ -2,8 +2,8 @@
  * Thin fetch wrapper around the Airecruitx backend.
  *
  * The backend always answers with `{ success: boolean, ... }`:
- *   success -> { success: true, data: <payload> }  (or { success: true, message })
- *   failure -> { success: false, message: <reason> }
+ * success -> { success: true, data: <payload> } (or { success: true, message })
+ * failure -> { success: false, message: <reason> }
  * so every caller here gets either the unwrapped `data` or an ApiError.
  */
 
@@ -67,7 +67,8 @@ export async function apiRequest<T>(
       signal,
     });
   } catch (error) {
-    if (error instanceof DOMException && error.name === "AbortError") throw error;
+    if (error instanceof DOMException && error.name === "AbortError")
+      throw error;
     throw new ApiError(
       "Could not reach the server. Please check your connection and try again.",
       0,

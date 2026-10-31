@@ -23,7 +23,8 @@ export function AdminDashboard() {
     { enabled: Boolean(token) },
   );
 
-  if (overview.isLoading) return <LoadingBlock label="Loading platform overview…" />;
+  if (overview.isLoading)
+    return <LoadingBlock label="Loading platform overview…" />;
   if (overview.error) {
     return (
       <div className="p-8">
@@ -39,7 +40,9 @@ export function AdminDashboard() {
       <PageHeader
         title="Platform Overview"
         description={
-          user ? `Signed in as ${user.name}.` : "Platform-wide counts and activity."
+          user
+            ? `Signed in as ${user.name}.`
+            : "Platform-wide counts and activity."
         }
       />
 
@@ -62,7 +65,7 @@ export function AdminDashboard() {
           value={data.totalJobs}
           sub={`${data.openJobs} open`}
           icon="💼"
-          gradient="from-purple-500 to-purple-600"
+          gradient="from-zinc-500 to-zinc-700"
         />
         <StatCard
           label="Applications"
@@ -79,7 +82,7 @@ export function AdminDashboard() {
           value={data.totalInterviewSessions}
           sub={`${data.completedInterviews} completed`}
           icon="🎤"
-          gradient="from-indigo-500 to-indigo-600"
+          gradient="from-brand to-brand"
         />
         <StatCard
           label="Completion rate"
@@ -90,7 +93,7 @@ export function AdminDashboard() {
           }
           sub="Sessions finished vs started"
           icon="✅"
-          gradient="from-amber-500 to-orange-600"
+          gradient="from-amber-500 to-brand-dark"
         />
       </div>
 
@@ -99,7 +102,7 @@ export function AdminDashboard() {
         action={
           <Link
             href="/admin/activity-logs"
-            className="text-sm font-semibold text-indigo-600 hover:text-indigo-800"
+            className="text-sm font-semibold text-brand hover:text-brand-dark"
           >
             Full log
           </Link>

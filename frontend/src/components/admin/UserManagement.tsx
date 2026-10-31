@@ -144,17 +144,29 @@ export function UserManagement() {
       ) : list.length === 0 ? (
         <EmptyState title="No users match these filters." />
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+        <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white ">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50">
-                  <th className="px-6 py-4 text-left font-semibold text-gray-600">User</th>
-                  <th className="px-6 py-4 text-left font-semibold text-gray-600">Role</th>
-                  <th className="px-6 py-4 text-left font-semibold text-gray-600">Sign-in</th>
-                  <th className="px-6 py-4 text-left font-semibold text-gray-600">Status</th>
-                  <th className="px-6 py-4 text-left font-semibold text-gray-600">Joined</th>
-                  <th className="px-6 py-4 text-left font-semibold text-gray-600">Actions</th>
+                  <th className="px-6 py-4 text-left font-semibold text-gray-600">
+                    User
+                  </th>
+                  <th className="px-6 py-4 text-left font-semibold text-gray-600">
+                    Role
+                  </th>
+                  <th className="px-6 py-4 text-left font-semibold text-gray-600">
+                    Sign-in
+                  </th>
+                  <th className="px-6 py-4 text-left font-semibold text-gray-600">
+                    Status
+                  </th>
+                  <th className="px-6 py-4 text-left font-semibold text-gray-600">
+                    Joined
+                  </th>
+                  <th className="px-6 py-4 text-left font-semibold text-gray-600">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -168,7 +180,7 @@ export function UserManagement() {
                     >
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-700">
+                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-light text-xs font-bold text-brand-dark">
                             {initials(item.name)}
                           </div>
                           <div className="min-w-0">

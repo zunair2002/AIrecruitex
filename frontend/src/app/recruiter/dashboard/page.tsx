@@ -2,7 +2,8 @@ import { RecruiterDashboard } from "@/components/recruiter/RecruiterDashboard";
 
 export const metadata = {
   title: "HR Dashboard | AiRecruitex",
-  description: "Recruiter dashboard - manage jobs, applicants, and shortlisted candidates",
+  description:
+    "Recruiter dashboard - manage jobs, applicants, and shortlisted candidates",
 };
 
 export default function RecruiterDashboardPage() {

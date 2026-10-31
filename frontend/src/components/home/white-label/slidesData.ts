@@ -21,6 +21,6 @@
     id: 4,
     title: "TechStart Solutions",
     description:
-      "Fast-growing startup selecting software developers with futuristic indigo-branded code consoles.",
+      "Fast-growing startup selecting software developers with futuristic teal-branded code consoles.",
   },
 ];

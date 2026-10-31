@@ -6,28 +6,26 @@ import { useRouter } from "next/navigation";
 import { useAuth, homePathForRole } from "@/context/AuthContext";
 import type { UserRole } from "@/lib/types";
 import { VerifyEmailForm } from "./VerifyEmailForm";
-import { LogoMark } from "@/components/layout/Logo";
+import { BrandWordmark } from "@/components/layout/Logo";
 
 export function AuthBrand() {
   return (
-    <div className="flex flex-col items-center text-center mb-8">
-      <Link
-        href="/"
-        className="flex items-center gap-2 mb-2 group transition-opacity hover:opacity-80"
-      >
-        <LogoMark className="w-10 h-10 group-hover:scale-105 transition-transform" />
-        <span className="text-2xl font-bold text-indigo-600">AiRecruitex</span>
+    <div className="mb-8">
+      <Link href="/" className="inline-block transition-opacity hover:opacity-80">
+        <BrandWordmark className="text-[1.85rem]" />
       </Link>
-      <p className="text-sm text-gray-500">AI-Powered Recruiting</p>
+      <p className="mt-2.5 text-[11px] font-semibold tracking-[0.16em] text-brand uppercase">
+        Screen with evidence
+      </p>
     </div>
   );
 }
 
 export const authInputClass =
-  "w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all";
+  "w-full rounded-sm border border-[#e0d6ea] bg-[#f6f3f9] px-4 py-3.5 text-ink placeholder:text-zinc-400 transition-colors focus:border-brand focus:bg-white focus:outline-none";
 
 export const authSubmitClass =
-  "w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-colors";
+  "w-full rounded-sm bg-brand px-4 py-3.5 font-semibold text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50";
 
 export type AuthTab = "login" | "register";
 
@@ -39,24 +37,28 @@ export function AuthTabs({
   onChange: (tab: AuthTab) => void;
 }) {
   return (
-    <div className="flex p-1 mb-8 bg-gray-100 rounded-full">
+    <div className="mb-8 grid grid-cols-2 bg-[#f6f3f9] p-1">
       <button
         type="button"
         onClick={() => onChange("login")}
-        className={`flex-1 py-2.5 text-sm font-semibold rounded-full transition-all ${
-          activeTab === "login" ? "bg-indigo-600 text-white shadow-sm" : "text-gray-500 hover:text-gray-700"
+        className={`py-2.5 text-sm font-semibold transition-colors ${
+          activeTab === "login"
+            ? "bg-brand text-white"
+            : "text-[#6b5f7a] hover:text-ink"
         }`}
       >
-        Login
+        Sign in
       </button>
       <button
         type="button"
         onClick={() => onChange("register")}
-        className={`flex-1 py-2.5 text-sm font-semibold rounded-full transition-all ${
-          activeTab === "register" ? "bg-indigo-600 text-white shadow-sm" : "text-gray-500 hover:text-gray-700"
+        className={`py-2.5 text-sm font-semibold transition-colors ${
+          activeTab === "register"
+            ? "bg-brand text-white"
+            : "text-[#6b5f7a] hover:text-ink"
         }`}
       >
-        Register
+        Create account
       </button>
     </div>
   );
@@ -67,7 +69,7 @@ export function AuthError({ message }: { message: string | null }) {
   return (
     <p
       role="alert"
-      className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700"
+      className="rounded-sm border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700"
     >
       {message}
     </p>
@@ -100,9 +102,10 @@ export function RegisterForm({
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   // Set once signup succeeds; swaps this form for the OTP step.
-  const [pending, setPending] = useState<{ email: string; devOtp?: string } | null>(
-    null,
-  );
+  const [pending, setPending] = useState<{
+    email: string;
+    devOtp?: string;
+  } | null>(null);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -149,7 +152,7 @@ export function RegisterForm({
       <div>
         <label
           htmlFor={`${role}-name`}
-          className="block text-sm font-medium text-gray-700 mb-2"
+          className="mb-2 block text-sm font-medium text-ink"
         >
           Full name
         </label>
@@ -168,7 +171,7 @@ export function RegisterForm({
       <div>
         <label
           htmlFor={`${role}-email`}
-          className="block text-sm font-medium text-gray-700 mb-2"
+          className="mb-2 block text-sm font-medium text-ink"
         >
           {emailLabel}
         </label>
@@ -187,7 +190,7 @@ export function RegisterForm({
       <div>
         <label
           htmlFor={`${role}-password`}
-          className="block text-sm font-medium text-gray-700 mb-2"
+          className="mb-2 block text-sm font-medium text-ink"
         >
           Password
         </label>
@@ -244,7 +247,10 @@ export function LoginForm() {
     <form className="space-y-5" onSubmit={handleSubmit} noValidate>
       <AuthError message={error} />
       <div>
-        <label htmlFor="login-email" className="block text-sm font-medium text-gray-700 mb-2">
+        <label
+          htmlFor="login-email"
+          className="mb-2 block text-sm font-medium text-ink"
+        >
           Email
         </label>
         <input
@@ -260,7 +266,10 @@ export function LoginForm() {
         />
       </div>
       <div>
-        <label htmlFor="login-password" className="block text-sm font-medium text-gray-700 mb-2">
+        <label
+          htmlFor="login-password"
+          className="mb-2 block text-sm font-medium text-ink"
+        >
           Password
         </label>
         <input
@@ -279,7 +288,7 @@ export function LoginForm() {
         {isSubmitting ? "Signing in…" : "Login"}
       </button>
       <div className="text-center">
-        <a href="#" className="text-sm font-medium text-indigo-500 hover:text-indigo-600">
+        <a href="#" className="text-sm font-medium text-brand hover:text-brand">
           Forgot password?
         </a>
       </div>
@@ -292,32 +301,77 @@ export function AuthCardLayout({
   onTabChange,
   registerForm,
   googleButton,
+  portalLabel,
+  tagline,
+  support,
 }: {
   activeTab: AuthTab;
   onTabChange: (tab: AuthTab) => void;
   registerForm: ReactNode;
   /** Rendered under whichever form is showing; omitted when unconfigured. */
   googleButton?: ReactNode;
+  portalLabel: string;
+  tagline: string;
+  support: string;
 }) {
   return (
-    <main className="min-h-screen flex items-center justify-center bg-white px-4 py-12">
-      <div className="w-full max-w-md bg-white rounded-2xl border border-gray-100 shadow-xl shadow-gray-200/60 p-8 sm:p-10">
-        <AuthBrand />
-        <AuthTabs activeTab={activeTab} onChange={onTabChange} />
-        {activeTab === "login" ? <LoginForm /> : registerForm}
-        {googleButton && <div className="mt-6">{googleButton}</div>}
-        {activeTab === "register" && (
-          <p className="mt-6 text-center text-sm text-gray-500">
-            Already have an account?{" "}
-            <button
-              type="button"
-              onClick={() => onTabChange("login")}
-              className="font-semibold text-indigo-600 hover:text-indigo-500"
-            >
-              Sign in
-            </button>
+    <main className="min-h-screen bg-[#f6f3f9]">
+      <div className="grid min-h-screen lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
+        <aside className="hidden flex-col justify-between border-r-4 border-brand bg-navy px-12 py-14 text-white lg:flex">
+          <Link href="/" className="transition-opacity hover:opacity-80">
+            <BrandWordmark className="text-[2rem]" tone="dark" />
+          </Link>
+          <div>
+            <p className="text-[11px] font-semibold tracking-[0.18em] text-[#d4b8f0] uppercase">
+              {portalLabel}
+            </p>
+            <h1 className="font-display mt-5 max-w-sm text-4xl leading-[1.15]">
+              {tagline}
+            </h1>
+            <p className="mt-5 max-w-sm text-sm leading-relaxed text-[#9aa6c2]">
+              {support}
+            </p>
+          </div>
+          <p className="text-[11px] font-medium tracking-[0.16em] text-[#9aa6c2] uppercase">
+            Screen with evidence
           </p>
-        )}
+        </aside>
+
+        <section className="flex items-center justify-center px-4 py-12 sm:px-8">
+          <div className="w-full max-w-md border border-[#e0d6ea] bg-white p-8 sm:p-10">
+            <div className="mb-8 lg:hidden">
+              <Link href="/" className="inline-block">
+                <BrandWordmark className="text-[1.7rem]" />
+              </Link>
+              <p className="mt-3 text-[11px] font-semibold tracking-[0.16em] text-brand uppercase">
+                {portalLabel}
+              </p>
+            </div>
+            <h2 className="font-display mb-1 text-2xl text-ink">
+              {activeTab === "login" ? "Welcome back" : "Create your account"}
+            </h2>
+            <p className="mb-7 text-sm text-[#6b5f7a]">
+              {activeTab === "login"
+                ? "Sign in to continue screening."
+                : "A short form. Then a code in your inbox."}
+            </p>
+            <AuthTabs activeTab={activeTab} onChange={onTabChange} />
+            {activeTab === "login" ? <LoginForm /> : registerForm}
+            {googleButton && <div className="mt-6">{googleButton}</div>}
+            {activeTab === "register" && (
+              <p className="mt-6 text-center text-sm text-[#6b5f7a]">
+                Already have an account?{" "}
+                <button
+                  type="button"
+                  onClick={() => onTabChange("login")}
+                  className="font-semibold text-brand hover:text-brand-dark"
+                >
+                  Sign in
+                </button>
+              </p>
+            )}
+          </div>
+        </section>
       </div>
     </main>
   );

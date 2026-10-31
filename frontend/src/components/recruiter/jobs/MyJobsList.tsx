@@ -19,11 +19,9 @@ import { primaryButtonClass } from "@/components/ui/controls";
 /** GET /api/jobs/mine — everything the Job schema stores for the HR user's postings. */
 export function MyJobsList() {
   const { token } = useAuth();
-  const jobs = useApiResource(
-    (signal) => listMyJobs(token, signal),
-    [token],
-    { enabled: Boolean(token) },
-  );
+  const jobs = useApiResource((signal) => listMyJobs(token, signal), [token], {
+    enabled: Boolean(token),
+  });
 
   return (
     <div className="p-8">
@@ -31,7 +29,10 @@ export function MyJobsList() {
         title="My Jobs"
         description="Every job you've posted, newest first."
         action={
-          <Link href="/recruiter/jobs/create" className={`${primaryButtonClass} text-sm`}>
+          <Link
+            href="/recruiter/jobs/create"
+            className={`${primaryButtonClass} text-sm`}
+          >
             Create job
           </Link>
         }
@@ -46,7 +47,10 @@ export function MyJobsList() {
           title="You haven't posted any jobs yet."
           description="Post one and candidates can start applying immediately."
           action={
-            <Link href="/recruiter/jobs/create" className={`${primaryButtonClass} text-sm`}>
+            <Link
+              href="/recruiter/jobs/create"
+              className={`${primaryButtonClass} text-sm`}
+            >
               Create your first job
             </Link>
           }
@@ -57,7 +61,9 @@ export function MyJobsList() {
             <Card key={job._id}>
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <h2 className="text-lg font-bold text-gray-900">{job.title}</h2>
+                  <h2 className="text-lg font-bold text-gray-900">
+                    {job.title}
+                  </h2>
                   <p className="mt-1 text-xs text-gray-500">
                     Posted {formatDate(job.createdAt)}
                   </p>
@@ -83,19 +89,19 @@ export function MyJobsList() {
               <div className="mt-5 flex flex-wrap items-center gap-4">
                 <Link
                   href={`/recruiter/applicants?jobId=${job._id}`}
-                  className="text-sm font-semibold text-indigo-600 hover:text-indigo-800"
+                  className="text-sm font-semibold text-brand hover:text-brand-dark"
                 >
                   View applicants →
                 </Link>
                 <Link
                   href={`/recruiter/reports?jobId=${job._id}`}
-                  className="text-sm font-semibold text-indigo-600 hover:text-indigo-800"
+                  className="text-sm font-semibold text-brand hover:text-brand-dark"
                 >
                   Interview reports →
                 </Link>
                 <Link
                   href={`/recruiter/jobs/${job._id}/questions`}
-                  className="text-sm font-semibold text-indigo-600 hover:text-indigo-800"
+                  className="text-sm font-semibold text-brand hover:text-brand-dark"
                 >
                   Question pool →
                 </Link>
@@ -130,9 +136,10 @@ function JdRawText({ text }: { text: string }) {
       <button
         type="button"
         onClick={() => setIsOpen((value) => !value)}
-        className="text-xs font-semibold text-indigo-600 hover:text-indigo-800"
+        className="text-xs font-semibold text-brand hover:text-brand-dark"
       >
-        {isOpen ? "Hide" : "Show"} extracted JD text ({text.length.toLocaleString()} chars)
+        {isOpen ? "Hide" : "Show"} extracted JD text (
+        {text.length.toLocaleString()} chars)
       </button>
       {isOpen && (
         <pre className="mt-2 max-h-64 overflow-auto whitespace-pre-wrap rounded-xl bg-gray-50 p-4 text-xs leading-relaxed text-gray-600">

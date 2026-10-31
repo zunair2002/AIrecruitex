@@ -22,7 +22,9 @@ export function ActivityLog() {
   const { token } = useAuth();
   const [actionInput, setActionInput] = useState("");
   const [actorInput, setActorInput] = useState("");
-  const [filter, setFilter] = useState<{ action?: string; actorId?: string }>({});
+  const [filter, setFilter] = useState<{ action?: string; actorId?: string }>(
+    {},
+  );
 
   const logs = useApiResource(
     (signal) => listActivityLogs(filter, token, signal),
@@ -84,7 +86,7 @@ export function ActivityLog() {
             return (
               <div
                 key={log._id}
-                className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
+                className="rounded-2xl border border-gray-100 bg-white p-5 "
               >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">

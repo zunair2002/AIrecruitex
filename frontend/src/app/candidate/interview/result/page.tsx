@@ -2,7 +2,8 @@ import { InterviewHistory } from "@/components/candidate/interview/InterviewHist
 
 export const metadata = {
   title: "Interview Results | AiRecruitex Candidate",
-  description: "Scores, per-answer feedback and certificates for every interview",
+  description:
+    "Scores, per-answer feedback and certificates for every interview",
 };
 
 export default function InterviewResultPage() {

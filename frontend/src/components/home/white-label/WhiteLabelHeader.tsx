@@ -1,32 +1,11 @@
 export const WhiteLabelHeader = () => (
-  <div className="carousel-header text-center mb-16">
-    <p
-      className="carousel-headline-small"
-      style={{
-        color: "#1F2937",
-        fontSize: "24px",
-        fontFamily: "'Plus Jakarta Sans', sans-serif",
-        margin: "0px 0px 8px",
-        fontWeight: "400",
-      }}
-    >
-      Your{" "}
-      <span className="hw" style={{ fontWeight: "600" }}>
-        Brand
-      </span>
-      , Front and Centre
-    </p>
-    <h2
-      className="carousel-headline"
-      style={{
-        color: "#1F2937",
-        fontSize: "40px",
-        fontFamily: "'Plus Jakarta Sans', sans-serif",
-        fontWeight: "bold",
-        margin: 0,
-      }}
-    >
-      White label in seconds. No code required.
+  <div className="mb-14 max-w-2xl">
+    <p className="eyebrow">White label</p>
+    <h2 className="font-display mt-5 text-4xl text-ink md:text-5xl">
+      Your brand, front and centre
     </h2>
+    <p className="mt-4 text-lg leading-relaxed text-[#6b5f7a]">
+      White-label the experience in minutes. No engineering required.
+    </p>
   </div>
 );

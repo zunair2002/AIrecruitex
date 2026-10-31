@@ -35,7 +35,7 @@ export function ScheduledInterview({ sessionId }: { sessionId: ObjectId }) {
         <p className="mt-4 text-center text-sm text-gray-500">
           <Link
             href="/candidate/applications"
-            className="font-semibold text-indigo-600 hover:text-indigo-800"
+            className="font-semibold text-brand hover:text-brand-dark"
           >
             Back to my applications
           </Link>

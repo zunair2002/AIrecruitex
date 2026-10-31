@@ -1,44 +1,28 @@
 /**
- * The AiRecruitex brand mark, defined once so the tab icon, the navbar, the
- * footer, the auth cards and the portal sidebars can't drift apart.
- *
- * The gradient matches `src/app/icon.svg`, which the App Router serves as the
- * favicon — change one and change the other.
+ * Site wordmark. "Ai" is the mark — extra-bold purple, square tittle —
+ * then Recruitex. No boxed icon.
  */
-export function LogoMark({
-  className = "h-10 w-10",
-  rounded = "rounded-xl",
+export function BrandWordmark({
+  className = "text-[1.35rem]",
+  tone = "light",
 }: {
   className?: string;
-  rounded?: string;
+  tone?: "light" | "dark";
 }) {
   return (
-    <div
-      className={`${className} ${rounded} flex shrink-0 items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 shadow-md`}
+    <span
+      className={`brand-wordmark ${tone === "dark" ? "is-on-dark" : ""} ${className}`}
+      aria-label="AiRecruitex"
     >
-      <svg
-        viewBox="0 0 64 64"
-        className="h-[60%] w-[60%]"
-        fill="none"
-        aria-hidden="true"
-      >
-        <path
-          d="M17 47 L32 17 L47 47"
-          stroke="white"
-          strokeWidth="6.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M23.5 38.5 L40.5 38.5"
-          stroke="white"
-          strokeWidth="6.5"
-          strokeLinecap="round"
-        />
-      </svg>
-    </div>
+      <span className="ai" aria-hidden="true">
+        A
+        <span className="i">ı</span>
+      </span>
+      <span className="rest" aria-hidden="true">
+        Recruitex
+      </span>
+    </span>
   );
 }
 
-/** Product name, styled consistently wherever the wordmark appears. */
 export const BRAND_NAME = "AiRecruitex";

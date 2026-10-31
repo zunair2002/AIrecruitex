@@ -4,35 +4,22 @@ import { motion } from "framer-motion";
 import { fadeInUp } from "./animationVariants";
 
 export const PowerfulFeaturesHeader = () => (
-  <motion.div variants={fadeInUp} className="section-header text-center mb-16">
-    <motion.p
-      variants={fadeInUp}
-      className="carousel-headline-small"
-      style={{
-        color: "#1F2937",
-        fontSize: "24px",
-        fontFamily: "'Plus Jakarta Sans', sans-serif",
-        margin: "0px 0px 8px",
-        fontWeight: "400",
-      }}
-    >
-      <span className="hw" style={{ fontWeight: "600" }}>
-        Powerful
-      </span>{" "}
-      Features
+  <motion.div variants={fadeInUp} className="mb-14 max-w-2xl">
+    <motion.p variants={fadeInUp} className="eyebrow">
+      Capabilities
     </motion.p>
     <motion.h2
       variants={fadeInUp}
-      className="carousel-headline"
-      style={{
-        color: "#1F2937",
-        fontSize: "40px",
-        fontFamily: "'Plus Jakarta Sans', sans-serif",
-        fontWeight: "bold",
-        margin: 0,
-      }}
+      className="font-display mt-5 text-4xl text-ink md:text-5xl"
     >
-      Everything you need to screen candidates efficiently.
+      Intelligence at every stage of the funnel
     </motion.h2>
+    <motion.p
+      variants={fadeInUp}
+      className="mt-4 text-lg leading-relaxed text-[#6b5f7a]"
+    >
+      Autopilot screening, structured scoring, and discrepancy checks that
+      surface the candidates your team should meet.
+    </motion.p>
   </motion.div>
 );

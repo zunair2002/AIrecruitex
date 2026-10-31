@@ -174,8 +174,8 @@ function JobCard({
 
       <p
         className={`mt-4 whitespace-pre-line text-sm leading-relaxed text-gray-600 ${
-          expanded ? "" : "line-clamp-4"
-        }`}
+ expanded ? "" : "line-clamp-4"
+ }`}
       >
         {job.description}
       </p>
@@ -183,7 +183,7 @@ function JobCard({
         <button
           type="button"
           onClick={() => setExpanded((value) => !value)}
-          className="mt-2 text-xs font-semibold text-indigo-600 hover:text-indigo-800"
+          className="mt-2 text-xs font-semibold text-brand hover:text-brand-dark"
         >
           {expanded ? "Show less" : "Show more"}
         </button>
@@ -201,7 +201,7 @@ function JobCard({
           href={job.jdFileUrl}
           target="_blank"
           rel="noreferrer"
-          className="mt-4 inline-block text-sm font-medium text-indigo-600 hover:text-indigo-800"
+          className="mt-4 inline-block text-sm font-medium text-brand hover:text-brand-dark"
         >
           Download job description
         </a>

@@ -59,7 +59,7 @@ type DialogState = { application: Application; kind: ScheduleKind } | null;
 /**
  * The HR applicant review screen. Every field the Application schema stores is
  * shown, and every HR action the backend exposes is wired:
- *   PATCH /:id/status, POST /:id/ai-interview, POST /:id/org-interview.
+ * PATCH /:id/status, POST /:id/ai-interview, POST /:id/org-interview.
  */
 export function ApplicantsList() {
   const { token } = useAuth();
@@ -136,7 +136,11 @@ export function ApplicantsList() {
         const ids: ObjectId[] = Array.from(selectedIds);
         await (kind === "ai"
           ? bulkTriggerAiInterview(ids, token)
-          : bulkInviteToOrgInterview(ids, { validityDays: payload.validityDays }, token));
+          : bulkInviteToOrgInterview(
+              ids,
+              { validityDays: payload.validityDays },
+              token,
+            ));
         setSelectedIds(new Set());
         applications.reload();
       } else {
@@ -211,7 +215,10 @@ export function ApplicantsList() {
           title="No jobs posted yet."
           description="Applicants appear once you post a job and candidates apply to it."
           action={
-            <Link href="/recruiter/jobs/create" className={`${primaryButtonClass} text-sm`}>
+            <Link
+              href="/recruiter/jobs/create"
+              className={`${primaryButtonClass} text-sm`}
+            >
               Create job
             </Link>
           }
@@ -245,7 +252,7 @@ export function ApplicantsList() {
             type="checkbox"
             checked={matchedOnly}
             onChange={(event) => setMatchedOnly(event.target.checked)}
-            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+            className="h-4 w-4 rounded border-gray-300 text-brand focus:ring-brand"
           />
           Matched only
         </label>
@@ -260,7 +267,10 @@ export function ApplicantsList() {
       {applications.isLoading ? (
         <LoadingBlock label="Loading applicants…" />
       ) : applications.error ? (
-        <ErrorBlock message={applications.error} onRetry={applications.reload} />
+        <ErrorBlock
+          message={applications.error}
+          onRetry={applications.reload}
+        />
       ) : filtered.length === 0 ? (
         <EmptyState
           title={
@@ -273,8 +283,8 @@ export function ApplicantsList() {
       ) : (
         <div className="space-y-5">
           {selectedIds.size > 0 && (
-            <div className="sticky top-0 z-10 flex flex-wrap items-center gap-3 rounded-2xl border border-indigo-200 bg-indigo-50 p-4 shadow-sm">
-              <span className="text-sm font-semibold text-indigo-900">
+            <div className="sticky top-0 z-10 flex flex-wrap items-center gap-3 rounded-2xl border border-brand/30 bg-brand-light p-4 ">
+              <span className="text-sm font-semibold text-zinc-900">
                 {selectedIds.size} selected
               </span>
               {APPLICATION_STATUSES.map((status) => (
@@ -290,7 +300,9 @@ export function ApplicantsList() {
               ))}
               <button
                 type="button"
-                onClick={() => setDialog({ application: filtered[0], kind: "ai" })}
+                onClick={() =>
+                  setDialog({ application: filtered[0], kind: "ai" })
+                }
                 disabled={isBulkBusy}
                 className={smallButtonClass}
               >
@@ -298,7 +310,9 @@ export function ApplicantsList() {
               </button>
               <button
                 type="button"
-                onClick={() => setDialog({ application: filtered[0], kind: "org" })}
+                onClick={() =>
+                  setDialog({ application: filtered[0], kind: "org" })
+                }
                 disabled={isBulkBusy}
                 className={smallButtonClass}
               >
@@ -322,7 +336,9 @@ export function ApplicantsList() {
               onToggleSelected={() => toggleSelected(application._id)}
               jobTitle={selectedJob?.title ?? "This job"}
               isBusy={busyId === application._id}
-              onStatusChange={(status) => handleStatusChange(application, status)}
+              onStatusChange={(status) =>
+                handleStatusChange(application, status)
+              }
               onSchedule={(kind) => setDialog({ application, kind })}
             />
           ))}
@@ -369,9 +385,11 @@ function ApplicantCard({
 
   return (
     <div
-      className={`rounded-2xl border bg-white p-6 shadow-sm transition-colors ${
-        isSelected ? "border-indigo-300 ring-1 ring-indigo-200" : "border-gray-100"
-      }`}
+      className={`rounded-2xl border bg-white p-6 transition-colors ${
+ isSelected
+ ? "border-brand/50 ring-1 ring-brand/30"
+ : "border-gray-100"
+ }`}
     >
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex min-w-0 items-center gap-3">
@@ -380,9 +398,9 @@ function ApplicantCard({
             checked={isSelected}
             onChange={onToggleSelected}
             aria-label={`Select ${candidate?.name ?? "applicant"}`}
-            className="h-4 w-4 shrink-0 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+            className="h-4 w-4 shrink-0 rounded border-gray-300 text-brand focus:ring-brand"
           />
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-sm font-bold text-indigo-700">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-light text-sm font-bold text-brand-dark">
             {initials(candidate?.name ?? "?")}
           </div>
           <div className="min-w-0">
@@ -400,7 +418,9 @@ function ApplicantCard({
 
         <div className="flex items-center gap-4">
           <div className="text-right">
-            <p className={`text-2xl font-bold ${scoreColor(application.matchScore)}`}>
+            <p
+              className={`text-2xl font-bold ${scoreColor(application.matchScore)}`}
+            >
               {application.matchScore}%
             </p>
             <p className="text-xs text-gray-500">
@@ -415,7 +435,8 @@ function ApplicantCard({
 
       <div className="mt-4 rounded-xl bg-gray-50 p-4">
         <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
-          Matched skills at time of applying ({application.resumeSnapshotSkills.length})
+          Matched skills at time of applying (
+          {application.resumeSnapshotSkills.length})
         </p>
         <SkillChips
           skills={application.resumeSnapshotSkills}
@@ -426,22 +447,24 @@ function ApplicantCard({
       {(aiInterview.scheduled || orgInterview?.status) && (
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
           {aiInterview.scheduled && (
-            <div className="rounded-xl border border-indigo-100 bg-indigo-50 p-4">
-              <p className="text-xs font-bold uppercase tracking-wide text-indigo-600">
+            <div className="rounded-xl border border-brand-light bg-brand-light p-4">
+              <p className="text-xs font-bold uppercase tracking-wide text-brand">
                 AI interview
               </p>
-              <p className="mt-1 text-sm text-indigo-900">
+              <p className="mt-1 text-sm text-zinc-900">
                 {formatDateTime(aiInterview.dateTime)}
               </p>
               {aiInterview.message && (
-                <p className="mt-1 text-xs text-indigo-800">{aiInterview.message}</p>
+                <p className="mt-1 text-xs text-brand-dark">
+                  {aiInterview.message}
+                </p>
               )}
               {aiInterview.calendarLink && (
                 <a
                   href={aiInterview.calendarLink}
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-2 inline-block text-xs font-semibold text-indigo-600 hover:text-indigo-800"
+                  className="mt-2 inline-block text-xs font-semibold text-brand hover:text-brand-dark"
                 >
                   Calendar link
                 </a>
@@ -484,7 +507,9 @@ function ApplicantCard({
               : "Only applicants above the match threshold can have an AI interview scheduled."
           }
         >
-          {aiInterview.scheduled ? "Reschedule AI interview" : "Schedule AI interview"}
+          {aiInterview.scheduled
+            ? "Reschedule AI interview"
+            : "Schedule AI interview"}
         </button>
 
         <button
@@ -512,7 +537,7 @@ function ApplicantCard({
                 ? application.jobId
                 : application.jobId._id
             }&applicationId=${application._id}`}
-            className="text-sm font-semibold text-indigo-600 hover:text-indigo-800"
+            className="text-sm font-semibold text-brand hover:text-brand-dark"
           >
             View interview report →
           </Link>

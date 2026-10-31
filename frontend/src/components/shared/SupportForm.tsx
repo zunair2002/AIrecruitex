@@ -4,7 +4,11 @@ import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { toErrorMessage } from "@/lib/api";
 import { createSupportTicket } from "@/lib/supportApi";
-import { SUPPORT_STATUS_BADGE, SUPPORT_STATUS_LABELS, formatDateTime } from "@/lib/format";
+import {
+  SUPPORT_STATUS_BADGE,
+  SUPPORT_STATUS_LABELS,
+  formatDateTime,
+} from "@/lib/format";
 import type { SupportTicket } from "@/lib/types";
 import {
   Card,
@@ -12,7 +16,11 @@ import {
   InlineSuccess,
   PageHeader,
 } from "@/components/ui/Feedback";
-import { inputClass, labelClass, primaryButtonClass } from "@/components/ui/controls";
+import {
+  inputClass,
+  labelClass,
+  primaryButtonClass,
+} from "@/components/ui/controls";
 
 /**
  * POST /api/support/tickets. The backend has no "list my tickets" route, so

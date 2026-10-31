@@ -10,7 +10,10 @@ type FeaturesCarouselProps = {
 };
 
 export const FeaturesCarousel = ({ wrapperRef }: FeaturesCarouselProps) => (
-  <motion.div variants={staggerContainer} className="features-carousel overflow-hidden">
+  <motion.div
+    variants={staggerContainer}
+    className="features-carousel overflow-hidden"
+  >
     <motion.div
       variants={scaleUp}
       ref={wrapperRef}
@@ -18,16 +21,30 @@ export const FeaturesCarousel = ({ wrapperRef }: FeaturesCarouselProps) => (
       style={{ transform: "translateX(0px)" }}
     >
       {powerfulFeaturesScenes.map((scene, index) => (
-        <motion.div key={index} variants={fadeInUp} className="feature-scene flex-shrink-0 w-full px-4" data-scene={scene.id}>
-          <motion.div whileHover={{ scale: 1.02 }} transition={{ duration: 0.3 }} className="scene-visual mb-8">
+        <motion.div
+          key={index}
+          variants={fadeInUp}
+          className="feature-scene flex-shrink-0 w-full px-4"
+          data-scene={scene.id}
+        >
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            transition={{ duration: 0.3 }}
+            className="framed-card mb-8 overflow-hidden"
+          >
             <SceneVisual sceneId={scene.id} />
           </motion.div>
-          <motion.div variants={fadeInUp} className="scene-content text-center max-w-2xl mx-auto">
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">
-              <span className="feature-tick inline-block mr-2 text-indigo-600">✓</span>
+          <motion.div
+            variants={fadeInUp}
+            className="scene-content text-center max-w-2xl mx-auto"
+          >
+            <h3 className="font-display mb-3 text-2xl text-ink">
+              <span className="feature-tick inline-block mr-2 text-brand">
+                ✓
+              </span>
               {scene.title}
             </h3>
-            <p className="text-gray-600">{scene.description}</p>
+            <p className="text-[#6b5f7a]">{scene.description}</p>
           </motion.div>
         </motion.div>
       ))}

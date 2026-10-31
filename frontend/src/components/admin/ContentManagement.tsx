@@ -47,11 +47,9 @@ export function ContentManagement() {
   const [busyId, setBusyId] = useState<ObjectId | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const jobs = useApiResource(
-    (signal) => listAllJobs(token, signal),
-    [token],
-    { enabled: Boolean(token) },
-  );
+  const jobs = useApiResource((signal) => listAllJobs(token, signal), [token], {
+    enabled: Boolean(token),
+  });
   const applications = useApiResource(
     (signal) => listAllApplications(token, signal),
     [token],
@@ -119,10 +117,10 @@ export function ContentManagement() {
               type="button"
               onClick={() => setTab(option)}
               className={`rounded-full px-5 py-2 text-sm font-semibold transition-all ${
-                tab === option
-                  ? "bg-indigo-600 text-white shadow-sm"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
+ tab === option
+ ? "bg-brand text-white "
+ : "text-gray-500 hover:text-gray-700"
+ }`}
             >
               {option === "jobs"
                 ? `Jobs (${jobs.data?.length ?? 0})`
@@ -163,7 +161,7 @@ export function ContentManagement() {
               return (
                 <div
                   key={job._id}
-                  className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm"
+                  className="rounded-2xl border border-gray-100 bg-white p-6 "
                 >
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div className="min-w-0">
@@ -235,21 +233,36 @@ export function ContentManagement() {
       ) : applications.isLoading ? (
         <LoadingBlock label="Loading applications…" />
       ) : applications.error ? (
-        <ErrorBlock message={applications.error} onRetry={applications.reload} />
+        <ErrorBlock
+          message={applications.error}
+          onRetry={applications.reload}
+        />
       ) : filteredApplications.length === 0 ? (
         <EmptyState title="No applications found." />
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+        <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white ">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50">
-                  <th className="px-6 py-4 text-left font-semibold text-gray-600">Candidate</th>
-                  <th className="px-6 py-4 text-left font-semibold text-gray-600">Job</th>
-                  <th className="px-6 py-4 text-left font-semibold text-gray-600">Match</th>
-                  <th className="px-6 py-4 text-left font-semibold text-gray-600">Status</th>
-                  <th className="px-6 py-4 text-left font-semibold text-gray-600">Interviews</th>
-                  <th className="px-6 py-4 text-left font-semibold text-gray-600">Applied</th>
+                  <th className="px-6 py-4 text-left font-semibold text-gray-600">
+                    Candidate
+                  </th>
+                  <th className="px-6 py-4 text-left font-semibold text-gray-600">
+                    Job
+                  </th>
+                  <th className="px-6 py-4 text-left font-semibold text-gray-600">
+                    Match
+                  </th>
+                  <th className="px-6 py-4 text-left font-semibold text-gray-600">
+                    Status
+                  </th>
+                  <th className="px-6 py-4 text-left font-semibold text-gray-600">
+                    Interviews
+                  </th>
+                  <th className="px-6 py-4 text-left font-semibold text-gray-600">
+                    Applied
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -284,7 +297,9 @@ export function ContentManagement() {
                       </td>
                       <td className="px-6 py-4">
                         <span
-                          className={APPLICATION_STATUS_BADGE[application.status]}
+                          className={
+                            APPLICATION_STATUS_BADGE[application.status]
+                          }
                         >
                           {APPLICATION_STATUS_LABELS[application.status]}
                         </span>

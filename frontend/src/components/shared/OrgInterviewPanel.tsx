@@ -30,18 +30,20 @@ export function OrgInterviewPanel({
 
   // The backend sweeps expired invites on a schedule, so a still-"invited"
   // record can be past its window; treat that as expired in the UI.
-  const expired = status === "expired" || (status === "invited" && isInviteExpired(orgInterview.expiresAt));
+  const expired =
+    status === "expired" ||
+    (status === "invited" && isInviteExpired(orgInterview.expiresAt));
   const effective = expired ? "expired" : status;
 
   return (
     <div
       className={`rounded-xl border p-4 ${
-        effective === "completed"
-          ? "border-emerald-100 bg-emerald-50"
-          : effective === "expired"
-            ? "border-gray-200 bg-gray-50"
-            : "border-amber-100 bg-amber-50"
-      }`}
+ effective === "completed"
+ ? "border-emerald-100 bg-emerald-50"
+ : effective === "expired"
+ ? "border-gray-200 bg-gray-50"
+ : "border-amber-100 bg-amber-50"
+ }`}
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs font-bold uppercase tracking-wide text-gray-600">
@@ -97,7 +99,7 @@ export function OrgInterviewPanel({
           <button
             type="button"
             onClick={() => navigator.clipboard?.writeText(joinLink)}
-            className="text-xs font-semibold text-indigo-600 hover:text-indigo-800"
+            className="text-xs font-semibold text-brand hover:text-brand-dark"
           >
             Copy candidate link
           </button>
@@ -107,7 +109,7 @@ export function OrgInterviewPanel({
             href={orgInterview.calendarLink}
             target="_blank"
             rel="noreferrer"
-            className="text-xs font-semibold text-indigo-600 hover:text-indigo-800"
+            className="text-xs font-semibold text-brand hover:text-brand-dark"
           >
             Add to calendar
           </a>

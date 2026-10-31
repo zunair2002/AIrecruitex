@@ -24,7 +24,25 @@ export function useRaasAnimations() {
     if (isContentInView) contentControls.start("visible");
     if (isFeaturesInView) featuresControls.start("visible");
     if (isCtaInView) ctaControls.start("visible");
-  }, [isSectionInView, isContentInView, isFeaturesInView, isCtaInView, sectionControls, contentControls, featuresControls, ctaControls]);
+  }, [
+    isSectionInView,
+    isContentInView,
+    isFeaturesInView,
+    isCtaInView,
+    sectionControls,
+    contentControls,
+    featuresControls,
+    ctaControls,
+  ]);
 
-  return { sectionRef, contentRef, featuresRef, ctaRef, sectionControls, contentControls, featuresControls, ctaControls };
+  return {
+    sectionRef,
+    contentRef,
+    featuresRef,
+    ctaRef,
+    sectionControls,
+    contentControls,
+    featuresControls,
+    ctaControls,
+  };
 }

@@ -15,14 +15,17 @@ import type {
   ObjectId,
 } from "@/lib/types";
 import { Card, InlineError, InlineSuccess } from "@/components/ui/Feedback";
-import { primaryButtonClass, secondaryButtonClass } from "@/components/ui/controls";
+import {
+  primaryButtonClass,
+  secondaryButtonClass,
+} from "@/components/ui/controls";
 
 /**
  * The certificate flow, exactly as the backend gates it:
- *   1. session completed AND score > CERTIFICATE_PASS_SCORE (403 otherwise)
- *   2. POST /checkout  -> Stripe Checkout URL
- *   3. POST /confirm-payment -> flips certificatePayment.paid once Stripe says paid
- *   4. POST /generate  -> renders + uploads the PDF (402 while unpaid)
+ * 1. session completed AND score > CERTIFICATE_PASS_SCORE (403 otherwise)
+ * 2. POST /checkout -> Stripe Checkout URL
+ * 3. POST /confirm-payment -> flips certificatePayment.paid once Stripe says paid
+ * 4. POST /generate -> renders + uploads the PDF (402 while unpaid)
  *
  * Stripe's success_url points at the backend's own APP_BASE_URL, so after
  * paying the candidate comes back here and presses "I've paid" to confirm.
@@ -41,7 +44,9 @@ export function CertificatePanel({
   const { token } = useAuth();
   const [certificate, setCertificate] = useState<CertificateView | null>(null);
   const [isPaid, setIsPaid] = useState(certificatePaid);
-  const [busy, setBusy] = useState<null | "checkout" | "confirm" | "generate">(null);
+  const [busy, setBusy] = useState<null | "checkout" | "confirm" | "generate">(
+    null,
+  );
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
@@ -166,7 +171,9 @@ export function CertificatePanel({
                   disabled={busy !== null}
                   className={`${primaryButtonClass} text-sm`}
                 >
-                  {busy === "checkout" ? "Opening checkout…" : "Pay for certificate"}
+                  {busy === "checkout"
+                    ? "Opening checkout…"
+                    : "Pay for certificate"}
                 </button>
                 <button
                   type="button"

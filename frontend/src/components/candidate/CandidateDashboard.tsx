@@ -63,7 +63,8 @@ export function CandidateDashboard() {
       pending: list.filter((item) => item.status === "pending").length,
       averageMatch: scored.length
         ? Math.round(
-            scored.reduce((sum, item) => sum + item.matchScore, 0) / scored.length,
+            scored.reduce((sum, item) => sum + item.matchScore, 0) /
+              scored.length,
           )
         : 0,
       upcoming: list.filter(
@@ -89,7 +90,10 @@ export function CandidateDashboard() {
             : "Here's where your applications stand."
         }
         action={
-          <Link href="/candidate/jobs" className={`${primaryButtonClass} text-sm`}>
+          <Link
+            href="/candidate/jobs"
+            className={`${primaryButtonClass} text-sm`}
+          >
             Browse jobs
           </Link>
         }
@@ -97,7 +101,10 @@ export function CandidateDashboard() {
 
       {applications.error && (
         <div className="mb-6">
-          <ErrorBlock message={applications.error} onRetry={applications.reload} />
+          <ErrorBlock
+            message={applications.error}
+            onRetry={applications.reload}
+          />
         </div>
       )}
 
@@ -113,7 +120,7 @@ export function CandidateDashboard() {
           value={summary.matched}
           sub={`Avg match ${summary.averageMatch}%`}
           icon="🎯"
-          gradient="from-purple-500 to-purple-600"
+          gradient="from-zinc-500 to-zinc-700"
         />
         <StatCard
           label="Selected by HR"
@@ -125,7 +132,11 @@ export function CandidateDashboard() {
         <StatCard
           label="Open jobs"
           value={jobs.data?.length ?? 0}
-          sub={unread.length ? `${unread.length} unread notifications` : "All caught up"}
+          sub={
+            unread.length
+              ? `${unread.length} unread notifications`
+              : "All caught up"
+          }
           icon="💼"
           gradient="from-sky-500 to-blue-600"
         />
@@ -137,7 +148,7 @@ export function CandidateDashboard() {
           action={
             <Link
               href="/candidate/applications"
-              className="text-sm font-semibold text-indigo-600 hover:text-indigo-800"
+              className="text-sm font-semibold text-brand hover:text-brand-dark"
             >
               View all
             </Link>
@@ -169,7 +180,9 @@ export function CandidateDashboard() {
                     >
                       {application.matchScore}%
                     </span>
-                    <span className={APPLICATION_STATUS_BADGE[application.status]}>
+                    <span
+                      className={APPLICATION_STATUS_BADGE[application.status]}
+                    >
                       {APPLICATION_STATUS_LABELS[application.status]}
                     </span>
                   </div>
@@ -184,7 +197,7 @@ export function CandidateDashboard() {
           action={
             <Link
               href="/candidate/interview/result"
-              className="text-sm font-semibold text-indigo-600 hover:text-indigo-800"
+              className="text-sm font-semibold text-brand hover:text-brand-dark"
             >
               Past results
             </Link>
@@ -200,14 +213,15 @@ export function CandidateDashboard() {
               {summary.upcoming.map((application) => (
                 <div
                   key={application._id}
-                  className="rounded-xl border border-indigo-100 bg-indigo-50 p-4"
+                  className="rounded-xl border border-brand-light bg-brand-light p-4"
                 >
-                  <p className="text-sm font-semibold text-indigo-900">
+                  <p className="text-sm font-semibold text-zinc-900">
                     {populated(application.jobId)?.title ?? "Job removed"}
                   </p>
                   {application.aiInterview.scheduled && (
-                    <p className="mt-1 text-xs text-indigo-800">
-                      AI interview · {formatDateTime(application.aiInterview.dateTime)}
+                    <p className="mt-1 text-xs text-brand-dark">
+                      AI interview ·{" "}
+                      {formatDateTime(application.aiInterview.dateTime)}
                     </p>
                   )}
                   {application.orgInterview?.status === "invited" && (
@@ -219,7 +233,7 @@ export function CandidateDashboard() {
                   {application.interviewSessionId && (
                     <Link
                       href={`/candidate/interview/session/${application.interviewSessionId}`}
-                      className="mt-3 inline-block text-sm font-semibold text-indigo-600 hover:text-indigo-800"
+                      className="mt-3 inline-block text-sm font-semibold text-brand hover:text-brand-dark"
                     >
                       Open AI interview →
                     </Link>

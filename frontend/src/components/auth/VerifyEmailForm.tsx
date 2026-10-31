@@ -111,15 +111,17 @@ export function VerifyEmailForm({
             setOtp(event.target.value.replace(/\D/g, "").slice(0, 6))
           }
           placeholder="123456"
-          className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-center text-2xl font-bold tracking-[0.4em] text-gray-900 placeholder:tracking-normal placeholder:text-gray-300 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-center text-2xl font-bold tracking-[0.4em] text-gray-900 placeholder:tracking-normal placeholder:text-gray-300 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-brand"
         />
-        <p className="mt-2 text-xs text-gray-400">The code expires in 10 minutes.</p>
+        <p className="mt-2 text-xs text-gray-400">
+          The code expires in 10 minutes.
+        </p>
       </div>
 
       <button
         type="submit"
         disabled={otp.length !== 6 || isSubmitting}
-        className="w-full rounded-xl bg-indigo-600 px-4 py-3 font-semibold text-white transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-indigo-300"
+        className="w-full rounded-xl bg-brand px-4 py-3 font-semibold text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50"
       >
         {isSubmitting ? "Verifying…" : "Verify and continue"}
       </button>
@@ -128,7 +130,7 @@ export function VerifyEmailForm({
         type="button"
         onClick={handleResend}
         disabled={secondsLeft > 0}
-        className="w-full text-sm font-medium text-indigo-600 transition-colors hover:text-indigo-500 disabled:text-gray-400"
+        className="w-full text-sm font-medium text-brand transition-colors hover:text-brand disabled:text-gray-400"
       >
         {secondsLeft > 0 ? `Resend code in ${secondsLeft}s` : "Resend code"}
       </button>

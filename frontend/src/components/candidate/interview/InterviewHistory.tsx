@@ -29,7 +29,10 @@ import {
   LoadingBlock,
   PageHeader,
 } from "@/components/ui/Feedback";
-import { compactInputClass, primaryButtonClass } from "@/components/ui/controls";
+import {
+  compactInputClass,
+  primaryButtonClass,
+} from "@/components/ui/controls";
 import { CertificatePanel } from "./CertificatePanel";
 import { ReportDetails, TurnHistory } from "./InterviewRunner";
 import { FinalScoreRing } from "./ScoreBreakdown";
@@ -45,12 +48,18 @@ const ALL = "all";
  */
 export function InterviewHistory() {
   const { token } = useAuth();
-  const [typeFilter, setTypeFilter] = useState<InterviewHistoryType | typeof ALL>(ALL);
+  const [typeFilter, setTypeFilter] = useState<
+    InterviewHistoryType | typeof ALL
+  >(ALL);
   const [requestedId, setRequestedId] = useState<ObjectId | null>(null);
 
   const sessions = useApiResource(
     (signal) =>
-      listMySessions(typeFilter === ALL ? undefined : typeFilter, token, signal),
+      listMySessions(
+        typeFilter === ALL ? undefined : typeFilter,
+        token,
+        signal,
+      ),
     [token, typeFilter],
     { enabled: Boolean(token) },
   );
@@ -248,14 +257,14 @@ function SessionRow({
       type="button"
       onClick={onSelect}
       className={`w-full rounded-xl border p-4 text-left transition-colors ${
-        isActive
-          ? "border-indigo-200 bg-indigo-50"
-          : "border-gray-100 bg-white hover:border-indigo-100 hover:bg-gray-50"
-      }`}
+ isActive
+ ? "border-brand/30 bg-brand-light"
+ : "border-gray-100 bg-white hover:border-brand-light hover:bg-gray-50"
+ }`}
     >
       <div className="flex items-center justify-between gap-2">
         <p
-          className={`truncate text-sm font-semibold ${isActive ? "text-indigo-900" : "text-gray-900"}`}
+          className={`truncate text-sm font-semibold ${isActive ? "text-zinc-900" : "text-gray-900"}`}
         >
           {session.jobTitle ?? "Practice interview"}
         </p>

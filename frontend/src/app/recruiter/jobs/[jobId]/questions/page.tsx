@@ -16,7 +16,7 @@ export default async function JobQuestionsPage({
     <div className="p-8">
       <Link
         href="/recruiter/jobs"
-        className="mb-6 inline-block text-sm font-semibold text-indigo-600 hover:text-indigo-800"
+        className="mb-6 inline-block text-sm font-semibold text-brand hover:text-brand-dark"
       >
         ← Back to my jobs
       </Link>

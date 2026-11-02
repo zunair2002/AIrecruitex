@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, type DragEvent } from "react";
+import { FileUp } from "lucide-react";
 import { RESUME_ACCEPT_ATTRIBUTE } from "@/lib/resumeApi";
 
 type ResumeDropzoneProps = {
@@ -36,30 +37,43 @@ export function ResumeDropzone({
       onDragLeave={() => setIsDragging(false)}
       onDrop={handleDrop}
       onClick={() => inputRef.current?.click()}
-      className={`cursor-pointer rounded-2xl border-2 border-dashed p-12 text-center transition-colors ${
- isDragging
- ? "border-brand bg-brand-light"
- : "border-gray-200 hover:border-brand/50 hover:bg-gray-50"
- }`}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          inputRef.current?.click();
+        }
+      }}
+      role="button"
+      tabIndex={0}
+      aria-label="Upload a PDF or DOCX resume"
+      className={`cursor-pointer rounded border border-dashed px-4 py-8 text-center transition-colors sm:py-9 ${
+        isDragging
+          ? "border-[#6b5ce7] bg-[#f7f6ff]"
+          : "border-[#c9c4f1] bg-white hover:border-[#6b5ce7] hover:bg-[#fcfbff]"
+      }`}
     >
       <input
         ref={inputRef}
         type="file"
         accept={RESUME_ACCEPT_ATTRIBUTE}
         className="hidden"
-        onChange={(e) => handleFile(e.target.files?.[0])}
+        onClick={(event) => event.stopPropagation()}
+        onChange={(event) => {
+          handleFile(event.target.files?.[0]);
+          event.target.value = "";
+        }}
       />
-      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-light text-3xl">
-        📄
+      <div className="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-[#f0efff] text-[#6658d9]">
+        <FileUp aria-hidden="true" className="h-4 w-4" />
       </div>
-      <p className="text-lg font-semibold text-gray-900">
-        Drag &amp; drop your resume here
+      <p className="text-[12px] font-semibold text-[#454752]">
+        <span className="text-[#6658d9]">Click to upload</span> or drag and drop
       </p>
-      <p className="mt-2 text-sm text-gray-500">
-        or click to browse — PDF or DOCX, max {maxSizeMB}MB
+      <p className="mt-1.5 text-[9px] text-[#92949d]">
+        PDF or DOCX · Maximum file size {maxSizeMB}MB
       </p>
       {error && (
-        <p className="mt-4 text-sm font-medium text-red-600">{error}</p>
+        <p className="mt-3 text-[10px] font-medium text-red-600">{error}</p>
       )}
     </div>
   );

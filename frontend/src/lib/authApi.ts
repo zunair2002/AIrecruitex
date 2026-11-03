@@ -81,6 +81,32 @@ export function getMe(token: string, signal?: AbortSignal): Promise<AuthUser> {
   return apiRequest<AuthUser>("/api/auth/me", { token, signal });
 }
 
+export type CandidateProfileUpdate = {
+  headline: string;
+  about: string;
+  interests: string[];
+  avatar?: File;
+  removeAvatar?: boolean;
+};
+
+export function updateCandidateProfile(
+  input: CandidateProfileUpdate,
+  token: string | null,
+): Promise<AuthUser> {
+  const formData = new FormData();
+  formData.append("headline", input.headline);
+  formData.append("about", input.about);
+  formData.append("interests", JSON.stringify(input.interests));
+  if (input.avatar) formData.append("avatar", input.avatar);
+  if (input.removeAvatar) formData.append("removeAvatar", "true");
+
+  return apiRequest<AuthUser>("/api/auth/profile", {
+    method: "PATCH",
+    formData,
+    token,
+  });
+}
+
 /** POST /api/auth/logout — clears the httpOnly cookie server-side. */
 export function logout(token: string): Promise<{ message?: string }> {
   return apiRequest<{ message?: string }>("/api/auth/logout", {

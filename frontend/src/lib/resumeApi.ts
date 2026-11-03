@@ -41,3 +41,13 @@ export function getMyResume(
 ): Promise<MyResume> {
   return apiRequest<MyResume>("/api/resume/mine", { token, signal });
 }
+
+/** DELETE /api/resume/mine — removes the candidate's stored resume file. */
+export function deleteMyResume(
+  token: string | null,
+): Promise<{ deleted: boolean }> {
+  return apiRequest<{ deleted: boolean }>("/api/resume/mine", {
+    method: "DELETE",
+    token,
+  });
+}

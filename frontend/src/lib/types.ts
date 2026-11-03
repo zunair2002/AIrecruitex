@@ -58,6 +58,9 @@ export type User = {
   orgId?: ObjectId;
   authProvider: AuthProvider;
   avatarUrl?: string;
+  headline?: string;
+  about?: string;
+  interests?: string[];
   isActive: boolean;
   /**
    * Password accounts start false and must confirm the emailed OTP before they
@@ -77,6 +80,9 @@ export type AuthUser = {
   role: UserRole;
   authProvider: AuthProvider;
   avatarUrl?: string;
+  headline?: string;
+  about?: string;
+  interests?: string[];
   emailVerified: boolean;
   /** Only present on GET /api/auth/me. */
   orgId?: ObjectId;
@@ -216,12 +222,19 @@ export type ResumeStatus = "parsed" | "failed";
 export type ResumeUploadResult = {
   fileUrl: string;
   status: ResumeStatus;
+  originalName?: string;
+  fileSize?: number;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 /** GET /api/resume/mine — null when nothing has been uploaded yet. */
 export type MyResume = {
   fileUrl: string;
   status: ResumeStatus;
+  originalName?: string;
+  fileSize?: number;
+  createdAt?: string;
   updatedAt: string;
 } | null;
 

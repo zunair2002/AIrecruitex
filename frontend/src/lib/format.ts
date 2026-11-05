@@ -270,6 +270,11 @@ export function scoreColor(score: number): string {
   return "text-red-600";
 }
 
+/** Formats an application match score as a whole percentage. */
+export function matchScoreLabel(score: number): string {
+  return Number.isFinite(score) ? `${Math.round(score)}%` : "—";
+}
+
 export function initials(name: string): string {
   return name
     .split(/\s+/)

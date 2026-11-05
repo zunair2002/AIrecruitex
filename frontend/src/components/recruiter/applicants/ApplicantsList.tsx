@@ -30,6 +30,7 @@ import {
   formatDate,
   formatDateTime,
   initials,
+  matchScoreLabel,
   scoreColor,
 } from "@/lib/format";
 import { OrgInterviewPanel } from "@/components/shared/OrgInterviewPanel";
@@ -421,7 +422,7 @@ function ApplicantCard({
             <p
               className={`text-2xl font-bold ${scoreColor(application.matchScore)}`}
             >
-              {application.matchScore}%
+              {matchScoreLabel(application.matchScore)}
             </p>
             <p className="text-xs text-gray-500">
               {application.matched ? "Above threshold" : "Below threshold"}

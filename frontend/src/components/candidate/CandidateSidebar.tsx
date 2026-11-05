@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Bell,
+  BookOpen,
   BriefcaseBusiness,
   ChartNoAxesColumnIncreasing,
   ChevronDown,
@@ -84,6 +85,16 @@ const navGroups: NavGroup[] = [
         href: "/candidate/interview/advanced",
         label: "Technical Interview",
         icon: Code2,
+      },
+    ],
+  },
+  {
+    title: "Learning",
+    items: [
+      {
+        href: "/candidate/learning",
+        label: "E-learning",
+        icon: BookOpen,
       },
     ],
   },

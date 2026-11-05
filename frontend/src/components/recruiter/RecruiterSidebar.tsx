@@ -8,6 +8,7 @@ const navItems: NavItem[] = [
   { href: "/recruiter/jobs", label: "My Jobs", icon: "💼" },
   { href: "/recruiter/applicants", label: "Applicants", icon: "👥" },
   { href: "/recruiter/reports", label: "Interview Reports", icon: "📋" },
+  { href: "/recruiter/learning", label: "E-learning", icon: "📚" },
   { href: "/recruiter/shortlisted", label: "Selected", icon: "⭐" },
   { href: "/recruiter/notifications", label: "Notifications", icon: "🔔" },
   { href: "/recruiter/support", label: "Support", icon: "💬" },

@@ -544,6 +544,50 @@ export type OrgInterviewInvite = {
   started: boolean;
 };
 
+/* -------------------------------------------------------------- learning */
+
+/**
+ * An HR-authored learning course. `topics` must come from the backend's fixed
+ * vocabulary (TECH_TOPICS + BASIC_TOPICS + "general_cs"), and `videoUrl` must
+ * be HTTPS — both are validated server-side.
+ */
+export type Course = {
+  _id: ObjectId;
+  title: string;
+  description: string;
+  videoUrl: string;
+  topics: string[];
+  isActive: boolean;
+  createdBy: ObjectId;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CourseInput = {
+  title: string;
+  description: string;
+  videoUrl: string;
+  topics: string[];
+};
+
+/** The exact topic slugs the backend accepts on a course. */
+export const COURSE_TECH_TOPICS = [
+  "dsa", "oop", "dbms", "os", "networks", "web", "programming",
+  "software_engineering", "cloud_devops", "security", "ai_ml", "architecture",
+  "big_data", "emerging_tech", "system_design", "general_cs",
+] as const;
+
+export const COURSE_BASIC_TOPICS = [
+  "self_introduction", "strengths_weaknesses", "pressure_time_management",
+  "education_projects", "adaptability", "career_goals", "conflict_resolution",
+  "culture_fit", "leadership", "motivation", "team_collaboration", "work_style",
+] as const;
+
+export const COURSE_TOPICS: string[] = [
+  ...COURSE_TECH_TOPICS,
+  ...COURSE_BASIC_TOPICS,
+];
+
 /* ---------------------------------------------------------- notification */
 
 export type Notification = {

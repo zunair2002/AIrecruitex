@@ -40,6 +40,7 @@ import {
 import { CertificatePanel } from "./CertificatePanel";
 import { FinalScoreRing } from "./ScoreBreakdown";
 import { VerdictBadge } from "@/components/shared/VerdictBadge";
+import { FailedInterviewNextSteps } from "./FailedInterviewNextSteps";
 
 const ALL = "all";
 
@@ -345,16 +346,12 @@ export function InterviewHistory() {
                     />
                   )}
 
-                  {report.data.elearningTips &&
-                    report.data.elearningTips.length > 0 && (
-                      <Card title="Before you try again">
-                        <ul className="list-inside list-disc space-y-2 text-sm text-gray-700">
-                          {report.data.elearningTips.map((tip) => (
-                            <li key={tip}>{tip}</li>
-                          ))}
-                        </ul>
-                      </Card>
-                    )}
+                  {report.data.result === "fail" && (
+                    <FailedInterviewNextSteps
+                      tips={report.data.elearningTips ?? []}
+                      report={report.data.report}
+                    />
+                  )}
 
                   <InterviewQuestionHistory
                     turns={report.data.turns}

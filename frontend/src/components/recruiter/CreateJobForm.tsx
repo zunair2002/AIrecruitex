@@ -19,6 +19,7 @@ import {
   primaryButtonClass,
   secondaryButtonClass,
 } from "@/components/ui/controls";
+import { useToast } from "@/context/ToastContext";
 
 const MAX_SIZE_MB = RESUME_MAX_BYTES / (1024 * 1024);
 
@@ -31,6 +32,7 @@ const MAX_SIZE_MB = RESUME_MAX_BYTES / (1024 * 1024);
  */
 export function CreateJobForm() {
   const { token } = useAuth();
+  const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [title, setTitle] = useState("");
@@ -82,17 +84,20 @@ export function CreateJobForm() {
     setIsSubmitting(true);
     setError(null);
     try {
-      setCreated(
-        await createJob(
+      const job = await createJob(
           {
             title: title.trim(),
             description: description.trim(),
             requiredSkills: uniqueSkills,
             jdFile,
-          },
-          token,
-        ),
+        },
+        token,
       );
+      setCreated(job);
+      toast({
+        title: "Job posted",
+        detail: `${job.title} is now open to candidates.`,
+      });
     } catch (err) {
       setError(toErrorMessage(err));
     } finally {

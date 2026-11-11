@@ -35,6 +35,7 @@ import {
   ScheduleInterviewDialog,
   type SchedulePayload,
 } from "../applicants/ScheduleInterviewDialog";
+import { useToast } from "@/context/ToastContext";
 
 /**
  * "Selected" is a real value of the Application schema's `status` enum, so this
@@ -44,6 +45,7 @@ import {
  */
 export function ShortlistedList() {
   const { token } = useAuth();
+  const { toast } = useToast();
   const searchParams = useSearchParams();
   const { jobs, selectedJobId, setSelectedJobId, selectedJob } = useMyJobs(
     searchParams.get("jobId"),
@@ -114,9 +116,13 @@ export function ShortlistedList() {
           token,
         ),
       );
+      toast({
+        title: "Interview invite sent",
+        detail: "The candidate has been emailed a private interview link.",
+      });
       setDialogFor(null);
     },
-    [dialogFor, token, applyLocalUpdate],
+    [dialogFor, token, applyLocalUpdate, toast],
   );
 
   if (jobs.isLoading) return <LoadingBlock label="Loading your jobs…" />;

@@ -119,3 +119,13 @@ export function logout(token: string): Promise<{ message?: string }> {
 export function health(): Promise<{ message: string }> {
   return apiRequest<{ message: string }>("/health");
 }
+
+/** The multer field name `uploadCandidateAvatar` expects. */
+export const AVATAR_FILE_FIELD = "avatar";
+
+export const AVATAR_ACCEPTED_MIME_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+];
+export const AVATAR_ACCEPT_ATTRIBUTE = "image/jpeg,image/png,image/webp";

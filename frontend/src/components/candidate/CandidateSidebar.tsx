@@ -12,8 +12,10 @@ import {
   Code2,
   FileUser,
   LayoutDashboard,
+  GraduationCap,
   MessageCircle,
   Mic,
+  UserRound,
 } from "lucide-react";
 
 import type { LucideIcon } from "lucide-react";
@@ -85,11 +87,21 @@ const navGroups: NavGroup[] = [
         label: "Technical Interview",
         icon: Code2,
       },
+      {
+        href: "/candidate/learning",
+        label: "Learning",
+        icon: GraduationCap,
+      },
     ],
   },
   {
     title: "General",
     items: [
+      {
+        href: "/candidate/profile",
+        label: "My Profile",
+        icon: UserRound,
+      },
       {
         href: "/candidate/notifications",
         label: "Notifications",

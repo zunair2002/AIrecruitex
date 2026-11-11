@@ -23,6 +23,7 @@ import { primaryButtonClass, secondaryButtonClass } from "@/components/ui/contro
 import { CertificatePanel } from "./CertificatePanel";
 import { FinalScoreRing, ScoreBar } from "./ScoreBreakdown";
 import { VoiceAnswerField, useVoiceAnswer } from "./VoiceAnswer";
+import { FailedInterviewNextSteps } from "./FailedInterviewNextSteps";
 
 /** Round 1 (5) + Round 2 (8) — used when the backend doesn't send a total. */
 const FALLBACK_TOTAL_QUESTIONS = 13;
@@ -232,14 +233,8 @@ function CompletedInterview({
         </div>
       )}
 
-      {tips.length > 0 && (
-        <Card title="Before you try again">
-          <ul className="list-inside list-disc space-y-2 text-sm text-gray-700">
-            {tips.map((tip) => (
-              <li key={tip}>{tip}</li>
-            ))}
-          </ul>
-        </Card>
+      {session.result === "fail" && (
+        <FailedInterviewNextSteps tips={tips} report={session.report} />
       )}
 
       <TurnHistory turns={session.turns} title="Question-by-question feedback" />

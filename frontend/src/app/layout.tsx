@@ -4,6 +4,8 @@ import "./globals.css";
 import { NavbarWrapper } from "@/components/layout/NavbarWrapper";
 import { AuthProvider } from "@/context/AuthContext";
 import { RealtimeProvider } from "@/context/RealtimeContext";
+import { ToastProvider } from "@/context/ToastContext";
+import { RealtimeToasts } from "@/components/shared/RealtimeToasts";
 
 const raleway = Raleway({
   subsets: ["latin"],
@@ -27,8 +29,11 @@ export default function RootLayout({
       <body className={`${raleway.className} antialiased`}>
         <AuthProvider>
           <RealtimeProvider>
-            <NavbarWrapper />
-            {children}
+            <ToastProvider>
+              <RealtimeToasts />
+              <NavbarWrapper />
+              {children}
+            </ToastProvider>
           </RealtimeProvider>
         </AuthProvider>
       </body>

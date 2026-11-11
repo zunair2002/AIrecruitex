@@ -20,6 +20,7 @@ import { useApiResource } from "@/lib/useApiResource";
 import { formatDate } from "@/lib/format";
 import { refId, type Job, type ObjectId } from "@/lib/types";
 import { ErrorBlock, InlineError } from "@/components/ui/Feedback";
+import { useToast } from "@/context/ToastContext";
 
 type JobFilter = "all" | "not-applied" | "applied";
 type SortOrder = "newest" | "oldest" | "title";
@@ -154,6 +155,7 @@ function JobCard({
 
 export function JobBoard() {
   const { token } = useAuth();
+  const { toast } = useToast();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const [sortOrder, setSortOrder] = useState<SortOrder>("newest");
@@ -201,13 +203,17 @@ export function JobBoard() {
       try {
         await applyToJob(jobId, token);
         applications.reload();
+        toast({
+          title: "Application sent",
+          detail: "Track it under My Applications.",
+        });
       } catch (error) {
         setApplyError(toErrorMessage(error));
       } finally {
         setApplyingId(null);
       }
     },
-    [token, applications],
+    [token, applications, toast],
   );
 
   const filtered = useMemo(() => {

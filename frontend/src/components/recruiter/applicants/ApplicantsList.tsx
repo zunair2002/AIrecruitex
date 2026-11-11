@@ -53,6 +53,7 @@ import {
   type ScheduleKind,
   type SchedulePayload,
 } from "./ScheduleInterviewDialog";
+import { useToast } from "@/context/ToastContext";
 
 type DialogState = { application: Application; kind: ScheduleKind } | null;
 
@@ -63,6 +64,7 @@ type DialogState = { application: Application; kind: ScheduleKind } | null;
  */
 export function ApplicantsList() {
   const { token } = useAuth();
+  const { toast } = useToast();
   const searchParams = useSearchParams();
   const { jobs, selectedJobId, setSelectedJobId, selectedJob } = useMyJobs(
     searchParams.get("jobId"),
@@ -118,13 +120,17 @@ export function ApplicantsList() {
         applyLocalUpdate(
           await updateApplicationStatus(application._id, status, token),
         );
+        toast({
+          title: `Marked ${APPLICATION_STATUS_LABELS[status].toLowerCase()}`,
+          detail: "The candidate is notified in real time.",
+        });
       } catch (error) {
         setActionError(toErrorMessage(error));
       } finally {
         setBusyId(null);
       }
     },
-    [token, applyLocalUpdate],
+    [token, applyLocalUpdate, toast],
   );
 
   const handleSchedule = useCallback(
@@ -143,6 +149,10 @@ export function ApplicantsList() {
             ));
         setSelectedIds(new Set());
         applications.reload();
+        toast({
+          title: kind === "ai" ? "AI interviews triggered" : "Invites sent",
+          detail: `${ids.length} candidate${ids.length === 1 ? "" : "s"} updated.`,
+        });
       } else {
         const updated =
           kind === "ai"
@@ -157,10 +167,17 @@ export function ApplicantsList() {
                 token,
               );
         applyLocalUpdate(updated);
+        toast({
+          title: kind === "ai" ? "AI interview scheduled" : "Interview invite sent",
+          detail:
+            kind === "ai"
+              ? "The candidate can start it from their applications."
+              : "The candidate has been emailed a private interview link.",
+        });
       }
       setDialog(null);
     },
-    [dialog, token, applyLocalUpdate, selectedIds, applications],
+    [dialog, token, applyLocalUpdate, selectedIds, applications, toast],
   );
 
   // Keeps the list honest if the candidate's own session, or another HR user,
@@ -173,16 +190,20 @@ export function ApplicantsList() {
       setIsBulkBusy(true);
       setActionError(null);
       try {
-        await bulkUpdateStatus(Array.from(selectedIds), status, token);
+        const ids = Array.from(selectedIds);
+        await bulkUpdateStatus(ids, status, token);
         setSelectedIds(new Set());
         applications.reload();
+        toast({
+          title: `${ids.length} marked ${APPLICATION_STATUS_LABELS[status].toLowerCase()}`,
+        });
       } catch (error) {
         setActionError(toErrorMessage(error));
       } finally {
         setIsBulkBusy(false);
       }
     },
-    [selectedIds, token, applications],
+    [selectedIds, token, applications, toast],
   );
 
   const filtered = useMemo(() => {

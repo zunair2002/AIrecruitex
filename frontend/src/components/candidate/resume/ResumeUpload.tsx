@@ -38,6 +38,7 @@ import {
 } from "@/lib/format";
 import type { ResumeStatus } from "@/lib/types";
 import { ErrorBlock } from "@/components/ui/Feedback";
+import { useToast } from "@/context/ToastContext";
 
 const MAX_SIZE_MB = RESUME_MAX_BYTES / (1024 * 1024);
 const MAX_AVATAR_BYTES = 5 * 1024 * 1024;
@@ -50,6 +51,7 @@ const parseStatusStyle: Record<ResumeStatus, string> = {
 
 export function ResumeUpload() {
   const { token, user, refresh } = useAuth();
+  const { toast } = useToast();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -90,6 +92,10 @@ export function ResumeUpload() {
     if (!RESUME_ACCEPTED_MIME_TYPES.includes(file.type)) {
       setError("Only PDF or DOCX files are allowed.");
       setSelectedFile(null);
+      toast({
+        title: "Resume uploaded",
+        detail: "It will be matched against jobs you apply to.",
+      });
       return;
     }
     if (file.size > RESUME_MAX_BYTES) {

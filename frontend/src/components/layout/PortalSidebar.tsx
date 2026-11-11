@@ -30,6 +30,18 @@ export function PortalSidebar({
   const unreadCount = useUnreadNotifications();
   const isLive = useRealtimeConnected();
 
+  // The most specific nav item matching the current path. Prefix matching on its
+  // own lights up a parent as well as its child — e.g. /recruiter/jobs/create
+  // matches both "Create Job" and "My Jobs" — so the longest match wins and
+  // only one item is ever highlighted.
+  const activeHref =
+    navItems
+      .map((item) => item.href)
+      .filter(
+        (href) => pathname === href || pathname.startsWith(`${href}/`),
+      )
+      .sort((a, b) => b.length - a.length)[0] ?? null;
+
   const handleLogout = async () => {
     setIsLoggingOut(true);
     await logout();
@@ -68,8 +80,7 @@ export function PortalSidebar({
         }`}
       >
         {navItems.map((item) => {
-          const isActive =
-            pathname === item.href || pathname.startsWith(`${item.href}/`);
+          const isActive = item.href === activeHref;
           return (
             <Link
               key={item.href}

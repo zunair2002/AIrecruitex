@@ -9,6 +9,7 @@ const navItems: NavItem[] = [
   { href: "/recruiter/applicants", label: "Applicants", icon: "👥" },
   { href: "/recruiter/reports", label: "Interview Reports", icon: "📋" },
   { href: "/recruiter/shortlisted", label: "Selected", icon: "⭐" },
+  { href: "/recruiter/courses", label: "Learning Courses", icon: "🎓" },
   { href: "/recruiter/notifications", label: "Notifications", icon: "🔔" },
   { href: "/recruiter/support", label: "Support", icon: "💬" },
 ];

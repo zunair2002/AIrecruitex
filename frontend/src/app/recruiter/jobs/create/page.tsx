@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function CreateJobPage() {
   return (
-    <div className="p-8">
+    <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
       <CreateJobForm />
     </div>
   );

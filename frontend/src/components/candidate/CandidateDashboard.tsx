@@ -62,7 +62,7 @@ const statusColors: Record<ApplicationStatus, string> = {
 const statusClasses: Record<ApplicationStatus, string> = {
   pending: "bg-amber-50 text-amber-700",
   selected: "bg-emerald-50 text-emerald-700",
-  rejected: "bg-slate-100 text-slate-500",
+  rejected: "bg-[#f3f3f6] text-[#898b96]",
 };
 
 function Panel({

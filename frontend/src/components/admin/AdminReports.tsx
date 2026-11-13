@@ -34,7 +34,7 @@ export function AdminReports() {
   if (summary.isLoading) return <LoadingBlock label="Loading reports…" />;
   if (summary.error) {
     return (
-      <div className="p-8">
+      <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
         <ErrorBlock message={summary.error} onRetry={summary.reload} />
       </div>
     );
@@ -43,7 +43,7 @@ export function AdminReports() {
   if (!data) return null;
 
   return (
-    <div className="p-8">
+    <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
       <PageHeader
         title="Reports"
         description="Aggregate counts straight from the backend's report pipeline."
@@ -104,7 +104,7 @@ function BucketCard<T extends UserRole | ApplicationStatus | JobStatus>({
   return (
     <Card title={title}>
       {buckets.length === 0 ? (
-        <p className="py-6 text-center text-sm text-gray-500">No data yet.</p>
+        <p className="py-6 text-center text-sm text-[#898b96]">No data yet.</p>
       ) : (
         <div className="space-y-4">
           {buckets.map((bucket) => {
@@ -114,17 +114,17 @@ function BucketCard<T extends UserRole | ApplicationStatus | JobStatus>({
             return (
               <div key={String(bucket._id)}>
                 <div className="mb-1.5 flex items-center justify-between text-sm">
-                  <span className="font-medium text-gray-700">
+                  <span className="font-medium text-[#44464f]">
                     {labels[bucket._id] ?? String(bucket._id)}
                   </span>
-                  <span className="font-bold text-gray-900">
+                  <span className="font-bold text-[#292b35]">
                     {bucket.count}
-                    <span className="ml-1 text-xs font-normal text-gray-400">
+                    <span className="ml-1 text-xs font-normal text-[#9698a2]">
                       {percent}%
                     </span>
                   </span>
                 </div>
-                <div className="h-2.5 overflow-hidden rounded-full bg-gray-100">
+                <div className="h-2.5 overflow-hidden rounded-full bg-[#f3f3f6]">
                   <div
                     className="h-full rounded-full bg-brand transition-all duration-500"
                     style={{ width: `${percent}%` }}
@@ -133,7 +133,7 @@ function BucketCard<T extends UserRole | ApplicationStatus | JobStatus>({
               </div>
             );
           })}
-          <p className="pt-2 text-xs text-gray-400">Total: {total}</p>
+          <p className="pt-2 text-xs text-[#9698a2]">Total: {total}</p>
         </div>
       )}
     </Card>

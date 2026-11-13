@@ -37,16 +37,16 @@ export function OrgInterviewPanel({
 
   return (
     <div
-      className={`rounded-xl border p-4 ${
+      className={`rounded border p-4 ${
  effective === "completed"
  ? "border-emerald-100 bg-emerald-50"
  : effective === "expired"
- ? "border-gray-200 bg-gray-50"
+ ? "border-[#e9eaf0] bg-[#f8f8fb]"
  : "border-amber-100 bg-amber-50"
  }`}
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-xs font-bold uppercase tracking-wide text-gray-600">
+        <p className="text-xs font-bold uppercase tracking-wide text-[#686b77]">
           Organisational interview
         </p>
         <span className={ORG_INTERVIEW_STATUS_BADGE[effective]}>
@@ -54,16 +54,16 @@ export function OrgInterviewPanel({
         </span>
       </div>
 
-      <dl className="mt-2 space-y-1 text-sm text-gray-700">
+      <dl className="mt-2 space-y-1 text-sm text-[#44464f]">
         {orgInterview.invitedAt && (
           <div className="flex gap-2">
-            <dt className="text-gray-500">Invited</dt>
+            <dt className="text-[#898b96]">Invited</dt>
             <dd>{formatDateTime(orgInterview.invitedAt)}</dd>
           </div>
         )}
         {orgInterview.expiresAt && effective !== "completed" && (
           <div className="flex gap-2">
-            <dt className="text-gray-500">Valid until</dt>
+            <dt className="text-[#898b96]">Valid until</dt>
             <dd>
               {formatDateTime(orgInterview.expiresAt)}
               {!expired && (
@@ -76,20 +76,20 @@ export function OrgInterviewPanel({
         )}
         {orgInterview.completedAt && (
           <div className="flex gap-2">
-            <dt className="text-gray-500">Completed</dt>
+            <dt className="text-[#898b96]">Completed</dt>
             <dd>{formatDateTime(orgInterview.completedAt)}</dd>
           </div>
         )}
         {orgInterview.notes && (
           <div className="flex gap-2">
-            <dt className="text-gray-500">Notes</dt>
+            <dt className="text-[#898b96]">Notes</dt>
             <dd className="whitespace-pre-line">{orgInterview.notes}</dd>
           </div>
         )}
       </dl>
 
       {audience === "candidate" && effective === "invited" && (
-        <p className="mt-3 text-xs text-gray-600">
+        <p className="mt-3 text-xs text-[#686b77]">
           Check your email for the interview link — it works without signing in.
         </p>
       )}

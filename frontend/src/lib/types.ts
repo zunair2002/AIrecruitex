@@ -240,7 +240,24 @@ export type MyResume = {
 
 /* ------------------------------------------------------------- interview */
 
-export type InterviewStatus = "in_progress" | "completed";
+/**
+ * "expired" — the session's time limit ran out. The backend finishes the session
+ * itself (unanswered questions score 0) and reports it through the same finished
+ * branch as "completed", so both must be narrowed together.
+ */
+export type InterviewStatus = "in_progress" | "completed" | "expired";
+
+/**
+ * Per-answer evaluation state. "pending_eval" means the first evaluation failed
+ * and is being retried; "estimated" means it never succeeded and the score is a
+ * fallback. "failed" is legacy and is excluded from scoring by the backend.
+ */
+export type EvalStatus =
+  | "pending"
+  | "pending_eval"
+  | "done"
+  | "estimated"
+  | "failed";
 export type InterviewResultVerdict = "pass" | "fail";
 export type InterviewLevel = "beginner" | "intermediate" | "expert";
 
@@ -352,6 +369,8 @@ export type InterviewReport = {
   recommendation?: string;
   weakTopics: string[];
   generatedBy: "model" | "fallback";
+  /** Answers scored by fallback because AI evaluation was unavailable. */
+  estimatedCount?: number;
 };
 
 /**
@@ -368,6 +387,10 @@ export type InterviewTurnView = {
   /** Per-criterion 0-10 scores from the model. */
   criteria?: Record<string, number>;
   improvementTip?: string;
+  /** True when this answer's score is a fallback estimate, not a model score. */
+  estimated?: boolean;
+  /** True when the clock ran out before this question was answered (scores 0). */
+  unanswered?: boolean;
   stage?: InterviewStage;
   round: InterviewRound;
 };
@@ -386,6 +409,11 @@ export type InterviewTurn = {
   criteria?: Record<string, number>;
   improvementTip?: string;
   weakTopics?: string[];
+  /** The model's original per-criterion scores, before calibration. */
+  rawScores?: Record<string, number>;
+  evalStatus?: EvalStatus;
+  /** True when the clock ran out before this question was answered. */
+  unanswered?: boolean;
   /** Structured org-interview turns only — HR's exact grading. */
   marksEarned?: number;
   marksPossible?: number;
@@ -423,11 +451,23 @@ export type InterviewSessionInProgress = {
   totalQuestions?: number;
   round?: InterviewRound;
   turns: InterviewTurnView[];
+  /**
+   * Timer, on the server's clock. All four are absent when the session has no
+   * time limit (job AI interviews, and sessions created before timers existed),
+   * so the UI must treat "no timer" as the normal case.
+   */
+  startedAt?: string;
+  expiresAt?: string;
+  timeLimitSeconds?: number;
+  /** Seconds left when the response was built — count down from this locally. */
+  remainingSeconds?: number;
+  timeUp?: boolean;
 };
 
 export type InterviewSessionCompleted = {
   sessionId: ObjectId;
-  status: "completed";
+  /** "expired" when the time limit ended it rather than the candidate. */
+  status: "completed" | "expired";
   stage?: InterviewSessionStage;
   track?: TrackId;
   /** 1 for practice Round 1, 2 for Round 2, absent for job interviews. */
@@ -443,6 +483,8 @@ export type InterviewSessionCompleted = {
   round2Unlocked?: boolean;
   certificateEligible: boolean;
   certificatePaid: boolean;
+  /** True when the session ended because the time limit ran out. */
+  timedOut: boolean;
   /** Returned only when a visible interview was failed. */
   elearningTips?: string[];
 };
@@ -450,6 +492,18 @@ export type InterviewSessionCompleted = {
 export type InterviewSessionView =
   | InterviewSessionInProgress
   | InterviewSessionCompleted;
+
+/**
+ * A session is finished when it was completed *or* when its timer expired — the
+ * backend reports both through the same branch of `buildSessionView()`. Use this
+ * rather than comparing `status` to "completed", which silently drops timed-out
+ * sessions back into the "still answering" UI.
+ */
+export function isFinishedSession(
+  session: InterviewSessionView,
+): session is InterviewSessionCompleted {
+  return session.status === "completed" || session.status === "expired";
+}
 
 /** One row of GET /api/interview/mine. */
 export type InterviewSessionSummary = {
@@ -483,6 +537,10 @@ export type InterviewSession = {
   turns: InterviewTurn[];
   currentQuestionNumber?: number;
   currentQuestion?: string;
+  startedAt?: string;
+  expiresAt?: string;
+  /** The time limit ran out; status is "expired". */
+  timedOut?: boolean;
   score?: number;
   result?: InterviewResultVerdict;
   feedback?: string;

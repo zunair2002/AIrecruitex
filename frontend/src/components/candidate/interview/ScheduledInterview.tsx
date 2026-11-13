@@ -30,9 +30,9 @@ export function ScheduledInterview({ sessionId }: { sessionId: ObjectId }) {
   }
   if (resource.error && !session) {
     return (
-      <div className="p-8">
+      <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
         <ErrorBlock message={resource.error} onRetry={resource.reload} />
-        <p className="mt-4 text-center text-sm text-gray-500">
+        <p className="mt-4 text-center text-sm text-[#898b96]">
           <Link
             href="/candidate/applications"
             className="font-semibold text-brand hover:text-brand-dark"

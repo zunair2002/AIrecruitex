@@ -103,14 +103,14 @@ export function ContentManagement() {
   }, [applications.data, query]);
 
   return (
-    <div className="p-8">
+    <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
       <PageHeader
         title="Jobs &amp; Applications"
         description="Every job and application on the platform, across all HR accounts."
       />
 
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center">
-        <div className="flex rounded-full bg-gray-100 p-1">
+        <div className="flex rounded-full bg-[#f3f3f6] p-1">
           {(["jobs", "applications"] as Tab[]).map((option) => (
             <button
               key={option}
@@ -119,7 +119,7 @@ export function ContentManagement() {
               className={`rounded-full px-5 py-2 text-sm font-semibold transition-all ${
  tab === option
  ? "bg-brand text-white "
- : "text-gray-500 hover:text-gray-700"
+ : "text-[#898b96] hover:text-[#44464f]"
  }`}
             >
               {option === "jobs"
@@ -161,12 +161,12 @@ export function ContentManagement() {
               return (
                 <div
                   key={job._id}
-                  className="rounded-2xl border border-gray-100 bg-white p-6 "
+                  className="rounded border border-[#f1f1f5] bg-white p-6 "
                 >
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div className="min-w-0">
-                      <h2 className="font-bold text-gray-900">{job.title}</h2>
-                      <p className="mt-1 text-xs text-gray-500">
+                      <h2 className="font-bold text-[#292b35]">{job.title}</h2>
+                      <p className="mt-1 text-xs text-[#898b96]">
                         Posted by {hr?.name ?? "Unknown HR"}
                         {hr?.email ? ` (${hr.email})` : ""} ·{" "}
                         {formatDate(job.createdAt)}
@@ -177,7 +177,7 @@ export function ContentManagement() {
                     </span>
                   </div>
 
-                  <p className="mt-3 line-clamp-2 whitespace-pre-line text-sm text-gray-600">
+                  <p className="mt-3 line-clamp-2 whitespace-pre-line text-sm text-[#686b77]">
                     {job.description}
                   </p>
 
@@ -219,7 +219,7 @@ export function ContentManagement() {
                         href={job.jdFileUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-xs font-medium text-gray-500 hover:text-gray-800"
+                        className="text-xs font-medium text-[#898b96] hover:text-[#292b35]"
                       >
                         JD file
                       </a>
@@ -240,27 +240,27 @@ export function ContentManagement() {
       ) : filteredApplications.length === 0 ? (
         <EmptyState title="No applications found." />
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white ">
+        <div className="overflow-hidden rounded border border-[#f1f1f5] bg-white ">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-100 bg-gray-50">
-                  <th className="px-6 py-4 text-left font-semibold text-gray-600">
+                <tr className="border-b border-[#f1f1f5] bg-[#f8f8fb]">
+                  <th className="px-6 py-4 text-left font-semibold text-[#686b77]">
                     Candidate
                   </th>
-                  <th className="px-6 py-4 text-left font-semibold text-gray-600">
+                  <th className="px-6 py-4 text-left font-semibold text-[#686b77]">
                     Job
                   </th>
-                  <th className="px-6 py-4 text-left font-semibold text-gray-600">
+                  <th className="px-6 py-4 text-left font-semibold text-[#686b77]">
                     Match
                   </th>
-                  <th className="px-6 py-4 text-left font-semibold text-gray-600">
+                  <th className="px-6 py-4 text-left font-semibold text-[#686b77]">
                     Status
                   </th>
-                  <th className="px-6 py-4 text-left font-semibold text-gray-600">
+                  <th className="px-6 py-4 text-left font-semibold text-[#686b77]">
                     Interviews
                   </th>
-                  <th className="px-6 py-4 text-left font-semibold text-gray-600">
+                  <th className="px-6 py-4 text-left font-semibold text-[#686b77]">
                     Applied
                   </th>
                 </tr>
@@ -272,17 +272,17 @@ export function ContentManagement() {
                   return (
                     <tr
                       key={application._id}
-                      className="border-b border-gray-50 transition-colors hover:bg-gray-50/50"
+                      className="border-b border-[#f1f1f5] transition-colors hover:bg-[#f8f8fb]/50"
                     >
                       <td className="px-6 py-4">
-                        <p className="font-semibold text-gray-900">
+                        <p className="font-semibold text-[#292b35]">
                           {candidate?.name ?? "Unknown"}
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-[#898b96]">
                           {candidate?.email ?? "—"}
                         </p>
                       </td>
-                      <td className="px-6 py-4 text-gray-700">
+                      <td className="px-6 py-4 text-[#44464f]">
                         {job?.title ?? "Job deleted"}
                       </td>
                       <td className="px-6 py-4">
@@ -291,7 +291,7 @@ export function ContentManagement() {
                         >
                           {application.matchScore}%
                         </span>
-                        <p className="text-xs text-gray-400">
+                        <p className="text-xs text-[#9698a2]">
                           {application.matched ? "Matched" : "Below threshold"}
                         </p>
                       </td>
@@ -304,14 +304,14 @@ export function ContentManagement() {
                           {APPLICATION_STATUS_LABELS[application.status]}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-xs text-gray-600">
+                      <td className="px-6 py-4 text-xs text-[#686b77]">
                         {application.aiInterview.scheduled ? "AI ✓" : "AI —"}
                         {" · "}
                         {application.orgInterview?.status
                           ? `Org ${ORG_INTERVIEW_STATUS_LABELS[application.orgInterview.status]}`
                           : "Org —"}
                       </td>
-                      <td className="px-6 py-4 text-gray-500">
+                      <td className="px-6 py-4 text-[#898b96]">
                         {formatDate(application.createdAt)}
                       </td>
                     </tr>

@@ -222,7 +222,7 @@ export function ApplicantsList() {
   if (jobs.isLoading) return <LoadingBlock label="Loading your jobs…" />;
   if (jobs.error) {
     return (
-      <div className="p-8">
+      <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
         <ErrorBlock message={jobs.error} onRetry={jobs.reload} />
       </div>
     );
@@ -230,7 +230,7 @@ export function ApplicantsList() {
 
   if ((jobs.data ?? []).length === 0) {
     return (
-      <div className="p-8">
+      <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
         <PageHeader title="Applicants" />
         <EmptyState
           title="No jobs posted yet."
@@ -249,7 +249,7 @@ export function ApplicantsList() {
   }
 
   return (
-    <div className="p-8">
+    <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
       <PageHeader
         title="Applicants"
         description="Ranked by match score — the share of the job's required skills found in each resume."
@@ -268,12 +268,12 @@ export function ApplicantsList() {
           placeholder="Search by name or email…"
           className={`${compactInputClass} flex-1`}
         />
-        <label className="flex items-center gap-2 text-sm text-gray-600">
+        <label className="flex items-center gap-2 text-sm text-[#686b77]">
           <input
             type="checkbox"
             checked={matchedOnly}
             onChange={(event) => setMatchedOnly(event.target.checked)}
-            className="h-4 w-4 rounded border-gray-300 text-brand focus:ring-brand"
+            className="h-4 w-4 rounded border-[#e3e4ec] text-brand focus:ring-brand"
           />
           Matched only
         </label>
@@ -304,8 +304,8 @@ export function ApplicantsList() {
       ) : (
         <div className="space-y-5">
           {selectedIds.size > 0 && (
-            <div className="sticky top-0 z-10 flex flex-wrap items-center gap-3 rounded-2xl border border-brand/30 bg-brand-light p-4 ">
-              <span className="text-sm font-semibold text-zinc-900">
+            <div className="sticky top-0 z-10 flex flex-wrap items-center gap-3 rounded border border-brand/30 bg-brand-light p-4 ">
+              <span className="text-sm font-semibold text-[#292b35]">
                 {selectedIds.size} selected
               </span>
               {APPLICATION_STATUSES.map((status) => (
@@ -342,7 +342,7 @@ export function ApplicantsList() {
               <button
                 type="button"
                 onClick={() => setSelectedIds(new Set())}
-                className="ml-auto text-sm font-medium text-gray-500 hover:text-gray-800"
+                className="ml-auto text-sm font-medium text-[#898b96] hover:text-[#292b35]"
               >
                 Clear
               </button>
@@ -406,10 +406,10 @@ function ApplicantCard({
 
   return (
     <div
-      className={`rounded-2xl border bg-white p-6 transition-colors ${
+      className={`rounded border bg-white p-6 transition-colors ${
  isSelected
  ? "border-brand/50 ring-1 ring-brand/30"
- : "border-gray-100"
+ : "border-[#f1f1f5]"
  }`}
     >
       <div className="flex flex-wrap items-start justify-between gap-4">
@@ -419,19 +419,19 @@ function ApplicantCard({
             checked={isSelected}
             onChange={onToggleSelected}
             aria-label={`Select ${candidate?.name ?? "applicant"}`}
-            className="h-4 w-4 shrink-0 rounded border-gray-300 text-brand focus:ring-brand"
+            className="h-4 w-4 shrink-0 rounded border-[#e3e4ec] text-brand focus:ring-brand"
           />
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-light text-sm font-bold text-brand-dark">
             {initials(candidate?.name ?? "?")}
           </div>
           <div className="min-w-0">
-            <p className="truncate font-bold text-gray-900">
+            <p className="truncate font-bold text-[#292b35]">
               {candidate?.name ?? "Unknown candidate"}
             </p>
-            <p className="truncate text-xs text-gray-500">
+            <p className="truncate text-xs text-[#898b96]">
               {candidate?.email ?? "—"}
             </p>
-            <p className="mt-1 text-xs text-gray-400">
+            <p className="mt-1 text-xs text-[#9698a2]">
               Applied {formatDate(application.createdAt)}
             </p>
           </div>
@@ -444,7 +444,7 @@ function ApplicantCard({
             >
               {application.matchScore}%
             </p>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-[#898b96]">
               {application.matched ? "Above threshold" : "Below threshold"}
             </p>
           </div>
@@ -454,8 +454,8 @@ function ApplicantCard({
         </div>
       </div>
 
-      <div className="mt-4 rounded-xl bg-gray-50 p-4">
-        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+      <div className="mt-4 rounded bg-[#f8f8fb] p-4">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#898b96]">
           Matched skills at time of applying (
           {application.resumeSnapshotSkills.length})
         </p>
@@ -468,11 +468,11 @@ function ApplicantCard({
       {(aiInterview.scheduled || orgInterview?.status) && (
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
           {aiInterview.scheduled && (
-            <div className="rounded-xl border border-brand-light bg-brand-light p-4">
+            <div className="rounded border border-brand-light bg-brand-light p-4">
               <p className="text-xs font-bold uppercase tracking-wide text-brand">
                 AI interview
               </p>
-              <p className="mt-1 text-sm text-zinc-900">
+              <p className="mt-1 text-sm text-[#292b35]">
                 {formatDateTime(aiInterview.dateTime)}
               </p>
               {aiInterview.message && (
@@ -499,8 +499,8 @@ function ApplicantCard({
       )}
 
       <div className="mt-5 flex flex-wrap items-center gap-3">
-        <label className="flex items-center gap-2 text-sm text-gray-600">
-          <span className="font-semibold text-gray-900">Status</span>
+        <label className="flex items-center gap-2 text-sm text-[#686b77]">
+          <span className="font-semibold text-[#292b35]">Status</span>
           <select
             value={application.status}
             onChange={(event) =>

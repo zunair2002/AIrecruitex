@@ -70,7 +70,7 @@ export function BroadcastForm() {
     (target === "role" ? Boolean(role) : Boolean(userId));
 
   return (
-    <div className="p-8">
+    <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
       <div className="mx-auto max-w-2xl">
         <PageHeader
           title="Broadcast Notification"
@@ -84,7 +84,7 @@ export function BroadcastForm() {
 
             <div>
               <span className={labelClass}>Send to</span>
-              <div className="flex rounded-full bg-gray-100 p-1">
+              <div className="flex rounded-full bg-[#f3f3f6] p-1">
                 {(["role", "user"] as Target[]).map((option) => (
                   <button
                     key={option}
@@ -93,7 +93,7 @@ export function BroadcastForm() {
                     className={`flex-1 rounded-full py-2.5 text-sm font-semibold transition-all ${
  target === option
  ? "bg-brand text-white "
- : "text-gray-500 hover:text-gray-700"
+ : "text-[#898b96] hover:text-[#44464f]"
  }`}
                   >
                     {option === "role"

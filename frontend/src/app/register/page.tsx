@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { AuthError, authInputClass, authSubmitClass } from "@/components/auth/AuthCardParts";
+import {
+  AuthError,
+  PasswordField,
+  authInputClass,
+  authSubmitClass,
+} from "@/components/auth/AuthCardParts";
 import { VerifyEmailForm } from "@/components/auth/VerifyEmailForm";
 import { BrandWordmark } from "@/components/layout/Logo";
 import { useAuth } from "@/context/AuthContext";
@@ -133,7 +138,7 @@ export default function RegisterPage() {
                           >
                             {ROLE_LABELS[option]}
                           </span>
-                          <span className="mt-1 block text-xs text-gray-500">
+                          <span className="mt-1 block text-xs text-[#898b96]">
                             {ROLE_BLURBS[option as "hr" | "candidate"]}
                           </span>
                         </button>
@@ -181,26 +186,14 @@ export default function RegisterPage() {
                     />
                   </div>
 
-                  <div>
-                    <label
-                      htmlFor="register-password"
-                      className="mb-2 block text-sm font-medium text-ink"
-                    >
-                      Password
-                    </label>
-                    <input
-                      id="register-password"
-                      name="password"
-                      type="password"
-                      autoComplete="new-password"
-                      required
-                      minLength={6}
-                      value={password}
-                      onChange={(event) => setPassword(event.target.value)}
-                      placeholder="At least 6 characters"
-                      className={authInputClass}
-                    />
-                  </div>
+                  <PasswordField
+                    id="register-password"
+                    value={password}
+                    onChange={setPassword}
+                    autoComplete="new-password"
+                    minLength={6}
+                    placeholder="At least 6 characters"
+                  />
 
                   <button
                     type="submit"
@@ -209,7 +202,7 @@ export default function RegisterPage() {
                   >
                     {isSubmitting ? "Creating account…" : "Create Account"}
                   </button>
-                  <p className="text-center text-xs text-gray-400">
+                  <p className="text-center text-xs text-[#9698a2]">
                     We&apos;ll email you a 6-digit code to confirm your address.
                   </p>
                 </form>

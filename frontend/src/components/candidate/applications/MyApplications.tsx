@@ -64,7 +64,7 @@ const statusColors: Record<ApplicationStatus, string> = {
 const statusStyles: Record<ApplicationStatus, string> = {
   pending: "bg-amber-50 text-amber-700",
   selected: "bg-emerald-50 text-emerald-700",
-  rejected: "bg-slate-100 text-slate-600",
+  rejected: "bg-[#f3f3f6] text-[#686b77]",
 };
 
 const statusFilters: { value: StatusFilter; label: string }[] = [
@@ -435,7 +435,7 @@ function InterviewSchedule({
                             orgStatus === "completed"
                               ? "bg-emerald-50 text-emerald-700"
                               : orgStatus === "expired"
-                                ? "bg-slate-100 text-slate-600"
+                                ? "bg-[#f3f3f6] text-[#686b77]"
                                 : "bg-[#f0efff] text-[#5f53ce]"
                           }`}
                         >

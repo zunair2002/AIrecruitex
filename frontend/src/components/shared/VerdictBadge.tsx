@@ -9,7 +9,7 @@ import type { TurnVerdict } from "@/lib/types";
 export function VerdictBadge({ verdict }: { verdict?: TurnVerdict | "" }) {
   if (!verdict) return null;
   return (
-    <span className={TURN_VERDICT_BADGE[verdict] ?? badgeClass("bg-gray-100 text-gray-600")}>
+    <span className={TURN_VERDICT_BADGE[verdict] ?? badgeClass("bg-[#f3f3f6] text-[#686b77]")}>
       {TURN_VERDICT_LABELS[verdict] ?? String(verdict).replace(/_/g, " ")}
     </span>
   );

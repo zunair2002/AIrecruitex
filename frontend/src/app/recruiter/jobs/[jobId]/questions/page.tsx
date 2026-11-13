@@ -13,7 +13,7 @@ export default async function JobQuestionsPage({
 }) {
   const { jobId } = await params;
   return (
-    <div className="p-8">
+    <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
       <Link
         href="/recruiter/jobs"
         className="mb-6 inline-block text-sm font-semibold text-brand hover:text-brand-dark"

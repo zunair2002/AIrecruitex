@@ -17,8 +17,8 @@ export function JobPicker({
   label?: string;
 }) {
   return (
-    <label className="flex items-center gap-3 text-sm text-gray-600">
-      <span className="font-semibold text-gray-900">{label}</span>
+    <label className="flex items-center gap-3 text-sm text-[#686b77]">
+      <span className="font-semibold text-[#292b35]">{label}</span>
       <select
         value={selectedJobId ?? ""}
         onChange={(event) => onSelect(event.target.value)}

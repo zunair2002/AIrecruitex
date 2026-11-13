@@ -22,18 +22,18 @@ export default function RouteError({
   }, [error]);
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md rounded-2xl border border-gray-100 bg-white p-8 text-center ">
+    <main className="flex min-h-screen items-center justify-center bg-[#f8f8fb] px-4">
+      <div className="w-full max-w-md rounded border border-[#f1f1f5] bg-white p-8 text-center ">
         <div className="mb-6 flex justify-center">
           <BrandWordmark className="text-[1.5rem]" />
         </div>
         <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 text-xl">
           !
         </div>
-        <h1 className="text-xl font-bold text-gray-900">
+        <h1 className="text-xl font-bold text-[#292b35]">
           Something went wrong on this page
         </h1>
-        <p className="mt-2 text-sm text-gray-500">
+        <p className="mt-2 text-sm text-[#898b96]">
           This is usually temporary. Try again, and if it keeps happening go
           back to your dashboard.
         </p>
@@ -41,13 +41,13 @@ export default function RouteError({
           <button
             type="button"
             onClick={reset}
-            className="rounded-xl bg-brand px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
+            className="rounded bg-brand px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
           >
             Try again
           </button>
           <Link
             href="/"
-            className="rounded-xl border border-gray-200 bg-white px-6 py-3 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50"
+            className="rounded border border-[#e9eaf0] bg-white px-6 py-3 text-sm font-semibold text-[#44464f] transition-colors hover:bg-[#f8f8fb]"
           >
             Go to homepage
           </Link>

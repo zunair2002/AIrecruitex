@@ -1,6 +1,10 @@
 import { RecruiterSidebar } from "@/components/recruiter/RecruiterSidebar";
 import { RequireAuth } from "@/components/auth/RequireAuth";
 
+/**
+ * Same shell as the candidate and admin portals: a fixed-height sidebar beside a
+ * single scrolling pane, so the nav never scrolls away with the content.
+ */
 export default function RecruiterLayout({
   children,
 }: {
@@ -8,9 +12,11 @@ export default function RecruiterLayout({
 }) {
   return (
     <RequireAuth roles={["hr"]} loginPath="/login/recruiter">
-      <div className="flex min-h-screen atmosphere">
+      <div className="flex h-dvh overflow-hidden">
         <RecruiterSidebar />
-        <main className="min-w-0 flex-1 overflow-auto">{children}</main>
+        <main className="h-dvh min-h-0 min-w-0 flex-1 overflow-y-auto bg-[#f7f8fa]">
+          {children}
+        </main>
       </div>
     </RequireAuth>
   );

@@ -90,14 +90,14 @@ export function ScheduleInterviewDialog({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 p-4">
-      <div className="w-full max-w-lg rounded-2xl bg-white p-6 ">
-        <h2 className="text-xl font-bold text-gray-900">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#292b35]/40 p-4">
+      <div className="w-full max-w-lg rounded bg-white p-6 ">
+        <h2 className="text-xl font-bold text-[#292b35]">
           {kind === "ai"
             ? "Schedule AI interview"
             : "Invite to organisational interview"}
         </h2>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-[#898b96]">
           {count && count > 1
             ? `${count} applicants · ${jobTitle}`
             : `${candidateName} · ${jobTitle}`}
@@ -133,7 +133,7 @@ export function ScheduleInterviewDialog({
                   placeholder="Shown to the candidate and used as the calendar event description."
                   className={`${inputClass} resize-none`}
                 />
-                <p className="mt-2 text-xs text-gray-400">
+                <p className="mt-2 text-xs text-[#9698a2]">
                   Scheduling creates the candidate&apos;s interview session and
                   a 30-minute Google Calendar link.
                 </p>
@@ -150,10 +150,10 @@ export function ScheduleInterviewDialog({
                     key={days}
                     type="button"
                     onClick={() => setValidityDays(days)}
-                    className={`rounded-xl border px-4 py-2 text-sm font-semibold transition-colors ${
+                    className={`rounded border px-4 py-2 text-sm font-semibold transition-colors ${
  validityDays === days
  ? "border-brand/50 bg-brand-light text-brand-dark"
- : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+ : "border-[#e9eaf0] bg-white text-[#686b77] hover:bg-[#f8f8fb]"
  }`}
                   >
                     {days} day{days === 1 ? "" : "s"}
@@ -172,7 +172,7 @@ export function ScheduleInterviewDialog({
                 className={inputClass}
                 required
               />
-              <p className="mt-2 text-xs text-gray-400">
+              <p className="mt-2 text-xs text-[#9698a2]">
                 The candidate is emailed a private link and can take the
                 interview any time inside this window. Questions come from the
                 job&apos;s question pool, drawn at random per candidate.

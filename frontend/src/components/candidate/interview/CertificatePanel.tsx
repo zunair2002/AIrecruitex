@@ -105,7 +105,7 @@ export function CertificatePanel({
   if (result === "fail") {
     return (
       <Card title="Certificate">
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-[#686b77]">
           Certificates are issued only for passing interviews. Practice again to
           raise your score, then come back here.
         </p>
@@ -119,19 +119,19 @@ export function CertificatePanel({
         <div className="space-y-3">
           <InlineSuccess message="Your certificate has been issued." />
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div className="rounded-xl bg-gray-50 p-4">
-              <p className="text-xs uppercase tracking-wide text-gray-500">
+            <div className="rounded bg-[#f8f8fb] p-4">
+              <p className="text-xs uppercase tracking-wide text-[#898b96]">
                 Certificate ID
               </p>
-              <p className="mt-1 font-mono text-sm font-semibold text-gray-900">
+              <p className="mt-1 font-mono text-sm font-semibold text-[#292b35]">
                 {certificate.certId}
               </p>
             </div>
-            <div className="rounded-xl bg-gray-50 p-4">
-              <p className="text-xs uppercase tracking-wide text-gray-500">
+            <div className="rounded bg-[#f8f8fb] p-4">
+              <p className="text-xs uppercase tracking-wide text-[#898b96]">
                 Score on certificate
               </p>
-              <p className="mt-1 text-sm font-semibold text-gray-900">
+              <p className="mt-1 text-sm font-semibold text-[#292b35]">
                 {certificate.score}%
               </p>
             </div>
@@ -147,7 +147,7 @@ export function CertificatePanel({
         </div>
       ) : (
         <div className="space-y-4">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-[#686b77]">
             {isPaid
               ? "Payment received — generate your certificate PDF."
               : "A certificate is available for this interview once payment is complete."}
@@ -197,7 +197,7 @@ export function CertificatePanel({
             )}
           </div>
 
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-[#9698a2]">
             The backend requires a score above its CERTIFICATE_PASS_SCORE
             threshold — it will say so if this interview doesn&apos;t qualify.
           </p>

@@ -60,7 +60,7 @@ export function SupportForm() {
   const isValid = subject.trim().length > 0 && message.trim().length > 0;
 
   return (
-    <div className="p-8">
+    <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
       <div className="mx-auto max-w-2xl">
         <PageHeader
           title="Support"
@@ -118,20 +118,20 @@ export function SupportForm() {
               {submitted.map((ticket) => (
                 <div
                   key={ticket._id}
-                  className="rounded-xl border border-gray-100 bg-gray-50 p-4"
+                  className="rounded border border-[#f1f1f5] bg-[#f8f8fb] p-4"
                 >
                   <div className="flex items-start justify-between gap-3">
-                    <p className="text-sm font-semibold text-gray-900">
+                    <p className="text-sm font-semibold text-[#292b35]">
                       {ticket.subject}
                     </p>
                     <span className={SUPPORT_STATUS_BADGE[ticket.status]}>
                       {SUPPORT_STATUS_LABELS[ticket.status]}
                     </span>
                   </div>
-                  <p className="mt-2 whitespace-pre-line text-sm text-gray-600">
+                  <p className="mt-2 whitespace-pre-line text-sm text-[#686b77]">
                     {ticket.message}
                   </p>
-                  <p className="mt-2 text-xs text-gray-400">
+                  <p className="mt-2 text-xs text-[#9698a2]">
                     {formatDateTime(ticket.createdAt)}
                   </p>
                 </div>

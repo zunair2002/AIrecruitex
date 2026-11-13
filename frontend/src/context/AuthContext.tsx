@@ -8,6 +8,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { onAuthFailure } from "@/lib/api";
 import * as authApi from "@/lib/authApi";
 import type {
   AuthUser,
@@ -17,6 +18,8 @@ import type {
 } from "@/lib/types";
 import {
   clearStoredToken,
+  clearTabToken,
+  getSessionOrigin,
   getStoredToken,
   setStoredToken,
 } from "@/lib/authStorage";
@@ -43,6 +46,20 @@ type AuthContextValue = {
   resendOtp: (email: string) => Promise<ResendOtpResult>;
   loginWithGoogle: (idToken: string, role?: UserRole) => Promise<AuthUser>;
   logout: () => Promise<void>;
+  /**
+   * Drops this tab's session without touching other tabs or the shared seed.
+   * Used when a tab inherited a session for a portal the user didn't ask for.
+   */
+  endTabSession: () => void;
+  /** "adopted" when this tab inherited its session rather than signing in. */
+  sessionOrigin: () => "explicit" | "adopted";
+  /**
+   * Set when the account was deactivated by an admin. The portals show a
+   * dedicated screen for this instead of bouncing to the login page.
+   */
+  isDeactivated: boolean;
+  /** Clears the deactivated state, e.g. when leaving for the public site. */
+  clearDeactivated: () => void;
   refresh: () => Promise<void>;
 };
 
@@ -52,6 +69,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDeactivated, setIsDeactivated] = useState(false);
 
   // Restore the session on first mount: if a token is in storage, ask the
   // backend who it belongs to. A rejected token is discarded silently.
@@ -83,8 +101,60 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => controller.abort();
   }, []);
 
+  /**
+   * One place reacts to auth rejections, so a deactivated or expired session
+   * tears down everywhere rather than leaving screens rendering from a cached
+   * user object while every request behind them fails.
+   */
+  useEffect(() => {
+    return onAuthFailure((failure) => {
+      if (failure === "deactivated") setIsDeactivated(true);
+      clearStoredToken();
+      setToken(null);
+      setUser(null);
+    });
+  }, []);
+
+  const clearDeactivated = useCallback(() => setIsDeactivated(false), []);
+
+  /**
+   * Re-check the session periodically and whenever the tab regains focus.
+   *
+   * Reacting to failed requests alone isn't enough: a tab sitting on a screen
+   * it already loaded makes no further calls, so an account deactivated by an
+   * admin would keep showing a working portal until the user happened to
+   * navigate. GET /api/auth/me is the cheap authority on this — `requireAuth`
+   * re-reads the user and returns 403 once `isActive` is false, which the
+   * failure listener above turns into the deactivated screen.
+   */
+  useEffect(() => {
+    if (!token) return;
+
+    const revalidate = () => {
+      // Errors are handled by the shared auth-failure listener; a network
+      // blip must not sign anyone out, so nothing is done here on failure.
+      void authApi.getMe(token).catch(() => undefined);
+    };
+
+    const onFocus = () => revalidate();
+    const onVisible = () => {
+      if (document.visibilityState === "visible") revalidate();
+    };
+
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onVisible);
+    const id = window.setInterval(revalidate, 60_000);
+
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onVisible);
+      window.clearInterval(id);
+    };
+  }, [token]);
+
   const applySession = useCallback(
     (session: { token: string; user: AuthUser }) => {
+      setIsDeactivated(false);
       setStoredToken(session.token);
       setToken(session.token);
       setUser(session.user);
@@ -139,6 +209,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
   }, [token]);
 
+  const endTabSession = useCallback(() => {
+    clearTabToken();
+    setToken(null);
+    setUser(null);
+  }, []);
+
+  const sessionOrigin = useCallback(() => getSessionOrigin(), []);
+
   const refresh = useCallback(async () => {
     const current = token ?? getStoredToken();
     if (!current) return;
@@ -163,6 +241,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       resendOtp,
       loginWithGoogle,
       logout,
+      endTabSession,
+      sessionOrigin,
+      isDeactivated,
+      clearDeactivated,
       refresh,
     }),
     [
@@ -175,6 +257,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       resendOtp,
       loginWithGoogle,
       logout,
+      endTabSession,
+      sessionOrigin,
+      isDeactivated,
+      clearDeactivated,
       refresh,
     ],
   );

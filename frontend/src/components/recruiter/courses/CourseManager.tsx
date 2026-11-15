@@ -158,7 +158,7 @@ export function CourseManager() {
   const list = courses.data ?? [];
 
   return (
-    <div className="p-8">
+    <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
       <PageHeader
         title="Learning Courses"
         description="Material candidates see under Learning. Useful for the weak topics interview reports flag."
@@ -184,7 +184,7 @@ export function CourseManager() {
                   placeholder="e.g. React hooks in depth"
                   className={inputClass}
                 />
-                <p className="mt-1 text-xs text-gray-400">
+                <p className="mt-1 text-xs text-[#9698a2]">
                   {form.title.length}/{TITLE_MAX}
                 </p>
               </div>
@@ -202,7 +202,7 @@ export function CourseManager() {
                   placeholder="What the course covers and who it's for."
                   className={`${inputClass} resize-none`}
                 />
-                <p className="mt-1 text-xs text-gray-400">
+                <p className="mt-1 text-xs text-[#9698a2]">
                   {form.description.length}/{DESCRIPTION_MAX}
                 </p>
               </div>
@@ -242,7 +242,7 @@ export function CourseManager() {
                   selected={form.topics}
                   onToggle={toggleTopic}
                 />
-                <p className="mt-2 text-xs text-gray-400">
+                <p className="mt-2 text-xs text-[#9698a2]">
                   Pick at least one. These match the topics interviews are scored
                   against.
                 </p>
@@ -290,8 +290,8 @@ export function CourseManager() {
                 <Card key={course._id}>
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <h2 className="font-bold text-gray-900">{course.title}</h2>
-                      <p className="mt-1 text-xs text-gray-500">
+                      <h2 className="font-bold text-[#292b35]">{course.title}</h2>
+                      <p className="mt-1 text-xs text-[#898b96]">
                         Added {formatDate(course.createdAt)}
                         {!course.isActive && " · hidden from candidates"}
                       </p>
@@ -315,7 +315,7 @@ export function CourseManager() {
                       </button>
                     </div>
                   </div>
-                  <p className="mt-3 whitespace-pre-line text-sm text-gray-600">
+                  <p className="mt-3 whitespace-pre-line text-sm text-[#686b77]">
                     {course.description}
                   </p>
                   <div className="mt-3">
@@ -352,7 +352,7 @@ function TopicPicker({
 }) {
   return (
     <div className="mt-3">
-      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#898b96]">
         {heading}
       </p>
       <div className="flex flex-wrap gap-1.5">
@@ -366,7 +366,7 @@ function TopicPicker({
               className={`rounded-full border px-2.5 py-1 text-xs font-medium transition-colors ${
                 isOn
                   ? "border-indigo-300 bg-indigo-600 text-white"
-                  : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+                  : "border-[#e9eaf0] bg-white text-[#686b77] hover:bg-[#f8f8fb]"
               }`}
             >
               {topicLabel(topic)}

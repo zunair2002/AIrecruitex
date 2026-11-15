@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useId, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth, homePathForRole } from "@/context/AuthContext";
@@ -22,7 +22,75 @@ export function AuthBrand() {
 }
 
 export const authInputClass =
-  "w-full rounded-sm border border-[#e0d6ea] bg-[#f6f3f9] px-4 py-3.5 text-ink placeholder:text-zinc-400 transition-colors focus:border-brand focus:bg-white focus:outline-none";
+  "w-full rounded-sm border border-[#e0d6ea] bg-[#f6f3f9] px-4 py-3.5 text-ink placeholder:text-[#9698a2] transition-colors focus:border-brand focus:bg-white focus:outline-none";
+
+/**
+ * Password input with a "Show password" checkbox beneath it.
+ *
+ * A labelled checkbox rather than an icon inside the field: the state is stated
+ * in words instead of inferred from an icon, the hit target is the whole label,
+ * and it needs no `aria-pressed` or icon-only `aria-label` to be understood.
+ * The field reverts to hidden on every mount, so a password is never revealed
+ * by default.
+ */
+export function PasswordField({
+  id,
+  label = "Password",
+  value,
+  onChange,
+  autoComplete,
+  placeholder,
+  minLength,
+  required = true,
+}: {
+  id: string;
+  label?: string;
+  value: string;
+  onChange: (next: string) => void;
+  autoComplete: "current-password" | "new-password";
+  placeholder?: string;
+  minLength?: number;
+  required?: boolean;
+}) {
+  const [isVisible, setIsVisible] = useState(false);
+  const toggleId = useId();
+
+  return (
+    <div>
+      <label htmlFor={id} className="mb-2 block text-sm font-medium text-ink">
+        {label}
+      </label>
+      <input
+        id={id}
+        name="password"
+        type={isVisible ? "text" : "password"}
+        autoComplete={autoComplete}
+        required={required}
+        minLength={minLength}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        placeholder={placeholder}
+        className={authInputClass}
+      />
+      <div className="mt-2.5 flex items-center gap-2.5">
+        <input
+          id={toggleId}
+          type="checkbox"
+          checked={isVisible}
+          onChange={(event) => setIsVisible(event.target.checked)}
+          aria-controls={id}
+          className="h-4 w-4 shrink-0 cursor-pointer rounded-sm border-[#e0d6ea] accent-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+        />
+        <label
+          htmlFor={toggleId}
+          className="cursor-pointer select-none text-sm font-medium text-[#686b77] transition-colors hover:text-ink"
+        >
+          Show password
+        </label>
+      </div>
+    </div>
+  );
+}
 
 export const authSubmitClass =
   "w-full rounded-sm bg-brand px-4 py-3.5 font-semibold text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50";
@@ -187,30 +255,18 @@ export function RegisterForm({
           className={authInputClass}
         />
       </div>
-      <div>
-        <label
-          htmlFor={`${role}-password`}
-          className="mb-2 block text-sm font-medium text-ink"
-        >
-          Password
-        </label>
-        <input
-          id={`${role}-password`}
-          name="password"
-          type="password"
-          autoComplete="new-password"
-          required
-          minLength={6}
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-          placeholder="At least 6 characters"
-          className={authInputClass}
-        />
-      </div>
+      <PasswordField
+        id={`${role}-password`}
+        value={password}
+        onChange={setPassword}
+        autoComplete="new-password"
+        minLength={6}
+        placeholder="At least 6 characters"
+      />
       <button type="submit" disabled={isSubmitting} className={authSubmitClass}>
         {isSubmitting ? "Creating account…" : submitLabel}
       </button>
-      <p className="text-center text-xs text-gray-400">
+      <p className="text-center text-xs text-[#9698a2]">
         We&apos;ll email you a 6-digit code to confirm your address.
       </p>
     </form>
@@ -234,6 +290,13 @@ export function LoginForm() {
       const user = await login(email.trim(), password);
       router.replace(homePathForRole(user.role));
     } catch (err) {
+      // The backend refuses a deactivated account at login too. Send them to
+      // the dedicated page rather than squeezing the explanation into the auth
+      // card, where the sign-in tabs would still invite another attempt.
+      if (err instanceof Error && /deactivat/i.test(err.message)) {
+        router.replace("/account-deactivated");
+        return;
+      }
       setError(
         err instanceof Error && err.message
           ? err.message
@@ -242,6 +305,7 @@ export function LoginForm() {
       setIsSubmitting(false);
     }
   };
+
 
   return (
     <form className="space-y-5" onSubmit={handleSubmit} noValidate>
@@ -265,25 +329,13 @@ export function LoginForm() {
           className={authInputClass}
         />
       </div>
-      <div>
-        <label
-          htmlFor="login-password"
-          className="mb-2 block text-sm font-medium text-ink"
-        >
-          Password
-        </label>
-        <input
-          id="login-password"
-          name="password"
-          type="password"
-          autoComplete="current-password"
-          required
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-          placeholder="Your password"
-          className={authInputClass}
-        />
-      </div>
+      <PasswordField
+        id="login-password"
+        value={password}
+        onChange={setPassword}
+        autoComplete="current-password"
+        placeholder="Your password"
+      />
       <button type="submit" disabled={isSubmitting} className={authSubmitClass}>
         {isSubmitting ? "Signing in…" : "Login"}
       </button>

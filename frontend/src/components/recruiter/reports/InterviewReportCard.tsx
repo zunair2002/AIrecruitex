@@ -69,13 +69,13 @@ export function InterviewReportDetail({
       <Card>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
-            <h2 className="text-xl font-bold text-gray-900">
+            <h2 className="text-xl font-bold text-[#292b35]">
               {candidate?.name ?? "Unknown candidate"}
             </h2>
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-[#898b96]">
               {candidate?.email ?? "—"} · {jobTitle}
             </p>
-            <p className="mt-1 text-xs text-gray-400">
+            <p className="mt-1 text-xs text-[#9698a2]">
               AI interview {formatDateTime(application.aiInterview.dateTime)}
             </p>
           </div>
@@ -84,7 +84,7 @@ export function InterviewReportDetail({
               <p className={`text-3xl font-bold ${scoreColor(application.matchScore)}`}>
                 {application.matchScore}%
               </p>
-              <p className="text-xs text-gray-500">Resume match</p>
+              <p className="text-xs text-[#898b96]">Resume match</p>
             </div>
             {interviewSession?.status === "completed" && (
               <div className="text-center">
@@ -93,7 +93,7 @@ export function InterviewReportDetail({
                 >
                   {interviewSession.score ?? 0}%
                 </p>
-                <p className="text-xs text-gray-500">Interview score</p>
+                <p className="text-xs text-[#898b96]">Interview score</p>
               </div>
             )}
           </div>
@@ -114,14 +114,14 @@ export function InterviewReportDetail({
             </span>
           )}
           {interviewSession?.level && (
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-[#898b96]">
               Level: {INTERVIEW_LEVEL_LABELS[interviewSession.level]}
             </span>
           )}
         </div>
 
-        <div className="mt-4 rounded-xl bg-gray-50 p-4">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+        <div className="mt-4 rounded bg-[#f8f8fb] p-4">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#898b96]">
             Matched skills ({application.resumeSnapshotSkills.length})
           </p>
           <SkillChips
@@ -157,19 +157,19 @@ export function InterviewReportDetail({
 
       {!interviewSession ? (
         <Card title="AI interview">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-[#686b77]">
             No interview session exists for this application yet.
           </p>
         </Card>
       ) : interviewSession.status === "in_progress" ? (
         <Card title="AI interview in progress">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-[#686b77]">
             The candidate has answered {interviewSession.turns.length} question
             {interviewSession.turns.length === 1 ? "" : "s"}. The overall score
             and verdict appear once the interview completes.
           </p>
           {interviewSession.currentQuestion && (
-            <p className="mt-3 rounded-xl bg-gray-50 p-4 text-sm text-gray-700">
+            <p className="mt-3 rounded bg-[#f8f8fb] p-4 text-sm text-[#44464f]">
               <span className="font-semibold">
                 Current question {interviewSession.currentQuestionNumber}:{" "}
               </span>
@@ -183,7 +183,7 @@ export function InterviewReportDetail({
         </Card>
       ) : (
         <Card title="AI feedback">
-          <p className="whitespace-pre-line text-sm leading-relaxed text-zinc-900">
+          <p className="whitespace-pre-line text-sm leading-relaxed text-[#292b35]">
             {interviewSession.feedback ?? "No overall feedback was returned."}
           </p>
         </Card>
@@ -203,10 +203,10 @@ export function InterviewReportDetail({
             {interviewSession.turns.map((turn) => (
               <div
                 key={turn.questionNumber}
-                className="rounded-xl border border-gray-100 bg-gray-50 p-4"
+                className="rounded border border-[#f1f1f5] bg-[#f8f8fb] p-4"
               >
                 <div className="flex items-start justify-between gap-3">
-                  <p className="text-sm font-semibold text-gray-900">
+                  <p className="text-sm font-semibold text-[#292b35]">
                     Q{turn.questionNumber}. {turn.question}
                   </p>
                   <div className="flex shrink-0 items-center gap-2">
@@ -218,11 +218,11 @@ export function InterviewReportDetail({
                     </span>
                   </div>
                 </div>
-                <p className="mt-3 whitespace-pre-line text-sm text-gray-700">
-                  <span className="font-semibold text-gray-500">Answer: </span>
+                <p className="mt-3 whitespace-pre-line text-sm text-[#44464f]">
+                  <span className="font-semibold text-[#898b96]">Answer: </span>
                   {turn.answer}
                 </p>
-                <p className="mt-2 whitespace-pre-line text-sm text-zinc-900">
+                <p className="mt-2 whitespace-pre-line text-sm text-[#292b35]">
                   <span className="font-semibold text-brand">Feedback: </span>
                   {turn.feedback}
                 </p>
@@ -264,10 +264,10 @@ function Transcript({
           {messages.map((message, index) => (
             <div
               key={index}
-              className={`rounded-xl p-3 text-sm ${
+              className={`rounded p-3 text-sm ${
                 message.role === "assistant"
-                  ? "bg-brand-light text-zinc-900"
-                  : "bg-gray-50 text-gray-700"
+                  ? "bg-brand-light text-[#292b35]"
+                  : "bg-[#f8f8fb] text-[#44464f]"
               }`}
             >
               <p className="mb-1 text-[10px] font-bold uppercase tracking-wider opacity-60">
@@ -308,7 +308,7 @@ function OrgInterviewResult({ session }: { session: InterviewSession }) {
           </span>
         )}
         {possible > 0 && (
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-[#898b96]">
             {earned}/{possible} marks
           </span>
         )}
@@ -320,7 +320,7 @@ function OrgInterviewResult({ session }: { session: InterviewSession }) {
         </div>
       ) : (
         session.feedback && (
-          <p className="mt-4 whitespace-pre-line rounded-xl bg-gray-50 p-4 text-sm text-gray-700">
+          <p className="mt-4 whitespace-pre-line rounded bg-[#f8f8fb] p-4 text-sm text-[#44464f]">
             {session.feedback}
           </p>
         )
@@ -331,10 +331,10 @@ function OrgInterviewResult({ session }: { session: InterviewSession }) {
           {session.turns.map((turn) => (
             <div
               key={turn.questionNumber}
-              className="rounded-xl border border-gray-100 bg-gray-50 p-4"
+              className="rounded border border-[#f1f1f5] bg-[#f8f8fb] p-4"
             >
               <div className="flex items-start justify-between gap-3">
-                <p className="text-sm font-semibold text-gray-900">
+                <p className="text-sm font-semibold text-[#292b35]">
                   Q{turn.questionNumber}. {turn.question}
                 </p>
                 <div className="flex shrink-0 items-center gap-2">
@@ -346,12 +346,12 @@ function OrgInterviewResult({ session }: { session: InterviewSession }) {
                   </span>
                 </div>
               </div>
-              <p className="mt-3 whitespace-pre-line text-sm text-gray-700">
-                <span className="font-semibold text-gray-500">Answer: </span>
+              <p className="mt-3 whitespace-pre-line text-sm text-[#44464f]">
+                <span className="font-semibold text-[#898b96]">Answer: </span>
                 {turn.answer}
               </p>
               {turn.feedback && (
-                <p className="mt-2 whitespace-pre-line text-sm text-zinc-900">
+                <p className="mt-2 whitespace-pre-line text-sm text-[#292b35]">
                   <span className="font-semibold text-brand">Grading: </span>
                   {turn.feedback}
                 </p>
@@ -360,7 +360,7 @@ function OrgInterviewResult({ session }: { session: InterviewSession }) {
           ))}
         </div>
       ) : (
-        <p className="mt-4 text-sm text-gray-600">
+        <p className="mt-4 text-sm text-[#686b77]">
           The candidate hasn&apos;t answered any questions yet.
         </p>
       )}
@@ -382,7 +382,7 @@ function ReportSummary({ report }: { report: InterviewReport }) {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+        <span className="text-xs font-semibold uppercase tracking-wide text-[#898b96]">
           Decision
         </span>
         <span
@@ -394,12 +394,12 @@ function ReportSummary({ report }: { report: InterviewReport }) {
           {INTERVIEW_DECISION_LABELS[report.decision] ?? report.decision}
         </span>
         {report.generatedBy === "fallback" && (
-          <span className="text-xs text-gray-400">(automatic summary)</span>
+          <span className="text-xs text-[#9698a2]">(automatic summary)</span>
         )}
       </div>
 
       {report.summary && (
-        <p className="whitespace-pre-line text-sm leading-relaxed text-zinc-900">
+        <p className="whitespace-pre-line text-sm leading-relaxed text-[#292b35]">
           {report.summary}
         </p>
       )}
@@ -426,10 +426,10 @@ function ReportSummary({ report }: { report: InterviewReport }) {
       {lists.map(({ title, items }) =>
         items && items.length > 0 ? (
           <div key={title}>
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#898b96]">
               {title}
             </p>
-            <ul className="list-inside list-disc space-y-1 text-sm text-gray-700">
+            <ul className="list-inside list-disc space-y-1 text-sm text-[#44464f]">
               {items.map((item) => (
                 <li key={item}>{item}</li>
               ))}
@@ -439,11 +439,11 @@ function ReportSummary({ report }: { report: InterviewReport }) {
       )}
 
       {report.recommendation && (
-        <div className="rounded-xl bg-gray-50 p-4">
-          <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-gray-500">
+        <div className="rounded bg-[#f8f8fb] p-4">
+          <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-[#898b96]">
             Recommendation
           </p>
-          <p className="whitespace-pre-line text-sm text-gray-700">
+          <p className="whitespace-pre-line text-sm text-[#44464f]">
             {report.recommendation}
           </p>
         </div>

@@ -61,6 +61,13 @@ export function fromDateTimeLocalValue(value: string): string {
   return new Date(value).toISOString();
 }
 
+/** mm:ss for an interview countdown; clamps at zero. */
+export function formatCountdown(seconds: number): string {
+  const safe = Math.max(0, Math.floor(seconds));
+  const minutes = Math.floor(safe / 60);
+  return `${minutes}:${String(safe % 60).padStart(2, "0")}`;
+}
+
 export function formatUptime(seconds: number): string {
   const days = Math.floor(seconds / 86400);
   const hours = Math.floor((seconds % 86400) / 3600);
@@ -96,6 +103,7 @@ export const JOB_STATUS_LABELS: Record<JobStatus, string> = {
 export const INTERVIEW_STATUS_LABELS: Record<InterviewStatus, string> = {
   in_progress: "In progress",
   completed: "Completed",
+  expired: "Time expired",
 };
 
 export const INTERVIEW_RESULT_LABELS: Record<InterviewResultVerdict, string> = {
@@ -192,7 +200,7 @@ export const badgeClass = (tone: string) => `${BADGE_BASE} ${tone}`;
 export const ROLE_BADGE: Record<UserRole, string> = {
   candidate: badgeClass("bg-blue-50 text-blue-700"),
   hr: badgeClass("bg-brand-light text-brand-dark"),
-  admin: badgeClass("bg-zinc-100 text-zinc-700"),
+  admin: badgeClass("bg-[#f3f3f6] text-[#44464f]"),
 };
 
 export const APPLICATION_STATUS_BADGE: Record<ApplicationStatus, string> = {
@@ -203,12 +211,13 @@ export const APPLICATION_STATUS_BADGE: Record<ApplicationStatus, string> = {
 
 export const JOB_STATUS_BADGE: Record<JobStatus, string> = {
   open: badgeClass("bg-emerald-50 text-emerald-700"),
-  closed: badgeClass("bg-gray-100 text-gray-600"),
+  closed: badgeClass("bg-[#f3f3f6] text-[#686b77]"),
 };
 
 export const INTERVIEW_STATUS_BADGE: Record<InterviewStatus, string> = {
   in_progress: badgeClass("bg-amber-50 text-amber-700"),
   completed: badgeClass("bg-emerald-50 text-emerald-700"),
+  expired: badgeClass("bg-rose-50 text-rose-700"),
 };
 
 export const INTERVIEW_RESULT_BADGE: Record<InterviewResultVerdict, string> = {
@@ -224,7 +233,7 @@ export const TURN_VERDICT_BADGE: Record<TurnVerdict, string> = {
   incorrect: badgeClass("bg-red-50 text-red-700"),
   no_answer: badgeClass("bg-red-50 text-red-700"),
   weak: badgeClass("bg-red-50 text-red-700"),
-  off_topic: badgeClass("bg-gray-100 text-gray-600"),
+  off_topic: badgeClass("bg-[#f3f3f6] text-[#686b77]"),
 };
 
 export const INTERVIEW_DECISION_BADGE: Record<InterviewDecision, string> = {
@@ -240,7 +249,7 @@ export const INTERVIEW_DECISION_BADGE: Record<InterviewDecision, string> = {
 export const ORG_INTERVIEW_STATUS_BADGE: Record<OrgInterviewStatus, string> = {
   invited: badgeClass("bg-amber-50 text-amber-700"),
   completed: badgeClass("bg-emerald-50 text-emerald-700"),
-  expired: badgeClass("bg-gray-100 text-gray-600"),
+  expired: badgeClass("bg-[#f3f3f6] text-[#686b77]"),
 };
 
 export const INTERVIEW_HISTORY_TYPE_BADGE: Record<
@@ -249,7 +258,7 @@ export const INTERVIEW_HISTORY_TYPE_BADGE: Record<
 > = {
   practice: badgeClass("bg-sky-50 text-sky-700"),
   ai_interview: badgeClass("bg-brand-light text-brand-dark"),
-  organizational: badgeClass("bg-zinc-50 text-zinc-800"),
+  organizational: badgeClass("bg-[#f8f8fb] text-[#292b35]"),
 };
 
 export const SUPPORT_STATUS_BADGE: Record<SupportTicketStatus, string> = {
@@ -260,7 +269,7 @@ export const SUPPORT_STATUS_BADGE: Record<SupportTicketStatus, string> = {
 /** `isActive` on the User schema. */
 export const activeBadge = (isActive: boolean): string =>
   badgeClass(
-    isActive ? "bg-emerald-50 text-emerald-700" : "bg-gray-100 text-gray-600",
+    isActive ? "bg-emerald-50 text-emerald-700" : "bg-[#f3f3f6] text-[#686b77]",
   );
 
 /** matchScore / interview score colouring, 0-100. */

@@ -79,10 +79,10 @@ export function VerifyEmailForm({
   return (
     <form className="space-y-5" onSubmit={handleSubmit} noValidate>
       <div>
-        <h2 className="text-lg font-bold text-gray-900">Check your email</h2>
-        <p className="mt-1 text-sm text-gray-500">
+        <h2 className="text-lg font-bold text-[#292b35]">Check your email</h2>
+        <p className="mt-1 text-sm text-[#898b96]">
           We sent a 6-digit code to{" "}
-          <span className="font-semibold text-gray-700">{email}</span>. Enter it
+          <span className="font-semibold text-[#44464f]">{email}</span>. Enter it
           to finish setting up your account.
         </p>
       </div>
@@ -93,7 +93,7 @@ export function VerifyEmailForm({
       <div>
         <label
           htmlFor="verify-otp"
-          className="mb-2 block text-sm font-medium text-gray-700"
+          className="mb-2 block text-sm font-medium text-[#44464f]"
         >
           Verification code
         </label>
@@ -111,9 +111,9 @@ export function VerifyEmailForm({
             setOtp(event.target.value.replace(/\D/g, "").slice(0, 6))
           }
           placeholder="123456"
-          className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-center text-2xl font-bold tracking-[0.4em] text-gray-900 placeholder:tracking-normal placeholder:text-gray-300 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-brand"
+          className="w-full rounded border border-[#e9eaf0] bg-white px-4 py-3 text-center text-2xl font-bold tracking-[0.4em] text-[#292b35] placeholder:tracking-normal placeholder:text-[#c9cbd4] focus:border-transparent focus:outline-none focus:ring-2 focus:ring-brand"
         />
-        <p className="mt-2 text-xs text-gray-400">
+        <p className="mt-2 text-xs text-[#9698a2]">
           The code expires in 10 minutes.
         </p>
       </div>
@@ -121,7 +121,7 @@ export function VerifyEmailForm({
       <button
         type="submit"
         disabled={otp.length !== 6 || isSubmitting}
-        className="w-full rounded-xl bg-brand px-4 py-3 font-semibold text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50"
+        className="w-full rounded bg-brand px-4 py-3 font-semibold text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50"
       >
         {isSubmitting ? "Verifying…" : "Verify and continue"}
       </button>
@@ -130,7 +130,7 @@ export function VerifyEmailForm({
         type="button"
         onClick={handleResend}
         disabled={secondsLeft > 0}
-        className="w-full text-sm font-medium text-brand transition-colors hover:text-brand disabled:text-gray-400"
+        className="w-full text-sm font-medium text-brand transition-colors hover:text-brand disabled:text-[#9698a2]"
       >
         {secondsLeft > 0 ? `Resend code in ${secondsLeft}s` : "Resend code"}
       </button>

@@ -23,9 +23,9 @@ export function CandidateShell({ children }: { children: React.ReactNode }) {
 
   return (
     <RequireAuth roles={["candidate"]} loginPath="/login/candidate">
-      <div className="flex h-dvh overflow-hidden atmosphere">
+      <div className="flex h-dvh overflow-hidden">
         <CandidateSidebar />
-        <main className="h-dvh min-h-0 min-w-0 flex-1 overflow-y-auto">
+        <main className="h-dvh min-h-0 min-w-0 flex-1 overflow-y-auto bg-[#f7f8fa]">
           {children}
         </main>
       </div>

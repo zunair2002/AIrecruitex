@@ -150,18 +150,18 @@ export function PracticeInterview({ stage }: { stage: InterviewStage }) {
   return (
     <div className="flex min-h-screen items-center justify-center p-8">
       <div className="w-full max-w-3xl text-center">
-        <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-brand text-4xl ">
+        <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded bg-brand text-4xl ">
           {lockedState ? "🔒" : copy.icon}
         </div>
-        <h1 className="text-3xl font-bold text-gray-900">{copy.heading}</h1>
-        <p className="mx-auto mt-3 max-w-lg text-gray-500">{copy.intro}</p>
+        <h1 className="text-3xl font-bold text-[#292b35]">{copy.heading}</h1>
+        <p className="mx-auto mt-3 max-w-lg text-[#898b96]">{copy.intro}</p>
 
         {lockedState ? (
           <div className="mx-auto mt-8 max-w-lg text-left">{lockedState}</div>
         ) : (
           <>
             <div className="mt-8 text-left">
-              <p className="mb-3 text-sm font-semibold text-gray-900">
+              <p className="mb-3 text-sm font-semibold text-[#292b35]">
                 {isRound2
                   ? "Your track"
                   : "Choose your track — Round 2 uses it for its technical questions"}
@@ -182,14 +182,14 @@ export function PracticeInterview({ stage }: { stage: InterviewStage }) {
                         type="button"
                         onClick={() => setPickedTrack(option.id)}
                         aria-pressed={isActive}
-                        className={`rounded-xl border p-5 text-left transition-colors ${
+                        className={`rounded border p-5 text-left transition-colors ${
                           isActive
                             ? "border-brand/50 bg-brand-light"
-                            : "border-gray-100 bg-white hover:border-brand-light hover:bg-gray-50"
+                            : "border-[#f1f1f5] bg-white hover:border-brand-light hover:bg-[#f8f8fb]"
                         }`}
                       >
                         <p
-                          className={`font-bold ${isActive ? "text-zinc-900" : "text-gray-900"}`}
+                          className={`font-bold ${isActive ? "text-[#292b35]" : "text-[#292b35]"}`}
                         >
                           {option.label}
                         </p>
@@ -205,7 +205,7 @@ export function PracticeInterview({ stage }: { stage: InterviewStage }) {
                 </div>
               )}
               {isRound2 && latestRound1?.track && (
-                <p className="mt-2 text-xs text-gray-400">
+                <p className="mt-2 text-xs text-[#9698a2]">
                   Preselected from your latest Round 1 (
                   {TRACK_LABELS[latestRound1.track] ?? latestRound1.track}).
                 </p>
@@ -226,7 +226,7 @@ export function PracticeInterview({ stage }: { stage: InterviewStage }) {
             >
               {isStarting ? "Starting…" : `Start Round ${isRound2 ? 2 : 1}`}
             </button>
-            <p className="mt-3 text-xs text-gray-400">
+            <p className="mt-3 text-xs text-[#9698a2]">
               {copy.questions} questions. If you have an unfinished round on this
               track, this resumes it. Voice answers work in Chrome or Edge.
             </p>
@@ -249,7 +249,7 @@ function LockedCard({
   cta: string;
 }) {
   return (
-    <div className="rounded-2xl border border-amber-100 bg-gradient-to-br from-amber-50 to-white p-6 ">
+    <div className="rounded border border-amber-100 bg-gradient-to-br from-amber-50 to-white p-6 ">
       <h2 className="text-lg font-bold text-amber-900">{title}</h2>
       <p className="mt-1 text-sm text-amber-800">{body}</p>
       <Link href={href} className={`${primaryButtonClass} mt-4 inline-block text-sm`}>

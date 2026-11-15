@@ -111,15 +111,15 @@ export function CreateJobForm() {
         <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-2xl font-bold text-emerald-700">
           OK
         </div>
-        <h2 className="text-2xl font-bold text-gray-900">Job posted</h2>
-        <p className="mt-3 text-gray-500">
-          <span className="font-semibold text-gray-700">{created.title}</span>{" "}
+        <h2 className="text-2xl font-bold text-[#292b35]">Job posted</h2>
+        <p className="mt-3 text-[#898b96]">
+          <span className="font-semibold text-[#44464f]">{created.title}</span>{" "}
           is now open. Candidates can apply and will be scored against its
           required skills.
         </p>
 
-        <div className="mt-6 rounded-2xl border border-gray-100 bg-white p-6 text-left ">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+        <div className="mt-6 rounded border border-[#f1f1f5] bg-white p-6 text-left ">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#898b96]">
             Required skills stored ({created.requiredSkills.length})
           </p>
           <SkillChips skills={created.requiredSkills} />
@@ -163,7 +163,7 @@ export function CreateJobForm() {
 
       <form
         onSubmit={handleSubmit}
-        className="space-y-6 rounded-2xl border border-gray-100 bg-white p-8 "
+        className="space-y-6 rounded border border-[#f1f1f5] bg-white p-8 "
       >
         {error && <InlineError message={error} />}
 
@@ -209,7 +209,7 @@ export function CreateJobForm() {
             placeholder="e.g. react, typescript, node.js, mongodb"
             className={inputClass}
           />
-          <p className="mt-2 text-xs text-gray-400">
+          <p className="mt-2 text-xs text-[#9698a2]">
             Comma separated. These are the exact terms searched in each
             candidate&apos;s resume text — the match score is the share of them
             found.
@@ -232,14 +232,14 @@ export function CreateJobForm() {
             type="file"
             accept={RESUME_ACCEPT_ATTRIBUTE}
             onChange={(event) => handleFile(event.target.files?.[0])}
-            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-600 file:mr-4 file:rounded-lg file:border-0 file:bg-brand-light file:px-4 file:py-2 file:text-sm file:font-semibold file:text-brand-dark"
+            className="w-full rounded border border-[#e9eaf0] bg-white px-4 py-3 text-sm text-[#686b77] file:mr-4 file:rounded-lg file:border-0 file:bg-brand-light file:px-4 file:py-2 file:text-sm file:font-semibold file:text-brand-dark"
           />
-          <p className="mt-2 text-xs text-gray-400">
+          <p className="mt-2 text-xs text-[#9698a2]">
             PDF or DOCX, max {MAX_SIZE_MB}MB. If you leave the skills field
             empty, skills are suggested from this file&apos;s text.
           </p>
           {jdFile && (
-            <p className="mt-2 text-xs font-medium text-gray-600">
+            <p className="mt-2 text-xs font-medium text-[#686b77]">
               {jdFile.name} · {formatFileSize(jdFile.size)}
             </p>
           )}
@@ -255,14 +255,14 @@ export function CreateJobForm() {
           </button>
           <Link
             href="/recruiter/dashboard"
-            className="px-6 py-3 font-semibold text-gray-600 transition-colors hover:text-gray-900"
+            className="px-6 py-3 font-semibold text-[#686b77] transition-colors hover:text-[#292b35]"
           >
             Cancel
           </Link>
         </div>
 
         {!isValid && (title || description) && (
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-[#9698a2]">
             Add at least one required skill, or attach a job description file to
             have them suggested.
           </p>

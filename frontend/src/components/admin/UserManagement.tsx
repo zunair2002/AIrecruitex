@@ -83,7 +83,7 @@ export function UserManagement() {
   const list = users.data ?? [];
 
   return (
-    <div className="p-8">
+    <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
       <PageHeader
         title="User Management"
         description="Every account on the platform. Role and active-status changes are written to the audit log."
@@ -144,27 +144,27 @@ export function UserManagement() {
       ) : list.length === 0 ? (
         <EmptyState title="No users match these filters." />
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white ">
+        <div className="overflow-hidden rounded border border-[#f1f1f5] bg-white ">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-100 bg-gray-50">
-                  <th className="px-6 py-4 text-left font-semibold text-gray-600">
+                <tr className="border-b border-[#f1f1f5] bg-[#f8f8fb]">
+                  <th className="px-6 py-4 text-left font-semibold text-[#686b77]">
                     User
                   </th>
-                  <th className="px-6 py-4 text-left font-semibold text-gray-600">
+                  <th className="px-6 py-4 text-left font-semibold text-[#686b77]">
                     Role
                   </th>
-                  <th className="px-6 py-4 text-left font-semibold text-gray-600">
+                  <th className="px-6 py-4 text-left font-semibold text-[#686b77]">
                     Sign-in
                   </th>
-                  <th className="px-6 py-4 text-left font-semibold text-gray-600">
+                  <th className="px-6 py-4 text-left font-semibold text-[#686b77]">
                     Status
                   </th>
-                  <th className="px-6 py-4 text-left font-semibold text-gray-600">
+                  <th className="px-6 py-4 text-left font-semibold text-[#686b77]">
                     Joined
                   </th>
-                  <th className="px-6 py-4 text-left font-semibold text-gray-600">
+                  <th className="px-6 py-4 text-left font-semibold text-[#686b77]">
                     Actions
                   </th>
                 </tr>
@@ -176,7 +176,7 @@ export function UserManagement() {
                   return (
                     <tr
                       key={item._id}
-                      className="border-b border-gray-50 transition-colors hover:bg-gray-50/50"
+                      className="border-b border-[#f1f1f5] transition-colors hover:bg-[#f8f8fb]/50"
                     >
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
@@ -184,15 +184,15 @@ export function UserManagement() {
                             {initials(item.name)}
                           </div>
                           <div className="min-w-0">
-                            <p className="truncate font-semibold text-gray-900">
+                            <p className="truncate font-semibold text-[#292b35]">
                               {item.name}
                               {isSelf && (
-                                <span className="ml-2 text-xs font-normal text-gray-400">
+                                <span className="ml-2 text-xs font-normal text-[#9698a2]">
                                   (you)
                                 </span>
                               )}
                             </p>
-                            <p className="truncate text-xs text-gray-500">
+                            <p className="truncate text-xs text-[#898b96]">
                               {item.email}
                             </p>
                           </div>
@@ -220,7 +220,7 @@ export function UserManagement() {
                           ))}
                         </select>
                       </td>
-                      <td className="px-6 py-4 text-gray-600">
+                      <td className="px-6 py-4 text-[#686b77]">
                         {AUTH_PROVIDER_LABEL[item.authProvider]}
                       </td>
                       <td className="px-6 py-4">
@@ -228,7 +228,7 @@ export function UserManagement() {
                           {item.isActive ? "Active" : "Deactivated"}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-gray-500">
+                      <td className="px-6 py-4 text-[#898b96]">
                         {formatDate(item.createdAt)}
                       </td>
                       <td className="px-6 py-4">

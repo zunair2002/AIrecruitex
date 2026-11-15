@@ -97,7 +97,7 @@ export function CandidateProfile() {
   const showExistingAvatar = Boolean(user?.avatarUrl) && !removeAvatar && !avatar;
 
   return (
-    <div className="p-8">
+    <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
       <div className="mx-auto max-w-2xl">
         <PageHeader
           title="My Profile"
@@ -124,8 +124,8 @@ export function CandidateProfile() {
                 </div>
               )}
               <div className="min-w-0">
-                <p className="font-semibold text-gray-900">{user?.name}</p>
-                <p className="truncate text-sm text-gray-500">{user?.email}</p>
+                <p className="font-semibold text-[#292b35]">{user?.name}</p>
+                <p className="truncate text-sm text-[#898b96]">{user?.email}</p>
               </div>
             </div>
 
@@ -139,14 +139,14 @@ export function CandidateProfile() {
                 type="file"
                 accept={AVATAR_ACCEPT_ATTRIBUTE}
                 onChange={(event) => handleFile(event.target.files?.[0])}
-                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-600 file:mr-4 file:rounded-lg file:border-0 file:bg-indigo-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-indigo-700"
+                className="w-full rounded border border-[#e9eaf0] bg-white px-4 py-3 text-sm text-[#686b77] file:mr-4 file:rounded-lg file:border-0 file:bg-indigo-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-indigo-700"
               />
-              <p className="mt-2 text-xs text-gray-400">
+              <p className="mt-2 text-xs text-[#9698a2]">
                 JPG, PNG or WEBP, max {MAX_MB}MB.
                 {avatar && ` Selected: ${avatar.name} · ${formatFileSize(avatar.size)}`}
               </p>
               {user?.avatarUrl && (
-                <label className="mt-2 flex items-center gap-2 text-sm text-gray-600">
+                <label className="mt-2 flex items-center gap-2 text-sm text-[#686b77]">
                   <input
                     type="checkbox"
                     checked={removeAvatar}
@@ -157,7 +157,7 @@ export function CandidateProfile() {
                         if (fileRef.current) fileRef.current.value = "";
                       }
                     }}
-                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    className="h-4 w-4 rounded border-[#e3e4ec] text-indigo-600 focus:ring-indigo-500"
                   />
                   Remove my current photo
                 </label>
@@ -177,7 +177,7 @@ export function CandidateProfile() {
                 placeholder="e.g. Frontend developer focused on React"
                 className={inputClass}
               />
-              <p className="mt-2 text-xs text-gray-400">
+              <p className="mt-2 text-xs text-[#9698a2]">
                 {headline.length}/{HEADLINE_MAX}
               </p>
             </div>
@@ -195,7 +195,7 @@ export function CandidateProfile() {
                 placeholder="A short summary of your experience and what you're looking for."
                 className={`${inputClass} resize-none`}
               />
-              <p className="mt-2 text-xs text-gray-400">
+              <p className="mt-2 text-xs text-[#9698a2]">
                 {about.length}/{ABOUT_MAX}
               </p>
             </div>
@@ -212,7 +212,7 @@ export function CandidateProfile() {
                 placeholder="e.g. react, system design, machine learning"
                 className={inputClass}
               />
-              <p className="mt-2 text-xs text-gray-400">Comma separated.</p>
+              <p className="mt-2 text-xs text-[#9698a2]">Comma separated.</p>
               {parsedInterests.length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-1.5">
                   {parsedInterests.map((item) => (

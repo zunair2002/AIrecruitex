@@ -62,7 +62,7 @@ export function InterviewReportsList() {
   if (jobs.isLoading) return <LoadingBlock label="Loading your jobs…" />;
   if (jobs.error) {
     return (
-      <div className="p-8">
+      <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
         <ErrorBlock message={jobs.error} onRetry={jobs.reload} />
       </div>
     );
@@ -70,7 +70,7 @@ export function InterviewReportsList() {
 
   if ((jobs.data ?? []).length === 0) {
     return (
-      <div className="p-8">
+      <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
         <PageHeader title="Interview Reports" />
         <EmptyState
           title="No jobs posted yet."
@@ -89,7 +89,7 @@ export function InterviewReportsList() {
   }
 
   return (
-    <div className="p-8">
+    <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
       <PageHeader
         title="Interview Reports"
         description="The AI interviewer's per-question scores and overall verdict for each applicant."
@@ -134,18 +134,18 @@ export function InterviewReportsList() {
                   key={application._id}
                   type="button"
                   onClick={() => setSelectedApplicationId(application._id)}
-                  className={`w-full rounded-xl border p-5 text-left transition-all ${
+                  className={`w-full rounded border p-5 text-left transition-all ${
  isActive
  ? "border-brand/50 bg-brand-light "
- : "border-gray-100 bg-white hover:border-brand-light hover:bg-gray-50"
+ : "border-[#f1f1f5] bg-white hover:border-brand-light hover:bg-[#f8f8fb]"
  }`}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="truncate font-semibold text-gray-900">
+                      <p className="truncate font-semibold text-[#292b35]">
                         {candidate?.name ?? "Unknown candidate"}
                       </p>
-                      <p className="mt-1 text-xs text-gray-500">
+                      <p className="mt-1 text-xs text-[#898b96]">
                         {formatDateTime(application.aiInterview.dateTime)}
                       </p>
                     </div>

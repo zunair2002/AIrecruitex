@@ -6,12 +6,12 @@ type ScoreBarProps = {
 
 export function ScoreBar({ label, score }: ScoreBarProps) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-5">
+    <div className="bg-white rounded border border-[#f1f1f5] p-5">
       <div className="flex items-center justify-between mb-3">
-        <p className="text-sm font-semibold text-gray-700">{label}</p>
-        <p className="text-2xl font-bold text-gray-900">{score}%</p>
+        <p className="text-sm font-semibold text-[#44464f]">{label}</p>
+        <p className="text-2xl font-bold text-[#292b35]">{score}%</p>
       </div>
-      <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+      <div className="h-3 bg-[#f3f3f6] rounded-full overflow-hidden">
         <div
           className="h-full rounded-full bg-brand transition-all duration-500"
           style={{ width: `${score}%` }}
@@ -61,8 +61,8 @@ export function FinalScoreRing({ score }: FinalScoreRingProps) {
         </defs>
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <p className="text-4xl font-bold text-gray-900">{score}%</p>
-        <p className="text-xs text-gray-500 font-medium mt-1">Final Score</p>
+        <p className="text-4xl font-bold text-[#292b35]">{score}%</p>
+        <p className="text-xs text-[#898b96] font-medium mt-1">Final Score</p>
       </div>
     </div>
   );

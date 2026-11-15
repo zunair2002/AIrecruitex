@@ -61,7 +61,7 @@ export function CourseList() {
   }, [list, search, topic]);
 
   return (
-    <div className="p-8">
+    <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
       <PageHeader
         title="Learning"
         description="Courses published by the hiring team. Useful when an interview report flags a weak topic."
@@ -103,11 +103,11 @@ export function CourseList() {
           <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
             {filtered.map((course) => (
               <Card key={course._id}>
-                <h2 className="text-lg font-bold text-gray-900">{course.title}</h2>
-                <p className="mt-1 text-xs text-gray-500">
+                <h2 className="text-lg font-bold text-[#292b35]">{course.title}</h2>
+                <p className="mt-1 text-xs text-[#898b96]">
                   Added {formatDate(course.createdAt)}
                 </p>
-                <p className="mt-3 whitespace-pre-line text-sm text-gray-600">
+                <p className="mt-3 whitespace-pre-line text-sm text-[#686b77]">
                   {course.description}
                 </p>
                 <div className="mt-4">
@@ -117,7 +117,7 @@ export function CourseList() {
                   href={course.videoUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-4 inline-block rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-indigo-700"
+                  className="mt-4 inline-block rounded bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-indigo-700"
                 >
                   Watch course
                 </a>
@@ -126,7 +126,7 @@ export function CourseList() {
           </div>
 
           {filtered.length === 0 && (
-            <p className="py-12 text-center text-gray-500">
+            <p className="py-12 text-center text-[#898b96]">
               No courses match those filters.
             </p>
           )}

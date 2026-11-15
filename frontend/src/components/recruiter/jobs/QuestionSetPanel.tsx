@@ -124,7 +124,7 @@ export function QuestionSetPanel({
               />
               <Stat label="Total marks in pool" value={totalMarks} />
             </div>
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-[#9698a2]">
               Last updated {formatDateTime(existing.updatedAt)}.
               {existing.questionsPerInterview
                 ? " Each candidate gets a different random draw, in a different order."
@@ -132,7 +132,7 @@ export function QuestionSetPanel({
             </p>
           </div>
         ) : (
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-[#686b77]">
             No question pool yet. Until one is uploaded, candidates can&apos;t
             be given an organisational interview for this job.
           </p>
@@ -154,19 +154,19 @@ export function QuestionSetPanel({
               type="file"
               accept={RESUME_ACCEPT_ATTRIBUTE}
               onChange={(event) => handleFile(event.target.files?.[0])}
-              className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-600 file:mr-4 file:rounded-lg file:border-0 file:bg-brand-light file:px-4 file:py-2 file:text-sm file:font-semibold file:text-brand-dark"
+              className="w-full rounded border border-[#e9eaf0] bg-white px-4 py-3 text-sm text-[#686b77] file:mr-4 file:rounded-lg file:border-0 file:bg-brand-light file:px-4 file:py-2 file:text-sm file:font-semibold file:text-brand-dark"
             />
-            <p className="mt-2 text-xs text-gray-400">
+            <p className="mt-2 text-xs text-[#9698a2]">
               PDF or DOCX, max {MAX_SIZE_MB}MB. One block per question:
-              <code className="mx-1 rounded bg-gray-100 px-1">Q:</code> the
+              <code className="mx-1 rounded bg-[#f3f3f6] px-1">Q:</code> the
               question,
-              <code className="mx-1 rounded bg-gray-100 px-1">A:</code> the
+              <code className="mx-1 rounded bg-[#f3f3f6] px-1">A:</code> the
               model answer it&apos;s graded against, and
-              <code className="mx-1 rounded bg-gray-100 px-1">Marks:</code> its
+              <code className="mx-1 rounded bg-[#f3f3f6] px-1">Marks:</code> its
               weight.
             </p>
             {file && (
-              <p className="mt-2 text-xs font-medium text-gray-600">
+              <p className="mt-2 text-xs font-medium text-[#686b77]">
                 {file.name} · {formatFileSize(file.size)}
               </p>
             )}
@@ -185,7 +185,7 @@ export function QuestionSetPanel({
               placeholder="Leave empty to ask the whole pool"
               className={inputClass}
             />
-            <p className="mt-2 text-xs text-gray-400">
+            <p className="mt-2 text-xs text-[#9698a2]">
               Drawn at random and shuffled for each candidate — e.g. 10 from a
               pool of 20 means no two candidates get the same set.
             </p>
@@ -203,7 +203,7 @@ export function QuestionSetPanel({
                 : "Upload pool"}
           </button>
           {existing && (
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-[#9698a2]">
               Uploading replaces the entire pool. Interviews already in progress
               keep the questions they were given.
             </p>
@@ -228,10 +228,10 @@ export function QuestionSetPanel({
             {questions.map((question, index) => (
               <li
                 key={`${index}-${question.question.slice(0, 24)}`}
-                className="rounded-xl border border-gray-100 bg-gray-50 p-4"
+                className="rounded border border-[#f1f1f5] bg-[#f8f8fb] p-4"
               >
                 <div className="flex items-start justify-between gap-3">
-                  <p className="text-sm font-semibold text-gray-900">
+                  <p className="text-sm font-semibold text-[#292b35]">
                     {index + 1}. {question.question}
                   </p>
                   <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-xs font-bold text-brand">
@@ -239,8 +239,8 @@ export function QuestionSetPanel({
                   </span>
                 </div>
                 {showAnswers && (
-                  <p className="mt-2 whitespace-pre-line text-sm text-gray-600">
-                    <span className="font-semibold text-gray-500">
+                  <p className="mt-2 whitespace-pre-line text-sm text-[#686b77]">
+                    <span className="font-semibold text-[#898b96]">
                       Model answer:{" "}
                     </span>
                     {question.referenceAnswer}
@@ -249,7 +249,7 @@ export function QuestionSetPanel({
               </li>
             ))}
           </ol>
-          <p className="mt-4 text-xs text-gray-400">
+          <p className="mt-4 text-xs text-[#9698a2]">
             Model answers are used for grading only and are never shown to
             candidates.
           </p>
@@ -261,9 +261,9 @@ export function QuestionSetPanel({
 
 function Stat({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-xl bg-gray-50 p-4">
-      <p className="text-xs uppercase tracking-wide text-gray-500">{label}</p>
-      <p className="mt-1 text-2xl font-bold text-gray-900">{value}</p>
+    <div className="rounded bg-[#f8f8fb] p-4">
+      <p className="text-xs uppercase tracking-wide text-[#898b96]">{label}</p>
+      <p className="mt-1 text-2xl font-bold text-[#292b35]">{value}</p>
     </div>
   );
 }

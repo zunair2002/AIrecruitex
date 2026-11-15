@@ -128,7 +128,7 @@ export function ShortlistedList() {
   if (jobs.isLoading) return <LoadingBlock label="Loading your jobs…" />;
   if (jobs.error) {
     return (
-      <div className="p-8">
+      <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
         <ErrorBlock message={jobs.error} onRetry={jobs.reload} />
       </div>
     );
@@ -136,7 +136,7 @@ export function ShortlistedList() {
 
   if ((jobs.data ?? []).length === 0) {
     return (
-      <div className="p-8">
+      <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
         <PageHeader title="Selected Candidates" />
         <EmptyState
           title="No jobs posted yet."
@@ -155,7 +155,7 @@ export function ShortlistedList() {
   }
 
   return (
-    <div className="p-8">
+    <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
       <PageHeader
         title="Selected Candidates"
         description="Applicants whose status is Selected — ready for an organisation interview."
@@ -215,10 +215,10 @@ export function ShortlistedList() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
-                        <h2 className="truncate font-bold text-gray-900">
+                        <h2 className="truncate font-bold text-[#292b35]">
                           {candidate?.name ?? "Unknown candidate"}
                         </h2>
-                        <p className="mt-0.5 truncate text-xs text-gray-500">
+                        <p className="mt-0.5 truncate text-xs text-[#898b96]">
                           {candidate?.email ?? "—"}
                         </p>
                       </div>
@@ -229,10 +229,10 @@ export function ShortlistedList() {
                       </span>
                     </div>
 
-                    <p className="mt-3 text-sm font-medium text-gray-700">
+                    <p className="mt-3 text-sm font-medium text-[#44464f]">
                       {selectedJob?.title}
                     </p>
-                    <p className="mt-1 text-xs text-gray-400">
+                    <p className="mt-1 text-xs text-[#9698a2]">
                       Applied {formatDate(application.createdAt)}
                     </p>
 

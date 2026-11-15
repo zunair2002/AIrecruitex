@@ -24,7 +24,7 @@ export function MyJobsList() {
   });
 
   return (
-    <div className="p-8">
+    <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
       <PageHeader
         title="My Jobs"
         description="Every job you've posted, newest first."
@@ -61,10 +61,10 @@ export function MyJobsList() {
             <Card key={job._id}>
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <h2 className="text-lg font-bold text-gray-900">
+                  <h2 className="text-lg font-bold text-[#292b35]">
                     {job.title}
                   </h2>
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs text-[#898b96]">
                     Posted {formatDate(job.createdAt)}
                   </p>
                 </div>
@@ -73,12 +73,12 @@ export function MyJobsList() {
                 </span>
               </div>
 
-              <p className="mt-4 line-clamp-3 whitespace-pre-line text-sm text-gray-600">
+              <p className="mt-4 line-clamp-3 whitespace-pre-line text-sm text-[#686b77]">
                 {job.description}
               </p>
 
               <div className="mt-4">
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#898b96]">
                   Required skills ({job.requiredSkills.length})
                 </p>
                 <SkillChips skills={job.requiredSkills} />
@@ -110,7 +110,7 @@ export function MyJobsList() {
                     href={job.jdFileUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-sm font-medium text-gray-500 hover:text-gray-800"
+                    className="text-sm font-medium text-[#898b96] hover:text-[#292b35]"
                   >
                     JD file
                   </a>
@@ -142,7 +142,7 @@ function JdRawText({ text }: { text: string }) {
         {text.length.toLocaleString()} chars)
       </button>
       {isOpen && (
-        <pre className="mt-2 max-h-64 overflow-auto whitespace-pre-wrap rounded-xl bg-gray-50 p-4 text-xs leading-relaxed text-gray-600">
+        <pre className="mt-2 max-h-64 overflow-auto whitespace-pre-wrap rounded bg-[#f8f8fb] p-4 text-xs leading-relaxed text-[#686b77]">
           {text}
         </pre>
       )}

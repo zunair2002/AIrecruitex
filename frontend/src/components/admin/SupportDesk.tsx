@@ -78,7 +78,7 @@ export function SupportDesk() {
   ).length;
 
   return (
-    <div className="p-8">
+    <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
       <PageHeader
         title="Support Desk"
         description={`${openCount} open ticket${openCount === 1 ? "" : "s"}. Resolving a ticket notifies its author.`}
@@ -115,14 +115,14 @@ export function SupportDesk() {
             return (
               <div
                 key={ticket._id}
-                className="rounded-2xl border border-gray-100 bg-white p-6 "
+                className="rounded border border-[#f1f1f5] bg-white p-6 "
               >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <h2 className="font-bold text-gray-900">
+                    <h2 className="font-bold text-[#292b35]">
                       {ticket.subject}
                     </h2>
-                    <p className="mt-1 text-xs text-gray-500">
+                    <p className="mt-1 text-xs text-[#898b96]">
                       {author?.name ?? "Unknown user"}
                       {author?.email ? ` · ${author.email}` : ""} ·{" "}
                       {formatDateTime(ticket.createdAt)}
@@ -133,12 +133,12 @@ export function SupportDesk() {
                   </span>
                 </div>
 
-                <p className="mt-4 whitespace-pre-line rounded-xl bg-gray-50 p-4 text-sm text-gray-700">
+                <p className="mt-4 whitespace-pre-line rounded bg-[#f8f8fb] p-4 text-sm text-[#44464f]">
                   {ticket.message}
                 </p>
 
                 {ticket.adminReply ? (
-                  <div className="mt-4 rounded-xl border border-emerald-100 bg-emerald-50 p-4">
+                  <div className="mt-4 rounded border border-emerald-100 bg-emerald-50 p-4">
                     <p className="text-xs font-bold uppercase tracking-wide text-emerald-700">
                       Admin reply
                     </p>

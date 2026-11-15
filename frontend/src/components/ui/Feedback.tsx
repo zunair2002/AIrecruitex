@@ -2,19 +2,28 @@
 
 import type { ReactNode } from "react";
 
-export function Spinner({ className = "h-8 w-8" }: { className?: string }) {
+/**
+ * Shared feedback + card chrome.
+ *
+ * These render in the same visual language as `components/dashboard/primitives`:
+ * flat white panels on a tinted page, #e9eaf0 hairlines, small uppercase labels
+ * and tight tracking on numerals. Props are unchanged from the earlier rounded
+ * style, so every existing caller picks the new look up for free.
+ */
+
+export function Spinner({ className = "h-7 w-7" }: { className?: string }) {
   return (
     <div
       role="status"
       aria-label="Loading"
-      className={`${className} animate-spin rounded-full border-2 border-zinc-200 border-t-brand`}
+      className={`${className} animate-spin rounded-full border-2 border-[#ececf1] border-t-[#6b5ce7]`}
     />
   );
 }
 
 export function LoadingBlock({ label = "Loading…" }: { label?: string }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 py-16 text-sm text-zinc-500">
+    <div className="flex flex-col items-center justify-center gap-3 py-14 text-[11px] text-[#898b96]">
       <Spinner />
       {label}
     </div>
@@ -31,14 +40,14 @@ export function ErrorBlock({
   return (
     <div
       role="alert"
-      className="rounded-2xl border border-red-100 bg-red-50 p-6 text-center"
+      className="border border-rose-100 bg-rose-50/70 p-5 text-center"
     >
-      <p className="text-sm font-semibold text-red-800">{message}</p>
+      <p className="text-[12px] font-semibold text-rose-700">{message}</p>
       {onRetry && (
         <button
           type="button"
           onClick={onRetry}
-          className="mt-4 rounded-xl bg-red-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-red-700"
+          className="mt-3 inline-flex h-7 items-center rounded bg-rose-600 px-3 text-[10px] font-semibold text-white transition-colors hover:bg-rose-700"
         >
           Try again
         </button>
@@ -52,7 +61,7 @@ export function InlineError({ message }: { message: string | null }) {
   return (
     <p
       role="alert"
-      className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700"
+      className="border border-rose-100 bg-rose-50/70 px-3 py-2 text-[11px] text-rose-700"
     >
       {message}
     </p>
@@ -62,7 +71,7 @@ export function InlineError({ message }: { message: string | null }) {
 export function InlineSuccess({ message }: { message: string | null }) {
   if (!message) return null;
   return (
-    <p className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+    <p className="border border-emerald-100 bg-emerald-50/70 px-3 py-2 text-[11px] text-emerald-700">
       {message}
     </p>
   );
@@ -78,18 +87,22 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-dashed border-zinc-200 bg-white/80 p-12 text-center ">
-      <p className="font-medium text-zinc-700">{title}</p>
+    <div className="border border-dashed border-[#e3e4ec] bg-white p-10 text-center">
+      <p className="text-[12px] font-semibold text-[#292b35]">{title}</p>
       {description && (
-        <p className="mx-auto mt-2 max-w-md text-sm text-zinc-500">
+        <p className="mx-auto mt-1.5 max-w-md text-[11px] text-[#898b96]">
           {description}
         </p>
       )}
-      {action && <div className="mt-6">{action}</div>}
+      {action && <div className="mt-5">{action}</div>}
     </div>
   );
 }
 
+/**
+ * Screen title row. Matches `PortalHeader` in dashboard/primitives — this is the
+ * variant for screens that have no icon tile.
+ */
 export function PageHeader({
   title,
   description,
@@ -100,24 +113,26 @@ export function PageHeader({
   action?: ReactNode;
 }) {
   return (
-    <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-      <div>
-        <h1 className="font-display text-3xl font-bold tracking-tight text-ink">
+    <div className="mb-3 flex min-h-8 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+      <div className="min-w-0">
+        <h1 className="truncate text-[13px] font-semibold text-[#30323b]">
           {title}
         </h1>
-        {description && <p className="mt-1.5 text-zinc-500">{description}</p>}
+        {description && (
+          <p className="mt-0.5 text-[10px] text-[#999ba4]">{description}</p>
+        )}
       </div>
-      {action}
+      {action && <div className="shrink-0">{action}</div>}
     </div>
   );
 }
 
-const toneSolid: Record<string, string> = {
-  brand: "bg-brand",
-  ink: "bg-navy",
-  emerald: "bg-emerald-600",
-  sky: "bg-sky-600",
-  amber: "bg-amber-500",
+const toneAccent: Record<string, string> = {
+  brand: "bg-[#efedfd] text-[#6b5ce7]",
+  ink: "bg-[#f3f3f6] text-[#4b4e5a]",
+  emerald: "bg-[#e7f6f1] text-[#3a9e85]",
+  sky: "bg-[#e8f1fd] text-[#4c8bd4]",
+  amber: "bg-[#fff4e8] text-[#e29a42]",
 };
 
 export function StatCard({
@@ -131,40 +146,38 @@ export function StatCard({
   label: string;
   value: string | number;
   sub?: string;
-  icon: string;
-  /** @deprecated kept for callers — maps to solid tone instead of gradient */
+  icon: ReactNode;
+  /** @deprecated legacy gradient string — mapped onto the flat accent tones. */
   gradient?: string;
-  tone?: keyof typeof toneSolid;
+  tone?: keyof typeof toneAccent;
 }) {
-  const solid =
-    toneSolid[tone] ??
+  const accent =
+    toneAccent[tone] ??
     (gradient?.includes("emerald")
-      ? toneSolid.emerald
+      ? toneAccent.emerald
       : gradient?.includes("sky") || gradient?.includes("blue")
-        ? toneSolid.sky
+        ? toneAccent.sky
         : gradient?.includes("amber")
-          ? toneSolid.amber
-          : toneSolid.brand);
+          ? toneAccent.amber
+          : toneAccent.brand);
 
   return (
-    <div className="lift-card relative border border-[#e0d6ea] bg-white p-6">
-      <div className="flex items-start gap-4">
-        <div
-          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-sm ${solid} text-lg text-white`}
-        >
-          {icon}
-        </div>
-        <div className="min-w-0">
-          <p className="text-sm text-zinc-500">{label}</p>
-          <p className="mt-1 font-display text-3xl font-bold tracking-tight text-ink">
-            {value}
-          </p>
-          {sub && (
-            <p className="mt-1 text-xs font-semibold text-brand">{sub}</p>
-          )}
-        </div>
+    <article className="flex min-h-[76px] items-center justify-between gap-3 border border-[#ececf1] bg-white px-3 py-3 sm:px-4">
+      <div className="min-w-0">
+        <p className="truncate text-[9px] font-semibold uppercase tracking-[0.07em] text-[#898b96]">
+          {label}
+        </p>
+        <p className="mt-1 text-[19px] font-bold leading-none tracking-[-0.04em] text-[#292b35]">
+          {value}
+        </p>
+        {sub && <p className="mt-1 truncate text-[9px] text-[#9698a2]">{sub}</p>}
       </div>
-    </div>
+      <span
+        className={`flex h-8 w-8 shrink-0 items-center justify-center text-[13px] ${accent} [&>svg]:h-4 [&>svg]:w-4`}
+      >
+        {icon}
+      </span>
+    </article>
   );
 }
 
@@ -181,12 +194,12 @@ export function Card({
 }) {
   return (
     <section
-      className={`rounded-2xl border border-zinc-200/90 bg-white p-6 ${className}`}
+      className={`min-w-0 border border-[#e9eaf0] bg-white p-4 sm:p-5 ${className}`}
     >
       {(title || action) && (
-        <div className="mb-4 flex items-center justify-between gap-3">
+        <div className="mb-4 flex min-h-6 items-center justify-between gap-3">
           {title && (
-            <h2 className="font-display text-lg font-bold tracking-tight text-ink">
+            <h2 className="text-[13px] font-bold tracking-[-0.01em] text-[#292b35]">
               {title}
             </h2>
           )}
@@ -208,18 +221,18 @@ export function SkillChips({
   tone?: "indigo" | "gray";
 }) {
   if (skills.length === 0) {
-    return <span className="text-xs text-zinc-400">{emptyLabel}</span>;
+    return <span className="text-[10px] text-[#9698a2]">{emptyLabel}</span>;
   }
   const toneClass =
     tone === "indigo"
-      ? "border-brand-light bg-brand-light text-brand-dark"
-      : "border-zinc-200 bg-zinc-50 text-zinc-600";
+      ? "bg-[#efedfd] text-[#5a4bd1]"
+      : "bg-[#f3f3f6] text-[#686b77]";
   return (
     <div className="flex flex-wrap gap-1.5">
       {skills.map((skill) => (
         <span
           key={skill}
-          className={`rounded-lg border px-2.5 py-1 text-xs font-medium ${toneClass}`}
+          className={`inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium ${toneClass}`}
         >
           {skill}
         </span>

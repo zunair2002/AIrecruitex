@@ -7,28 +7,28 @@ import { BrandWordmark } from "@/components/layout/Logo";
  */
 export default function NotFound() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md rounded-2xl border border-gray-100 bg-white p-8 text-center ">
+    <main className="flex min-h-screen items-center justify-center bg-[#f8f8fb] px-4">
+      <div className="w-full max-w-md rounded border border-[#f1f1f5] bg-white p-8 text-center ">
         <div className="mb-6 flex justify-center">
           <BrandWordmark className="text-[1.5rem]" />
         </div>
         <p className="text-5xl font-bold text-brand">404</p>
-        <h1 className="mt-4 text-xl font-bold text-gray-900">
+        <h1 className="mt-4 text-xl font-bold text-[#292b35]">
           We couldn&apos;t find that page
         </h1>
-        <p className="mt-2 text-sm text-gray-500">
+        <p className="mt-2 text-sm text-[#898b96]">
           The link may be out of date, or the page may have moved.
         </p>
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
           <Link
             href="/"
-            className="rounded-xl bg-brand px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
+            className="rounded bg-brand px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
           >
             Go to homepage
           </Link>
           <Link
             href="/login/candidate"
-            className="rounded-xl border border-gray-200 bg-white px-6 py-3 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50"
+            className="rounded border border-[#e9eaf0] bg-white px-6 py-3 text-sm font-semibold text-[#44464f] transition-colors hover:bg-[#f8f8fb]"
           >
             Sign in
           </Link>

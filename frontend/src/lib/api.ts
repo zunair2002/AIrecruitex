@@ -20,6 +20,44 @@ export class ApiError extends Error {
   }
 }
 
+/**
+ * Why a request was rejected as unauthenticated.
+ *
+ * "deactivated" is reported separately because it is not a dead token — the
+ * account exists and the password still works, an admin has simply switched it
+ * off. The UI says so rather than silently bouncing to the login page, where
+ * the user would just be told their credentials are wrong.
+ */
+export type AuthFailure = "deactivated" | "unauthenticated";
+
+type AuthFailureListener = (failure: AuthFailure) => void;
+
+const authFailureListeners = new Set<AuthFailureListener>();
+
+/**
+ * Subscribe to auth rejections coming back from any request. Used by
+ * AuthProvider so one 401/403 anywhere tears the session down everywhere,
+ * instead of each screen rendering its own broken state.
+ */
+export function onAuthFailure(listener: AuthFailureListener): () => void {
+  authFailureListeners.add(listener);
+  return () => authFailureListeners.delete(listener);
+}
+
+function reportAuthFailure(status: number, message: string): void {
+  if (status !== 401 && status !== 403) return;
+  // The backend's wording for this is "Account is deactivated" (auth.middleware
+  // and auth.service both use it). 403 is also used for ordinary permission
+  // errors, so match on the reason rather than the status alone.
+  const isDeactivated = /deactivat/i.test(message);
+  if (status === 403 && !isDeactivated) return;
+
+  const failure: AuthFailure = isDeactivated
+    ? "deactivated"
+    : "unauthenticated";
+  for (const listener of authFailureListeners) listener(failure);
+}
+
 export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 /** Values are dropped when `undefined`/`null`/`""` so filters stay optional. */
@@ -83,10 +121,10 @@ export async function apiRequest<T>(
   }
 
   if (!response.ok || payload?.success === false) {
-    throw new ApiError(
-      payload?.message ?? `Request failed with status ${response.status}`,
-      response.status,
-    );
+    const message =
+      payload?.message ?? `Request failed with status ${response.status}`;
+    reportAuthFailure(response.status, message);
+    throw new ApiError(message, response.status);
   }
 
   // Unwrap `data` when the envelope carries it — testing for the KEY, not its
@@ -101,6 +139,11 @@ export async function apiRequest<T>(
     return payload.data as T;
   }
   return payload as T;
+}
+
+/** The HTTP status behind a thrown error, or 0 when it wasn't an API error. */
+export function apiErrorStatus(error: unknown): number {
+  return error instanceof ApiError ? error.status : 0;
 }
 
 /** Turns a thrown value into something safe to render. */

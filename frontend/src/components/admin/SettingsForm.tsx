@@ -37,7 +37,7 @@ export function SettingsForm() {
   if (settings.isLoading) return <LoadingBlock label="Loading settings…" />;
   if (settings.error) {
     return (
-      <div className="p-8">
+      <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
         <ErrorBlock message={settings.error} onRetry={settings.reload} />
       </div>
     );
@@ -99,7 +99,7 @@ function SettingsFields({
   };
 
   return (
-    <div className="p-8">
+    <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
       <div className="mx-auto max-w-2xl">
         <PageHeader
           title="Platform Settings"
@@ -140,7 +140,7 @@ function SettingsFields({
                 }
                 className="w-full accent-brand"
               />
-              <p className="mt-2 text-xs text-gray-400">
+              <p className="mt-2 text-xs text-[#9698a2]">
                 An application is flagged as matched when its match score
                 reaches this percentage. Applied at apply time — existing
                 applications keep the flag they were given.
@@ -162,7 +162,7 @@ function SettingsFields({
                 }
                 className={inputClass}
               />
-              <p className="mt-2 text-xs text-gray-400">
+              <p className="mt-2 text-xs text-[#9698a2]">
                 Stored for reference — the upload middleware&apos;s own 5MB
                 limit applies to actual uploads.
               </p>
@@ -173,13 +173,13 @@ function SettingsFields({
                 type="checkbox"
                 checked={allowSignups}
                 onChange={(event) => setAllowSignups(event.target.checked)}
-                className="mt-1 h-4 w-4 rounded border-gray-300 text-brand focus:ring-brand"
+                className="mt-1 h-4 w-4 rounded border-[#e3e4ec] text-brand focus:ring-brand"
               />
               <span>
-                <span className="block text-sm font-semibold text-gray-900">
+                <span className="block text-sm font-semibold text-[#292b35]">
                   Allow new sign-ups
                 </span>
-                <span className="block text-xs text-gray-400">
+                <span className="block text-xs text-[#9698a2]">
                   Stored on the settings document for the platform&apos;s
                   sign-up policy.
                 </span>
@@ -194,7 +194,7 @@ function SettingsFields({
               >
                 {isSaving ? "Saving…" : "Save settings"}
               </button>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-[#9698a2]">
                 Last updated {formatDateTime(settings.updatedAt)}
               </p>
             </div>

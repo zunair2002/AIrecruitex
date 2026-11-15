@@ -35,7 +35,7 @@ export function ActivityLog() {
   const list = logs.data ?? [];
 
   return (
-    <div className="p-8">
+    <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
       <PageHeader
         title="Activity Log"
         description="Every admin action the backend records, newest first (latest 200)."
@@ -86,30 +86,30 @@ export function ActivityLog() {
             return (
               <div
                 key={log._id}
-                className="rounded-2xl border border-gray-100 bg-white p-5 "
+                className="rounded border border-[#f1f1f5] bg-white p-5 "
               >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="font-semibold text-gray-900">
+                    <p className="font-semibold text-[#292b35]">
                       {humanizeAction(log.action)}
                     </p>
-                    <p className="mt-1 text-xs text-gray-500">
+                    <p className="mt-1 text-xs text-[#898b96]">
                       {actor?.name ?? "Unknown actor"}
                       {actor?.email ? ` · ${actor.email}` : ""} · role{" "}
                       {log.actorRole}
                     </p>
-                    <p className="mt-1 text-xs text-gray-400">
+                    <p className="mt-1 text-xs text-[#9698a2]">
                       Target: {log.targetType}
                       {log.targetId ? ` · ${log.targetId}` : ""}
                     </p>
                   </div>
-                  <p className="shrink-0 text-xs text-gray-400">
+                  <p className="shrink-0 text-xs text-[#9698a2]">
                     {formatDateTime(log.createdAt)}
                   </p>
                 </div>
 
                 {log.metadata && Object.keys(log.metadata).length > 0 && (
-                  <pre className="mt-3 overflow-x-auto rounded-xl bg-gray-50 p-3 text-xs text-gray-600">
+                  <pre className="mt-3 overflow-x-auto rounded bg-[#f8f8fb] p-3 text-xs text-[#686b77]">
                     {JSON.stringify(log.metadata, null, 2)}
                   </pre>
                 )}

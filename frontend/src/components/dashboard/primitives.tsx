@@ -266,3 +266,112 @@ export function EmptyLine({ children }: { children: ReactNode }) {
     <p className="py-6 text-center text-[11px] text-[#9698a2]">{children}</p>
   );
 }
+
+/**
+ * The page frame every portal screen sits in — tinted page, centred column,
+ * consistent gutters. Candidate, HR and Admin all use this, so the three
+ * portals line up pixel-for-pixel.
+ */
+export function PortalPage({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={`min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6 ${className}`}
+    >
+      <div className="mx-auto max-w-[1500px] space-y-3">{children}</div>
+    </div>
+  );
+}
+
+/**
+ * The header row at the top of a portal screen: a small outlined icon tile,
+ * the screen name with a muted subtitle, and an optional action on the right.
+ */
+export function PortalHeader({
+  icon,
+  title,
+  subtitle,
+  action,
+}: {
+  icon: ReactNode;
+  title: string;
+  subtitle?: string;
+  action?: ReactNode;
+}) {
+  return (
+    <header className="flex min-h-8 items-center justify-between gap-3">
+      <div className="flex min-w-0 items-center gap-2.5">
+        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#e9eaf0] bg-white text-[#767985] [&>svg]:h-3 [&>svg]:w-3">
+          {icon}
+        </span>
+        <div className="min-w-0">
+          <h1 className="truncate text-[13px] font-semibold text-[#30323b]">
+            {title}
+          </h1>
+          {subtitle && (
+            <p className="hidden truncate text-[10px] text-[#999ba4] sm:block">
+              {subtitle}
+            </p>
+          )}
+        </div>
+      </div>
+      {action && <div className="shrink-0">{action}</div>}
+    </header>
+  );
+}
+
+/** The single accent button used for a screen's primary action. */
+export function HeaderAction({
+  href,
+  onClick,
+  children,
+  disabled = false,
+}: {
+  href?: string;
+  onClick?: () => void;
+  children: ReactNode;
+  disabled?: boolean;
+}) {
+  const className =
+    "inline-flex h-7 shrink-0 items-center gap-1.5 rounded bg-[#6b5ce7] px-2.5 text-[10px] font-semibold text-white transition-colors hover:bg-[#5849d1] disabled:cursor-not-allowed disabled:opacity-50";
+  if (href) {
+    return (
+      <Link href={href} className={className}>
+        {children}
+      </Link>
+    );
+  }
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className={className}
+    >
+      {children}
+    </button>
+  );
+}
+
+/** A plain key/value row, for dense definition lists inside a Panel. */
+export function DataRow({
+  label,
+  children,
+}: {
+  label: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className="flex items-start justify-between gap-3 border-b border-[#f1f1f5] py-2 last:border-b-0">
+      <span className="text-[11px] text-[#686b77]">{label}</span>
+      <span className="text-right text-[11px] font-semibold text-[#292b35]">
+        {children}
+      </span>
+    </div>
+  );
+}

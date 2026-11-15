@@ -39,7 +39,7 @@ export function Monitoring() {
     return <LoadingBlock label="Loading system status…" />;
   if (snapshot.error) {
     return (
-      <div className="p-8">
+      <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
         <ErrorBlock message={snapshot.error} onRetry={snapshot.reload} />
       </div>
     );
@@ -48,7 +48,7 @@ export function Monitoring() {
   if (!data) return null;
 
   return (
-    <div className="p-8">
+    <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
       <PageHeader
         title="Monitoring"
         description="Live backend status and the most recent server errors."
@@ -111,7 +111,7 @@ export function Monitoring() {
       </div>
 
       <Card title="Error reporting">
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-[#686b77]">
           Server errors are no longer written to the database — every 5xx used
           to create a document, which added up quickly whenever a dependency
           (such as Ollama) was briefly unreachable. They&apos;re captured in the

@@ -92,7 +92,7 @@ export function VoiceAnswerField({
   return (
     <>
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <label htmlFor={id} className="block text-sm font-semibold text-gray-900">
+        <label htmlFor={id} className="block text-sm font-semibold text-[#292b35]">
           {label}
         </label>
         <div className="flex flex-wrap items-center gap-2">
@@ -101,7 +101,7 @@ export function VoiceAnswerField({
               type="button"
               onClick={answer.readQuestion}
               disabled={disabled || voice.speaking}
-              className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-lg border border-[#e9eaf0] bg-white px-3 py-1.5 text-xs font-semibold text-[#44464f] transition-colors hover:bg-[#f8f8fb] disabled:cursor-not-allowed disabled:opacity-50"
             >
               {voice.speaking ? "🔊 Reading…" : "🔊 Read question"}
             </button>
@@ -143,9 +143,9 @@ export function VoiceAnswerField({
             : "Type your answer here…"
         }
         disabled={disabled}
-        className="w-full resize-none rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-gray-50"
+        className="w-full resize-none rounded border border-[#e9eaf0] px-4 py-3 text-sm text-[#292b35] placeholder:text-[#9698a2] focus:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-[#f8f8fb]"
       />
-      <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-gray-400">
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-[#9698a2]">
         <span>{answer.value.split(/\s+/).filter(Boolean).length} words</span>
         <span>{answer.value.length}/{MAX_ANSWER_CHARS} characters</span>
         {!voice.sttSupported && <span>Voice answers work in Chrome or Edge</span>}

@@ -1,46 +1,134 @@
 "use client";
 
-import { useState } from "react";
-import type { ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { BrandWordmark } from "./Logo";
+import { ChevronDown, ChevronRight, LogOut, type LucideIcon } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useRealtimeConnected } from "@/context/RealtimeContext";
 import { useUnreadNotifications } from "@/components/shared/useUnreadNotifications";
-import { ROLE_BADGE, ROLE_LABELS, initials } from "@/lib/format";
+import { ROLE_LABELS, initials } from "@/lib/format";
 
-export type NavItem = { href: string; label: string; icon: ReactNode };
+/**
+ * The portal sidebar — one component for all three portals.
+ *
+ * Candidate, HR and Admin differ only in their nav configuration, so they share
+ * this file rather than each keeping a look of their own. That is what stops the
+ * three portals drifting apart: a change to the chrome lands in all of them.
+ */
+
+export type NavItem = {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+  /**
+   * Show the unread-notification count on this item. Set it explicitly rather
+   * than inferring it from the href: /admin/notifications is the *broadcast*
+   * composer, not an inbox, and must not wear an unread badge.
+   */
+  showUnreadBadge?: boolean;
+};
+
+export type NavGroup = {
+  /** Groups with a title are collapsible; an untitled group is a loose row. */
+  title?: string;
+  items: NavItem[];
+};
+
+/** The user's photo, or their initials when they have none. */
+function Avatar({ user }: { user: { name: string; avatarUrl?: string } }) {
+  if (user.avatarUrl) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={user.avatarUrl}
+        alt=""
+        referrerPolicy="no-referrer"
+        className="h-8 w-8 rounded-full object-cover ring-1 ring-white/20"
+      />
+    );
+  }
+  return (
+    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-[11px] font-semibold text-emerald-300 ring-1 ring-white/20">
+      {initials(user.name)}
+    </span>
+  );
+}
 
 export function PortalSidebar({
   portalName,
-  navItems,
+  portalTagline,
+  navGroups,
+  accountMenu = [],
   loginPath,
-  compactOnMobile = false,
+  homeHref,
 }: {
   portalName: string;
-  navItems: NavItem[];
+  portalTagline: string;
+  navGroups: NavGroup[];
+  /**
+   * Shortcuts shown in the account card that opens from the user row. Each
+   * portal passes the pages it actually has, so no item ever points at a route
+   * that doesn't exist for that role.
+   */
+  accountMenu?: NavItem[];
   loginPath: string;
-  compactOnMobile?: boolean;
+  /** Where the portal name links to — this portal's own home, never "/". */
+  homeHref: string;
 }) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const unreadCount = useUnreadNotifications();
   const isLive = useRealtimeConnected();
+  const [collapsedGroups, setCollapsedGroups] = useState<string[]>([]);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isAccountOpen, setIsAccountOpen] = useState(false);
+  const accountRef = useRef<HTMLDivElement | null>(null);
 
-  // The most specific nav item matching the current path. Prefix matching on its
-  // own lights up a parent as well as its child — e.g. /recruiter/jobs/create
-  // matches both "Create Job" and "My Jobs" — so the longest match wins and
-  // only one item is ever highlighted.
+  /**
+   * The most specific nav item matching the current path. Prefix matching on its
+   * own lights up a parent as well as its child — /recruiter/jobs/create matches
+   * both "Create Job" and "My Jobs" — so the longest match wins and exactly one
+   * item is ever highlighted.
+   */
   const activeHref =
-    navItems
-      .map((item) => item.href)
-      .filter(
-        (href) => pathname === href || pathname.startsWith(`${href}/`),
-      )
+    navGroups
+      .flatMap((group) => group.items.map((item) => item.href))
+      .filter((href) => pathname === href || pathname.startsWith(`${href}/`))
       .sort((a, b) => b.length - a.length)[0] ?? null;
+
+  useEffect(() => {
+    if (!isAccountOpen) return;
+
+    const onPointerDown = (event: MouseEvent | TouchEvent) => {
+      if (!accountRef.current?.contains(event.target as Node)) {
+        setIsAccountOpen(false);
+      }
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsAccountOpen(false);
+    };
+
+    document.addEventListener("mousedown", onPointerDown);
+    document.addEventListener("touchstart", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", onPointerDown);
+      document.removeEventListener("touchstart", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [isAccountOpen]);
+
+  // Navigating away is already covered: every item in the card closes it on
+  // click, and anything else the user clicks is an outside click.
+
+  const toggleGroup = (title: string) =>
+    setCollapsedGroups((previous) =>
+      previous.includes(title)
+        ? previous.filter((group) => group !== title)
+        : [...previous, title],
+    );
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -49,158 +137,217 @@ export function PortalSidebar({
   };
 
   return (
-    <aside
-      className={`flex min-h-screen shrink-0 flex-col border-r border-zinc-200/80 bg-white ${
-        compactOnMobile ? "w-[4.25rem] sm:w-20 md:w-64" : "w-64"
-      }`}
-    >
-      <div className="border-t-[3px] border-t-brand border-b border-zinc-100 p-2 md:p-6">
+    <aside className="sticky top-0 flex h-dvh max-h-dvh w-60 shrink-0 flex-col overflow-hidden border-r border-white/10 bg-[#1e1838] px-2.5 py-3.5">
+      <div className="mb-5 px-3">
         <Link
-          href="/"
-          className="flex items-center justify-center transition-opacity hover:opacity-80 md:block"
+          href={homeHref}
+          className="block transition-opacity hover:opacity-80"
         >
-          {compactOnMobile && (
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-violet-600 text-sm font-extrabold text-white md:hidden">
-              AI
-            </span>
-          )}
-          <div className={compactOnMobile ? "hidden md:block" : ""}>
-            <BrandWordmark className="text-[1.28rem]" />
-            <p className="mt-1.5 text-[11px] font-medium tracking-[0.14em] text-accent uppercase">
-              {portalName}
-            </p>
-          </div>
+          <h2 className="text-sm font-semibold tracking-tight text-white">
+            {portalName}
+          </h2>
+          <p className="mt-1 text-xs text-purple-300/60">{portalTagline}</p>
         </Link>
       </div>
 
       <nav
         aria-label={`${portalName} navigation`}
-        className={`flex-1 space-y-1 overflow-y-auto ${
-          compactOnMobile ? "p-2 md:p-4" : "p-4"
-        }`}
+        className="min-h-0 flex-1 space-y-3 overflow-y-auto"
       >
-        {navItems.map((item) => {
-          const isActive = item.href === activeHref;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              title={compactOnMobile ? item.label : undefined}
-              className={`relative flex items-center py-2.5 text-sm font-medium transition-colors ${
-                compactOnMobile
-                  ? "justify-center gap-0 rounded-md px-2 md:justify-start md:gap-3 md:px-3"
-                  : "gap-3 rounded-sm px-4"
-              } ${
-                isActive
-                  ? compactOnMobile
-                    ? "bg-[#17181d] text-white"
-                    : "bg-navy text-white"
-                  : compactOnMobile
-                    ? "text-[#777984] hover:bg-[#f4f4f7] hover:text-[#282a32]"
-                    : "text-zinc-600 hover:bg-[#f6f3f9] hover:text-ink"
-              }`}
-            >
-              <span className="flex h-5 w-5 shrink-0 items-center justify-center [&>svg]:h-[15px] [&>svg]:w-[15px]">
-                {item.icon}
-              </span>
-              <span
-                className={`flex-1 ${compactOnMobile ? "sr-only md:not-sr-only" : ""}`}
+        {navGroups.map((group, index) => {
+          const title = group.title;
+          const isCollapsed = title ? collapsedGroups.includes(title) : false;
+
+          const links = group.items.map((item) => {
+            const Icon = item.icon;
+            const isActive = item.href === activeHref;
+            const showBadge = Boolean(item.showUnreadBadge) && unreadCount > 0;
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={isActive ? "page" : undefined}
+                className={`flex items-center gap-2.5 rounded-md px-3 py-1.5 text-[11px] transition-colors duration-150 ${
+                  isActive
+                    ? "bg-white/10 font-medium text-emerald-300"
+                    : "font-normal text-purple-100/70 hover:bg-white/5 hover:text-white"
+                }`}
               >
-                {item.label}
-              </span>
-              {item.href.endsWith("/notifications") && unreadCount > 0 && (
-                <span
-                  aria-label={`${unreadCount} unread`}
-                  className={`min-w-[20px] px-1.5 py-0.5 text-center text-[11px] font-bold ${
-                    compactOnMobile
-                      ? "absolute right-0 top-0 min-w-4 rounded-full px-1 text-[9px] md:static md:min-w-[20px] md:rounded-none md:px-1.5 md:text-[11px]"
-                      : ""
-                  } ${
-                    isActive ? "bg-white text-navy" : "bg-navy text-white"
+                <Icon
+                  aria-hidden="true"
+                  className={`h-3.5 w-3.5 shrink-0 ${
+                    isActive ? "text-emerald-400" : "text-purple-300/60"
                   }`}
-                >
-                  {unreadCount > 99 ? "99+" : unreadCount}
-                </span>
+                />
+                <span className="flex-1 truncate">{item.label}</span>
+                {showBadge && (
+                  <span
+                    aria-label={`${unreadCount} unread`}
+                    className="min-w-[17px] rounded-full bg-emerald-400/90 px-1 py-px text-center text-[9px] font-bold text-[#1e1838]"
+                  >
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </span>
+                )}
+              </Link>
+            );
+          });
+
+          return (
+            <section key={title ?? `standalone-${index}`}>
+              {title ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => toggleGroup(title)}
+                    aria-expanded={!isCollapsed}
+                    className="flex w-full items-center justify-between rounded-md px-3 py-1 text-left text-[9px] font-semibold uppercase tracking-[0.12em] text-purple-300/60 transition-colors hover:text-white"
+                  >
+                    <span>{title}</span>
+                    <ChevronDown
+                      aria-hidden="true"
+                      className={`h-3 w-3 transition-transform duration-200 ${
+                        isCollapsed ? "-rotate-90" : "rotate-0"
+                      }`}
+                    />
+                  </button>
+                  <div
+                    className={`grid transition-[grid-template-rows] duration-200 ${
+                      isCollapsed ? "grid-rows-[0fr]" : "grid-rows-[1fr]"
+                    }`}
+                  >
+                    <div className="overflow-hidden">
+                      <div className="mt-0.5 space-y-0.5">{links}</div>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="space-y-0.5">{links}</div>
               )}
-            </Link>
+            </section>
           );
         })}
       </nav>
 
-      <div
-        className={`border-t border-zinc-100 ${
-          compactOnMobile ? "p-2 md:p-4" : "p-4"
-        }`}
-      >
-        {user && (
-          <div
-            className={`rounded-2xl bg-zinc-50 py-3 ${
-              compactOnMobile ? "px-1.5 md:px-4" : "px-4"
+      {user && (
+        <div
+          ref={accountRef}
+          className="relative mt-auto border-t border-white/10 pt-3"
+        >
+          {/* ---- the account card ---- */}
+          {isAccountOpen && (
+            <div
+              role="menu"
+              aria-label="Account"
+              className="absolute bottom-full left-0 right-0 z-50 mb-2 overflow-hidden rounded-xl border border-white/10 bg-[#282046] py-1.5 shadow-[0_18px_40px_-12px_rgba(0,0,0,0.65)]"
+            >
+              <div className="flex items-center gap-2.5 px-3 py-2">
+                <Avatar user={user} />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-xs font-semibold text-white">
+                    {user.name}
+                  </p>
+                  <p className="truncate text-[10px] text-purple-300/70">
+                    {user.email}
+                  </p>
+                </div>
+              </div>
+
+              <p className="px-3 pb-1.5 text-[9px] font-semibold uppercase tracking-[0.12em] text-purple-300/50">
+                {ROLE_LABELS[user.role]} ·{" "}
+                {user.authProvider === "google" ? "Google" : "Email"}
+              </p>
+
+              {accountMenu.length > 0 && (
+                <div className="my-1 border-t border-white/10" />
+              )}
+
+              {accountMenu.map((item) => {
+                const Icon = item.icon;
+                const showBadge =
+                  Boolean(item.showUnreadBadge) && unreadCount > 0;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    role="menuitem"
+                    onClick={() => setIsAccountOpen(false)}
+                    className="flex items-center gap-2.5 px-3 py-2 text-[11px] text-purple-100/80 transition-colors hover:bg-white/5 hover:text-white"
+                  >
+                    <Icon aria-hidden="true" className="h-3.5 w-3.5 shrink-0" />
+                    <span className="flex-1 truncate">{item.label}</span>
+                    {showBadge && (
+                      <span
+                        aria-label={`${unreadCount} unread`}
+                        className="min-w-[17px] rounded-full bg-emerald-400/90 px-1 py-px text-center text-[9px] font-bold text-[#1e1838]"
+                      >
+                        {unreadCount > 99 ? "99+" : unreadCount}
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
+
+              <div className="my-1 border-t border-white/10" />
+
+              <button
+                type="button"
+                role="menuitem"
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                className="flex w-full items-center gap-2.5 px-3 py-2 text-[11px] text-purple-100/80 transition-colors hover:bg-white/5 hover:text-white disabled:opacity-60"
+              >
+                <LogOut aria-hidden="true" className="h-3.5 w-3.5 shrink-0" />
+                {isLoggingOut ? "Logging out…" : "Log out"}
+              </button>
+            </div>
+          )}
+
+          {/* ---- the row that opens it ---- */}
+          <button
+            type="button"
+            onClick={() => setIsAccountOpen((open) => !open)}
+            aria-haspopup="menu"
+            aria-expanded={isAccountOpen}
+            className={`flex w-full min-w-0 items-center gap-2.5 rounded-lg px-2 py-1.5 text-left transition-colors ${
+              isAccountOpen ? "bg-white/10" : "hover:bg-white/5"
             }`}
           >
-            <div className="flex items-center gap-3">
-              {user.avatarUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={user.avatarUrl}
-                  alt=""
-                  referrerPolicy="no-referrer"
-                  className="h-9 w-9 shrink-0 rounded-full object-cover ring-2 ring-white"
-                />
-              ) : (
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-light text-xs font-bold text-brand-dark">
-                  {initials(user.name)}
-                </div>
-              )}
-              <div
-                className={`min-w-0 ${compactOnMobile ? "hidden md:block" : ""}`}
-              >
-                <p className="truncate text-sm font-semibold text-ink">
-                  {user.name}
-                </p>
-                <p className="truncate text-xs text-zinc-500">{user.email}</p>
-              </div>
-            </div>
-            <div
-              className={`mt-2.5 flex items-center gap-2 ${
-                compactOnMobile ? "hidden md:flex" : ""
-              }`}
-            >
-              <span className={ROLE_BADGE[user.role]}>
-                {ROLE_LABELS[user.role]}
-              </span>
+            <span className="relative block h-8 w-8 shrink-0">
+              <Avatar user={user} />
               <span
                 title={
                   isLive
                     ? "Live updates connected"
                     : "Live updates disconnected — data refreshes on navigation"
                 }
-                className="flex items-center gap-1 text-[10px] font-medium text-zinc-400"
-              >
-                <span
-                  className={`h-1.5 w-1.5 rounded-full ${isLive ? "bg-emerald-500" : "bg-zinc-300"}`}
-                />
-                {isLive ? "Live" : "Offline"}
+                aria-label={
+                  isLive
+                    ? "Live updates connected"
+                    : "Live updates disconnected"
+                }
+                className={`absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-[#1e1838] ${
+                  isLive ? "bg-emerald-500" : "bg-slate-500"
+                }`}
+              />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-xs font-semibold text-white">
+                {user.name}
               </span>
-            </div>
-          </div>
-        )}
-        <button
-          type="button"
-          onClick={handleLogout}
-          disabled={isLoggingOut}
-          className={`mt-2 flex w-full items-center gap-2 py-2 text-sm text-zinc-500 transition-colors hover:text-red-600 disabled:opacity-60 ${
-            compactOnMobile
-              ? "justify-center px-1 md:justify-start md:px-4"
-              : "px-4"
-          }`}
-        >
-          <span aria-hidden="true">←</span>
-          <span className={compactOnMobile ? "sr-only md:not-sr-only" : ""}>
-            {isLoggingOut ? "Logging out…" : "Log out"}
-          </span>
-        </button>
-      </div>
+              <span className="block truncate text-[10px] text-purple-300/60">
+                {user.email}
+              </span>
+            </span>
+            <ChevronRight
+              aria-hidden="true"
+              className={`h-3.5 w-3.5 shrink-0 text-purple-300/60 transition-transform duration-200 ${
+                isAccountOpen ? "-rotate-90" : "rotate-0"
+              }`}
+            />
+          </button>
+        </div>
+      )}
     </aside>
   );
 }

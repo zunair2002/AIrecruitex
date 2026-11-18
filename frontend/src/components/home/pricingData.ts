@@ -1,4 +1,18 @@
-export const pricingPlans = [
+export type PricingPlan = {
+  name: string;
+  price: string;
+  period: string;
+  description: string;
+  features: string[];
+  cta: string;
+  href: string;
+  highlighted: boolean;
+};
+
+export type PricingCategory = "candidates" | "companies";
+
+/** Plans for job seekers: practice interviews, feedback and career guidance. */
+export const candidatePlans: PricingPlan[] = [
   {
     name: "Free",
     price: "$0",
@@ -6,29 +20,80 @@ export const pricingPlans = [
     description:
       "Perfect for candidates getting started with practice interviews.",
     features: [
-      "3 practice interviews per month",
+      "5 practice interviews per day",
+      "Free learning courses",
       "Basic interview feedback",
       "Resume upload",
-      "Career guidance (limited)",
     ],
     cta: "Get Started",
     href: "/login/candidate",
     highlighted: false,
   },
   {
-    name: "Pro",
+    name: "Premium",
     price: "$29",
     period: "/month",
     description: "For serious job seekers who want advanced AI coaching.",
     features: [
-      "Unlimited practice interviews",
+      "10 practice interviews per day",
+      "Every course, including Premium",
       "Advanced role-based interviews",
       "Detailed AI scoring & feedback",
       "Personalized learning recommendations",
-      "Full career guidance chatbot",
     ],
-    cta: "Start Pro Trial",
+    cta: "Start Premium Trial",
     href: "/login/candidate",
+    highlighted: true,
+  },
+  {
+    name: "Career+",
+    price: "$59",
+    period: "/month",
+    description: "Everything in Premium, plus deeper preparation for a target role.",
+    features: [
+      "Everything in Premium",
+      "Company-style interview packs",
+      "AI resume review & rewrite tips",
+      "Progress reports across sessions",
+      "Priority feedback processing",
+    ],
+    cta: "Choose Career+",
+    href: "/login/candidate",
+    highlighted: false,
+  },
+];
+
+/** Plans for HR teams: job postings, AI screening and AI interviews. */
+export const companyPlans: PricingPlan[] = [
+  {
+    name: "Starter",
+    price: "$49",
+    period: "/month",
+    description: "For small teams making their first few hires.",
+    features: [
+      "Up to 3 active job postings",
+      "AI resume matching",
+      "100 AI interviews per month",
+      "Applicant dashboard & shortlisting",
+    ],
+    cta: "Start Hiring",
+    href: "/login/recruiter",
+    highlighted: false,
+  },
+  {
+    name: "Growth",
+    price: "$199",
+    period: "/month",
+    description: "For growing teams screening candidates every week.",
+    features: [
+      "Up to 20 active job postings",
+      "AI resume matching & ranking",
+      "Unlimited automated AI interviews",
+      "Organisational interview invites",
+      "Team-wide hiring analytics",
+    ],
+    cta: "Start Growth Trial",
+    href: "/login/recruiter",
     highlighted: true,
   },
   {
@@ -48,3 +113,15 @@ export const pricingPlans = [
     highlighted: false,
   },
 ];
+
+export const pricingCategories: {
+  id: PricingCategory;
+  label: string;
+  plans: PricingPlan[];
+}[] = [
+  { id: "candidates", label: "For candidates", plans: candidatePlans },
+  { id: "companies", label: "For companies / HR", plans: companyPlans },
+];
+
+/** Every plan, for callers that don't split by audience. */
+export const pricingPlans: PricingPlan[] = [...candidatePlans, ...companyPlans];

@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useMemo, useState } from "react";
 import {
   ArrowRight,
@@ -12,6 +11,7 @@ import {
   Clock3,
   FileCheck2,
   FileText,
+  Mail,
   Search,
   Target,
 } from "lucide-react";
@@ -24,6 +24,7 @@ import { listMyApplications } from "@/lib/applicationsApi";
 import { listOpenJobs } from "@/lib/jobsApi";
 import { listMyNotifications } from "@/lib/notificationsApi";
 import { useApiResource } from "@/lib/useApiResource";
+import { greetingFor } from "@/lib/greeting";
 import {
   APPLICATION_STATUS_LABELS,
   formatDate,
@@ -121,9 +122,6 @@ const SERIES: {
     dashed: true,
   },
 ];
-
-const linkClass =
-  "inline-flex items-center gap-1 rounded-md text-sm font-medium text-brand-700 transition-colors hover:text-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2";
 
 function scoreBarClass(score: number): string {
   if (score >= 80) return "bg-success-400";
@@ -482,6 +480,9 @@ export function CandidateDashboard() {
   const [search, setSearch] = useState("");
   // Reference time for "next up" countdowns, fixed for the life of the page.
   const [now] = useState(() => Date.now());
+  // Computed once per mount: "Hello, Ali" on first use after signup, then
+  // "Welcome back, Ali" (see lib/greeting.ts).
+  const [greeting] = useState(() => greetingFor(user));
   const enabled = Boolean(token);
 
   const applications = useApiResource(
@@ -507,9 +508,6 @@ export function CandidateDashboard() {
   const notificationList = notifications.data ?? EMPTY_NOTIFICATIONS;
 
   const summary = useMemo(() => {
-    const scored = applicationList.filter(
-      (application) => typeof application.matchScore === "number",
-    );
     return {
       total: applicationList.length,
       matched: applicationList.filter((application) => application.matched)
@@ -520,12 +518,6 @@ export function CandidateDashboard() {
       pending: applicationList.filter(
         (application) => application.status === "pending",
       ).length,
-      averageMatch: scored.length
-        ? Math.round(
-            scored.reduce((sum, application) => sum + application.matchScore, 0) /
-              scored.length,
-          )
-        : 0,
       upcoming: applicationList.filter(
         (application) =>
           application.aiInterview.scheduled ||
@@ -585,7 +577,6 @@ export function CandidateDashboard() {
     });
   const [nextUp, ...laterEvents] = nextEvents;
 
-  const firstName = user?.name.split(/\s+/)[0];
   const upcomingCount = summary.upcoming.length;
   const heroSummary = [
     upcomingCount
@@ -606,7 +597,7 @@ export function CandidateDashboard() {
     <PortalPage>
       <DashboardHero
         eyebrow={<span suppressHydrationWarning>{today}</span>}
-        title={firstName ? `Welcome back, ${firstName}` : "Welcome back"}
+        title={greeting}
         description={
           heroSummary.length
             ? heroSummary.join(" · ")
@@ -628,9 +619,13 @@ export function CandidateDashboard() {
         }
         aside={
           <HeroMeter
-            value={summary.averageMatch}
-            label="Average match"
-            caption={`${summary.matched} of ${summary.total} application${summary.total === 1 ? "" : "s"} matched your profile`}
+            value={
+              summary.total
+                ? ((summary.total - summary.pending) / summary.total) * 100
+                : 0
+            }
+            label="Responses received"
+            caption={`${summary.total - summary.pending} of ${summary.total} application${summary.total === 1 ? "" : "s"} have a decision from the employer`}
           />
         }
         stats={[
@@ -941,23 +936,20 @@ function NextUpHighlight({ event, now }: { event: NextEvent; now: number }) {
           </div>
         </div>
         <div className="flex flex-wrap gap-2 sm:shrink-0 sm:flex-col sm:items-stretch">
-          {application.interviewSessionId ? (
-            <Button
-              href={`/candidate/interview/session/${application.interviewSessionId}`}
-              trailingIcon={<ArrowRight aria-hidden="true" />}
-            >
-              Open interview
-            </Button>
-          ) : (
-            <Button
-              href="/candidate/applications"
-              trailingIcon={<ArrowRight aria-hidden="true" />}
-            >
-              View application
-            </Button>
-          )}
+          <Button
+            href="/candidate/applications"
+            variant="secondary"
+            trailingIcon={<ArrowRight aria-hidden="true" />}
+          >
+            View application
+          </Button>
         </div>
       </div>
+      {/* Interviews are started only from the emailed link sent after HR approval. */}
+      <p className="mt-4 flex items-center gap-2 border-t border-brand-100 pt-3 text-sm text-body">
+        <Mail aria-hidden="true" className="h-4 w-4 shrink-0 text-brand-700" />
+        You&apos;ll receive the interview link by email.
+      </p>
     </div>
   );
 }
@@ -979,16 +971,13 @@ function LaterEventRow({ event }: { event: NextEvent }) {
             : `Organisation interview · ${timeUntil(application.orgInterview?.expiresAt)}`}
         </p>
       </div>
-      {application.interviewSessionId && (
-        <Link
-          href={`/candidate/interview/session/${application.interviewSessionId}`}
-          className={`${linkClass} shrink-0`}
-        >
-          <span className="hidden sm:inline">Open</span>
-          <ArrowRight aria-hidden="true" className="h-4 w-4" />
-          <span className="sr-only">Open interview for {job?.title ?? "this job"}</span>
-        </Link>
-      )}
+      <span
+        className="hidden shrink-0 items-center gap-1 text-xs text-muted sm:inline-flex"
+        title="You'll receive the interview link by email"
+      >
+        <Mail aria-hidden="true" className="h-3.5 w-3.5" />
+        Link by email
+      </span>
     </li>
   );
 }

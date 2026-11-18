@@ -6,6 +6,7 @@ import {
   ClipboardList,
   GraduationCap,
   LayoutDashboard,
+  ListChecks,
   MessageCircle,
   SquarePlus,
   Star,
@@ -35,6 +36,11 @@ const navGroups: NavGroup[] = [
     items: [
       { href: "/recruiter/jobs/create", label: "Create job", icon: SquarePlus },
       { href: "/recruiter/jobs", label: "My jobs", icon: BriefcaseBusiness },
+      {
+        href: "/recruiter/question-pool",
+        label: "Question pool",
+        icon: ListChecks,
+      },
     ],
   },
   {

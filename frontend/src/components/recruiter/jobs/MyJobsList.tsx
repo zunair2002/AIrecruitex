@@ -6,7 +6,6 @@ import {
   BriefcaseBusiness,
   ChevronDown,
   ExternalLink,
-  ListChecks,
   Plus,
   Users,
 } from "lucide-react";
@@ -23,6 +22,7 @@ import {
   SkillChips,
 } from "@/components/ui";
 import { PortalPage } from "@/components/dashboard/primitives";
+import { QuestionPoolButton } from "./QuestionPoolIndex";
 
 /** GET /api/jobs/mine — everything the Job schema stores for the HR user's postings. */
 export function MyJobsList() {
@@ -131,14 +131,7 @@ export function MyJobsList() {
                 >
                   Interview reports
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  href={`/recruiter/jobs/${job._id}/questions`}
-                  leadingIcon={<ListChecks aria-hidden="true" />}
-                >
-                  Question pool
-                </Button>
+                <QuestionPoolButton jobId={job._id} />
                 {job.jdFileUrl && (
                   <a
                     href={job.jdFileUrl}

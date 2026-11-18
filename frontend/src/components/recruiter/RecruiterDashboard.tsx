@@ -13,6 +13,7 @@ import {
   Users,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { greetingFor } from "@/lib/greeting";
 import { listMyJobs } from "@/lib/jobsApi";
 import { listApplicationsForJob } from "@/lib/applicationsApi";
 import { useApiResource } from "@/lib/useApiResource";
@@ -75,6 +76,11 @@ const percent = (value: number, total: number) =>
 export function RecruiterDashboard() {
   const { user, token } = useAuth();
   const [tab, setTab] = useState<FeedTab>("applicants");
+  // Computed once per mount: "Hello" on the first session after sign-up,
+  // "Welcome back" afterwards (see greetingFor).
+  const [greeting] = useState(() =>
+    user?.name?.trim() ? greetingFor(user) : "Welcome back",
+  );
 
   const jobs = useApiResource((signal) => listMyJobs(token, signal), [token], {
     enabled: Boolean(token),
@@ -159,7 +165,6 @@ export function RecruiterDashboard() {
     );
   }
 
-  const firstName = user?.name?.trim().split(/\s+/)[0];
   const waiting = summary.all
     .filter((a) => a.status === "pending" && a.matched)
     .sort((a, b) => b.matchScore - a.matchScore);
@@ -189,7 +194,7 @@ export function RecruiterDashboard() {
     <PortalPage>
       <DashboardHero
         eyebrow="HR dashboard"
-        title={firstName ? `Welcome back, ${firstName}` : "Welcome back"}
+        title={greeting}
         description={description}
         actions={
           <>

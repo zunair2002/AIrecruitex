@@ -15,26 +15,15 @@ import { helpTextClass, labelClass } from "@/components/ui/controls";
  * session once it's confirmed, so a password account lands here before it can
  * reach the app.
  *
- * In non-production the server echoes the code back as `devOtp`, which is
- * pre-filled here so testing never blocks on email delivery.
+ * The code is only ever delivered by email — the user types it in here.
  */
-export function VerifyEmailForm({
-  email,
-  devOtp,
-  onResendDevOtp,
-}: {
-  email: string;
-  devOtp?: string;
-  onResendDevOtp?: (otp?: string) => void;
-}) {
+export function VerifyEmailForm({ email }: { email: string }) {
   const { verifyEmail, resendOtp } = useAuth();
   const router = useRouter();
 
-  const [otp, setOtp] = useState(devOtp ?? "");
+  const [otp, setOtp] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(
-    devOtp ? "Development mode: the code below was filled in for you." : null,
-  );
+  const [notice, setNotice] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(30);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -65,15 +54,9 @@ export function VerifyEmailForm({
     setError(null);
     setNotice(null);
     try {
-      const result = await resendOtp(email);
+      await resendOtp(email);
       setSecondsLeft(30);
-      if (result.devOtp) setOtp(result.devOtp);
-      onResendDevOtp?.(result.devOtp);
-      setNotice(
-        result.devOtp
-          ? "A new code was issued and filled in for you."
-          : "A new code is on its way to your inbox.",
-      );
+      setNotice("A new code is on its way to your inbox.");
     } catch (err) {
       setError(toErrorMessage(err));
     }

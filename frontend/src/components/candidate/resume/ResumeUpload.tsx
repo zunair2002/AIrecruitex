@@ -7,6 +7,7 @@ import {
   Check,
   CircleAlert,
   Clock3,
+  Download,
   ExternalLink,
   FileText,
   Pencil,
@@ -28,6 +29,7 @@ import {
   uploadResume,
 } from "@/lib/resumeApi";
 import { useApiResource } from "@/lib/useApiResource";
+import type { MyResume } from "@/lib/types";
 import {
   RESUME_STATUS_LABELS,
   badgeClass,
@@ -86,6 +88,47 @@ function FieldLabel({
   );
 }
 
+const RESUME_EXTENSIONS: Record<string, string> = {
+  "application/pdf": ".pdf",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+    ".docx",
+};
+
+/** The original filename, guaranteed to end in the right extension. */
+function resumeDownloadName(resume: NonNullable<MyResume>): string {
+  const fromUrl = /\.(pdf|docx)(?:$|\?)/i.exec(resume.fileUrl)?.[0];
+  const extension =
+    RESUME_EXTENSIONS[resume.mimeType ?? ""] ??
+    (fromUrl ? fromUrl.replace("?", "").toLowerCase() : ".pdf");
+  const base = (resume.originalName || "resume").trim();
+  return /\.(pdf|docx)$/i.test(base) ? base : `${base}${extension}`;
+}
+
+/**
+ * Saves the resume under its original name. The `download` attribute is ignored
+ * for cross-origin (Cloudinary) links, so fetch the bytes and save a blob; if
+ * that fails (CORS/network) fall back to opening the file in a new tab.
+ */
+async function downloadResume(resume: NonNullable<MyResume>) {
+  try {
+    const response = await fetch(resume.fileUrl);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const blob = await response.blob();
+    const url = URL.createObjectURL(
+      resume.mimeType ? new Blob([blob], { type: resume.mimeType }) : blob,
+    );
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = resumeDownloadName(resume);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch {
+    window.open(resume.fileUrl, "_blank", "noopener,noreferrer");
+  }
+}
+
 export function ResumeUpload() {
   const { token, user, refresh } = useAuth();
   const { toast } = useToast();
@@ -129,10 +172,6 @@ export function ResumeUpload() {
     if (!RESUME_ACCEPTED_MIME_TYPES.includes(file.type)) {
       setError("Only PDF or DOCX files are allowed.");
       setSelectedFile(null);
-      toast({
-        title: "Resume uploaded",
-        detail: "It will be matched against jobs you apply to.",
-      });
       return;
     }
     if (file.size > RESUME_MAX_BYTES) {
@@ -152,6 +191,10 @@ export function ResumeUpload() {
       await uploadResume(selectedFile, token);
       setSelectedFile(null);
       existing.reload();
+      toast({
+        title: "Resume uploaded",
+        detail: "It will be matched against jobs you apply to.",
+      });
     } catch (uploadError) {
       setError(toErrorMessage(uploadError));
     } finally {
@@ -481,6 +524,14 @@ export function ResumeUpload() {
                               <ExternalLink aria-hidden="true" />
                             </a>
                             <Button
+                              variant="secondary"
+                              size="sm"
+                              leadingIcon={<Download aria-hidden="true" />}
+                              onClick={() => void downloadResume(resume)}
+                            >
+                              Download
+                            </Button>
+                            <Button
                               variant="danger-soft"
                               size="sm"
                               leadingIcon={<Trash2 aria-hidden="true" />}
@@ -515,7 +566,7 @@ export function ResumeUpload() {
                     <Clock3 aria-hidden="true" className="h-4 w-4 text-subtle" />
                     Updated {formatDateTime(resume.updatedAt)}
                   </p>
-                  <div className="mt-4 grid grid-cols-2 gap-3">
+                  <div className="mt-4 grid grid-cols-3 gap-3">
                     <a
                       href={resume.fileUrl}
                       target="_blank"
@@ -525,6 +576,13 @@ export function ResumeUpload() {
                       View
                       <ExternalLink aria-hidden="true" />
                     </a>
+                    <Button
+                      variant="secondary"
+                      leadingIcon={<Download aria-hidden="true" />}
+                      onClick={() => void downloadResume(resume)}
+                    >
+                      Download
+                    </Button>
                     <Button
                       variant="danger-soft"
                       leadingIcon={<Trash2 aria-hidden="true" />}

@@ -54,10 +54,7 @@ export default function RegisterPage() {
 
   const [role, setRole] = useState<UserRole>("hr");
   // Signup emails an OTP instead of returning a session; this holds the step.
-  const [pending, setPending] = useState<{
-    email: string;
-    devOtp?: string;
-  } | null>(null);
+  const [pending, setPending] = useState<{ email: string } | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -85,7 +82,7 @@ export default function RegisterPage() {
         password,
         role,
       });
-      setPending({ email: result.email, devOtp: result.devOtp });
+      setPending({ email: result.email });
     } catch (err) {
       setError(toErrorMessage(err));
       setIsSubmitting(false);
@@ -105,7 +102,7 @@ export default function RegisterPage() {
       />
 
       {pending ? (
-        <VerifyEmailForm email={pending.email} devOtp={pending.devOtp} />
+        <VerifyEmailForm email={pending.email} />
       ) : (
         <form className="space-y-5" onSubmit={handleSubmit} noValidate>
           <AuthError message={error} />

@@ -179,10 +179,23 @@ export function CreateJobForm() {
               >
                 Post another job
               </Button>
-              <Button href={`/recruiter/applicants?jobId=${created._id}`}>
+              <Button
+                variant="secondary"
+                href={`/recruiter/applicants?jobId=${created._id}`}
+              >
                 View applicants
               </Button>
+              <Button
+                href={`/recruiter/jobs/${created._id}/questions`}
+                leadingIcon={<ListChecks aria-hidden="true" />}
+              >
+                Upload question pool
+              </Button>
             </div>
+            <p className="mt-3 text-center text-xs text-muted">
+              Upload the interview questions file before inviting candidates to
+              the organisational interview.
+            </p>
           </Card>
         </div>
       </PortalPage>

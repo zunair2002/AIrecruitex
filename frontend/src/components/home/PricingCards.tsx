@@ -1,11 +1,59 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { pricingPlans } from "./pricingData";
+import { Building2, UserRound } from "lucide-react";
+import {
+  pricingCategories,
+  type PricingCategory,
+  type PricingPlan,
+} from "./pricingData";
 import { fadeUp, stagger } from "@/lib/motion";
+import { SegmentedControl } from "@/components/ui/Tabs";
 
-export const PricingCards = ({ compact = false }: { compact?: boolean }) => (
+const CATEGORY_ICONS: Record<PricingCategory, React.ReactNode> = {
+  candidates: <UserRound aria-hidden="true" />,
+  companies: <Building2 aria-hidden="true" />,
+};
+
+/**
+ * Pricing split by audience: a segmented control switches between candidate
+ * plans and company / HR plans, each shown as its own row of tier cards.
+ */
+export function PricingTabs({ compact = false }: { compact?: boolean }) {
+  const [category, setCategory] = useState<PricingCategory>("candidates");
+  const active =
+    pricingCategories.find((item) => item.id === category) ??
+    pricingCategories[0];
+
+  return (
+    <div>
+      <div className="flex justify-center border-b border-line bg-white px-4 py-5">
+        <SegmentedControl
+          ariaLabel="Plan audience"
+          options={pricingCategories.map((item) => ({
+            value: item.id,
+            label: item.label,
+            icon: CATEGORY_ICONS[item.id],
+          }))}
+          value={category}
+          onChange={setCategory}
+        />
+      </div>
+      {/* Keyed so the cards animate in again when the audience changes. */}
+      <PricingCards key={active.id} plans={active.plans} compact={compact} />
+    </div>
+  );
+}
+
+export const PricingCards = ({
+  plans,
+  compact = false,
+}: {
+  plans: PricingPlan[];
+  compact?: boolean;
+}) => (
   <motion.div
     initial="hidden"
     whileInView="visible"
@@ -13,7 +61,7 @@ export const PricingCards = ({ compact = false }: { compact?: boolean }) => (
     variants={stagger}
     className={`grid grid-cols-1 gap-px bg-line ${compact ? "md:grid-cols-3" : "lg:grid-cols-3"}`}
   >
-    {pricingPlans.map((plan) => (
+    {plans.map((plan) => (
       <motion.div
         key={plan.name}
         variants={fadeUp}

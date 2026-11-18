@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { UserRound } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Sparkles, UserRound } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { toErrorMessage } from "@/lib/api";
 import {
@@ -10,6 +11,10 @@ import {
   updateCandidateProfile,
 } from "@/lib/authApi";
 import { RESUME_MAX_BYTES } from "@/lib/resumeApi";
+import {
+  CANDIDATE_HOME_PATH,
+  isCandidateProfileComplete,
+} from "@/lib/candidateProfile";
 import { badgeClass, formatFileSize } from "@/lib/format";
 import {
   Card,
@@ -27,6 +32,7 @@ import {
   textareaClass,
 } from "@/components/ui/controls";
 import { PortalPage } from "@/components/dashboard/primitives";
+import { PlanBadge, UpgradeLink, planOf } from "@/components/candidate/plan/PlanBits";
 
 const MAX_MB = RESUME_MAX_BYTES / (1024 * 1024);
 const HEADLINE_MAX = 120;
@@ -41,7 +47,11 @@ const ABOUT_MAX = 1000;
  */
 export function CandidateProfile() {
   const { user, token, refresh } = useAuth();
+  const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
+  // Set from the saved account (not the form), so the banner only clears once
+  // a complete profile has actually been stored.
+  const mustComplete = !isCandidateProfileComplete(user);
 
   const [headline, setHeadline] = useState(user?.headline ?? "");
   const [about, setAbout] = useState(user?.about ?? "");
@@ -93,6 +103,15 @@ export function CandidateProfile() {
         token,
       );
       await refresh();
+      // First-time setup: the profile gate held them here, so once the saved
+      // profile is complete, carry on into the portal.
+      if (
+        mustComplete &&
+        isCandidateProfileComplete({ headline, about, interests: parsedInterests })
+      ) {
+        router.replace(CANDIDATE_HOME_PATH);
+        return;
+      }
       setAvatar(null);
       setRemoveAvatar(false);
       if (fileRef.current) fileRef.current.value = "";
@@ -128,6 +147,26 @@ export function CandidateProfile() {
           className="xl:col-span-2"
         >
           <form onSubmit={handleSubmit} className="space-y-6">
+            {mustComplete && (
+              <div
+                role="status"
+                className="flex items-start gap-3 rounded-xl border border-brand-200 bg-brand-50 p-4"
+              >
+                <Sparkles
+                  aria-hidden="true"
+                  className="mt-0.5 h-5 w-5 shrink-0 text-brand-600"
+                />
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-ink">
+                    Complete your profile to continue
+                  </p>
+                  <p className="mt-0.5 text-sm text-body">
+                    Add a headline, an about section and at least one interest,
+                    then save. You&apos;ll go straight to your dashboard.
+                  </p>
+                </div>
+              </div>
+            )}
             {error && <InlineError message={error} />}
             {success && <InlineSuccess message={success} />}
 
@@ -260,9 +299,12 @@ export function CandidateProfile() {
               size="lg"
             />
             <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-ink">
-                {user?.name}
-              </p>
+              <div className="flex min-w-0 flex-wrap items-center gap-2">
+                <p className="truncate text-sm font-semibold text-ink">
+                  {user?.name}
+                </p>
+                <PlanBadge plan={planOf(user)} />
+              </div>
               <p className="text-sm text-muted">
                 {headline.trim() || "Add a headline"}
               </p>
@@ -305,6 +347,19 @@ export function CandidateProfile() {
             <p className="mt-2 text-xs text-muted">
               Add a photo, headline, about section and interests to stand out.
             </p>
+          </div>
+          <div className="mt-5 flex flex-col gap-3 border-t border-line-soft pt-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-body">
+                {planOf(user) === "premium" ? "Premium plan" : "Free plan"}
+              </p>
+              <p className="text-xs text-muted">
+                {planOf(user) === "premium"
+                  ? "All courses unlocked · 10 practice interviews a day"
+                  : "Free courses · 5 practice interviews a day"}
+              </p>
+            </div>
+            {planOf(user) === "free" && <UpgradeLink />}
           </div>
         </Card>
       </div>

@@ -36,7 +36,7 @@ export function createCourse(
   });
 }
 
-/** PUT /api/learning/courses/:courseId — HR only; replaces all four fields. */
+/** PUT /api/learning/courses/:courseId — HR only; replaces all five fields. */
 export function updateCourse(
   courseId: ObjectId,
   input: CourseInput,

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import {
   ArrowRight,
   BarChart3,
@@ -10,6 +11,7 @@ import {
   CircleCheck,
   ClipboardCheck,
   Cpu,
+  Crown,
   FileBarChart,
   History,
   Layers,
@@ -21,18 +23,25 @@ import {
   Route,
   Server,
   Target,
+  Timer,
   Trophy,
   Unlock,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { toErrorMessage } from "@/lib/api";
-import { listMySessions, listTracks, startInterview } from "@/lib/interviewApi";
+import { ApiError, toErrorMessage } from "@/lib/api";
+import {
+  getPracticeUsage,
+  listMySessions,
+  listTracks,
+  startInterview,
+} from "@/lib/interviewApi";
 import { useApiResource } from "@/lib/useApiResource";
 import {
   INTERVIEW_STATUS_BADGE,
   INTERVIEW_STATUS_LABELS,
   TRACK_LABELS,
   formatDate,
+  formatDateTime,
   roundTrackLabel,
   scoreColor,
 } from "@/lib/format";
@@ -40,6 +49,7 @@ import type {
   InterviewSessionSummary,
   InterviewSessionView,
   InterviewStage,
+  PracticeUsage,
   TrackId,
 } from "@/lib/types";
 import {
@@ -50,7 +60,8 @@ import {
 } from "@/components/dashboard/DashboardHero";
 import { PanelLink, PortalPage } from "@/components/dashboard/primitives";
 import { Badge, scoreTone } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
+import { Button, buttonClass } from "@/components/ui/Button";
+import { PlanBadge } from "@/components/candidate/plan/PlanBits";
 import {
   Card,
   ErrorBlock,
@@ -135,6 +146,12 @@ export function PracticeInterview({ stage }: { stage: InterviewStage }) {
   const [error, setError] = useState<string | null>(null);
 
   const tracks = useApiResource((signal) => listTracks(signal), []);
+  // The plan's daily practice allowance (free 5/day, premium 10/day).
+  const usage = useApiResource(
+    (signal) => getPracticeUsage(token, signal),
+    [token],
+    { enabled: Boolean(token) },
+  );
   // Both rounds read the practice history: Round 2 for its lock state, and
   // both pages for the attempts / best-score summary.
   const history = useApiResource(
@@ -152,13 +169,25 @@ export function PracticeInterview({ stage }: { stage: InterviewStage }) {
   const trackLabel =
     tracks.data?.find((t) => t.id === track)?.label ?? TRACK_LABELS[track] ?? track;
 
+  // Resuming an unfinished round never uses up the allowance.
+  const canResume = Boolean(
+    history.data?.some(
+      (s) => s.stage === stage && s.track === track && s.status === "in_progress",
+    ),
+  );
+  const limitReached = Boolean(usage.data && usage.data.remaining <= 0 && !canResume);
+
   const handleStart = async () => {
+    if (limitReached) return;
     setIsStarting(true);
     setError(null);
     try {
       setSession(await startInterview({ stage, track }, token));
+      usage.reload();
     } catch (err) {
-      setError(toErrorMessage(err));
+      // 429 = allowance used up meanwhile; refresh so the limit state shows.
+      if (err instanceof ApiError && err.status === 429) usage.reload();
+      else setError(toErrorMessage(err));
     } finally {
       setIsStarting(false);
     }
@@ -181,7 +210,10 @@ export function PracticeInterview({ stage }: { stage: InterviewStage }) {
         onSessionChange={setSession}
         title={copy.heading}
         subtitle={`Practice mode · ${trackLabel}`}
-        onRestart={() => setSession(null)}
+        onRestart={() => {
+          setSession(null);
+          usage.reload();
+        }}
       />
     );
   }
@@ -248,12 +280,20 @@ export function PracticeInterview({ stage }: { stage: InterviewStage }) {
   const bestScore = stageScores.length > 0 ? Math.max(...stageScores) : null;
 
   const stats: HeroStat[] = [
-    {
-      label: "Questions",
-      value: copy.questions,
-      detail: isRound2 ? "On your chosen track" : "About you and your work",
-      icon: <ListChecks />,
-    },
+    usage.data
+      ? {
+          label: "Left today",
+          value: `${usage.data.remaining} of ${usage.data.limit}`,
+          detail: limitReached ? "Daily limit reached" : "Practice interviews",
+          icon: <Timer />,
+          trend: usage.data.remaining > 0 ? "neutral" : "down",
+        }
+      : {
+          label: "Questions",
+          value: copy.questions,
+          detail: isRound2 ? "On your chosen track" : "About you and your work",
+          icon: <ListChecks />,
+        },
     isRound2
       ? {
           label: "Reward",
@@ -345,9 +385,17 @@ export function PracticeInterview({ stage }: { stage: InterviewStage }) {
             </HeroButton>
           ) : (
             <>
-              <HeroButton onClick={handleStart} icon={<Play aria-hidden="true" />}>
-                {`Start Round ${isRound2 ? 2 : 1}`}
-              </HeroButton>
+              {limitReached ? (
+                usage.data?.plan === "free" ? (
+                  <HeroButton href="/pricing" icon={<Crown aria-hidden="true" />}>
+                    Upgrade to Premium
+                  </HeroButton>
+                ) : null
+              ) : (
+                <HeroButton onClick={handleStart} icon={<Play aria-hidden="true" />}>
+                  {`Start Round ${isRound2 ? 2 : 1}`}
+                </HeroButton>
+              )}
               <HeroButton
                 href="/candidate/interview/result"
                 variant="ghost"
@@ -485,6 +533,9 @@ export function PracticeInterview({ stage }: { stage: InterviewStage }) {
                 </div>
               )}
 
+              {limitReached && usage.data ? (
+                <LimitReachedPanel usage={usage.data} onAvailable={usage.reload} />
+              ) : (
               <div className="mt-6 flex flex-col gap-4 rounded-xl border border-brand-200 bg-brand-50 p-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex min-w-0 items-center gap-3">
                   <span
@@ -515,6 +566,7 @@ export function PracticeInterview({ stage }: { stage: InterviewStage }) {
                   {isStarting ? "Starting…" : `Start Round ${isRound2 ? 2 : 1}`}
                 </Button>
               </div>
+              )}
               <p className="mt-3 text-xs text-muted">
                 {copy.questions} questions. If you have an unfinished round on this
                 track, this resumes it. Voice answers work in Chrome or Edge.
@@ -523,14 +575,145 @@ export function PracticeInterview({ stage }: { stage: InterviewStage }) {
           )}
         </div>
 
-        <ProgressCard
-          sessions={practice}
-          isLoading={history.isLoading}
-          latestRound1Score={latestRound1 ? latestRound1Score : null}
-          round2Unlocked={round2Unlocked}
-        />
+        <div className="flex min-w-0 flex-col gap-6">
+          {usage.data && <UsageCard usage={usage.data} canResume={canResume} />}
+          <ProgressCard
+            sessions={practice}
+            isLoading={history.isLoading}
+            latestRound1Score={latestRound1 ? latestRound1Score : null}
+            round2Unlocked={round2Unlocked}
+          />
+        </div>
       </div>
     </PortalPage>
+  );
+}
+
+/** Ticks every second until `target`, then calls `onDone` once. */
+function useCountdown(target: string | null, onDone?: () => void): number {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (!target) return;
+    const end = new Date(target).getTime();
+    const id = window.setInterval(() => {
+      const t = Date.now();
+      setNow(t);
+      if (t >= end) {
+        window.clearInterval(id);
+        onDone?.();
+      }
+    }, 1000);
+    return () => window.clearInterval(id);
+  }, [target, onDone]);
+  return target ? Math.max(0, new Date(target).getTime() - now) : 0;
+}
+
+function formatCountdown(ms: number): string {
+  const total = Math.ceil(ms / 1000);
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const sec = total % 60;
+  if (h > 0) return `${h}h ${m}m`;
+  if (m > 0) return `${m}m ${sec.toString().padStart(2, "0")}s`;
+  return `${sec}s`;
+}
+
+/** Shown in place of the Start panel once the plan's allowance is used up. */
+function LimitReachedPanel({
+  usage,
+  onAvailable,
+}: {
+  usage: PracticeUsage;
+  onAvailable: () => void;
+}) {
+  const left = useCountdown(usage.nextAvailableAt, onAvailable);
+  const isFree = usage.plan === "free";
+  return (
+    <div
+      role="status"
+      className="mt-6 flex flex-col gap-4 rounded-xl border border-warning-200 bg-warning-50 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5"
+    >
+      <div className="flex min-w-0 items-start gap-3">
+        <span
+          aria-hidden="true"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-warning-100 text-warning-700"
+        >
+          <Timer className="h-5 w-5" />
+        </span>
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-ink">
+            Limit reached — you can practise again in{" "}
+            <span className="tabular-nums">{formatCountdown(left)}</span>
+          </p>
+          <p className="mt-0.5 text-sm text-body">
+            You&apos;ve used all {usage.limit} practice interviews on the{" "}
+            {isFree ? "Free" : "Premium"} plan.
+            {isFree && " Premium members get 10 a day."}
+          </p>
+        </div>
+      </div>
+      {isFree && (
+        <Link
+          href="/pricing"
+          className={buttonClass({ size: "lg", className: "w-full shrink-0 sm:w-auto" })}
+        >
+          <Crown aria-hidden="true" />
+          Upgrade to Premium for 10/day
+        </Link>
+      )}
+    </div>
+  );
+}
+
+/** Today's practice allowance for the candidate's plan. */
+function UsageCard({ usage, canResume }: { usage: PracticeUsage; canResume: boolean }) {
+  const percent = Math.round((usage.used / usage.limit) * 100);
+  const exhausted = usage.remaining <= 0;
+  return (
+    <Card title="Practice allowance" action={<PlanBadge plan={usage.plan} />}>
+      <p className="text-sm text-body">
+        <span className="text-2xl font-semibold tabular-nums text-ink">
+          {usage.remaining}
+        </span>{" "}
+        of {usage.limit} practice interviews left today
+      </p>
+      <div
+        role="progressbar"
+        aria-label="Practice interviews used today"
+        aria-valuemin={0}
+        aria-valuemax={usage.limit}
+        aria-valuenow={usage.used}
+        className="mt-3 h-2 overflow-hidden rounded-full bg-surface-3"
+      >
+        <div
+          className={`h-full rounded-full transition-[width] ${exhausted ? "bg-warning-500" : "bg-brand-600"}`}
+          style={{ width: `${percent}%` }}
+        />
+      </div>
+      <p className="mt-2 text-xs text-muted">
+        {exhausted
+          ? canResume
+            ? "Limit reached — you can still finish your unfinished round."
+            : "Limit reached. Resuming an unfinished round never counts."
+          : usage.resetsAt
+            ? `Next slot frees up ${formatDateTime(usage.resetsAt)}. Resuming never counts.`
+            : "Resuming an unfinished round never counts."}
+      </p>
+      {usage.plan === "free" && (
+        <div className="mt-4 flex flex-col gap-3 rounded-lg bg-brand-50 p-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs text-body">
+            <span className="font-semibold text-ink">Premium</span> doubles it to 10 a day
+            and unlocks every course.
+          </p>
+          <Link
+            href="/pricing"
+            className={buttonClass({ size: "sm", variant: "soft", className: "shrink-0" })}
+          >
+            Upgrade
+          </Link>
+        </div>
+      )}
+    </Card>
   );
 }
 

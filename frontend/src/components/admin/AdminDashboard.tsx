@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   ArrowRight,
   BriefcaseBusiness,
@@ -12,6 +12,7 @@ import {
   Users,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { greetingFor } from "@/lib/greeting";
 import {
   getDashboardOverview,
   getMonitoringSnapshot,
@@ -92,6 +93,11 @@ function StatusDot({ up }: { up: boolean }) {
 export function AdminDashboard() {
   const { user, token } = useAuth();
   const enabled = { enabled: Boolean(token) };
+  // Computed once per mount: "Hello" on the first session after sign-up,
+  // "Welcome back" afterwards (see greetingFor).
+  const [greeting] = useState(() =>
+    user?.name?.trim() ? greetingFor(user) : null,
+  );
 
   const overview = useApiResource(
     (signal) => getDashboardOverview(token, signal),
@@ -160,7 +166,6 @@ export function AdminDashboard() {
   const dbUp = monitoring.data?.dbState === 1;
   const dbLabel = DB_STATES[monitoring.data?.dbState ?? -1] ?? "Unknown";
   const openTickets = monitoring.data?.openTicketCount;
-  const firstName = user?.name?.split(/\s+/)[0];
 
   const healthSummary = monitoring.isLoading
     ? "Checking system status"
@@ -179,7 +184,7 @@ export function AdminDashboard() {
       <DashboardHero
         eyebrow={`Admin console · ${todayLabel()}`}
         title="Platform overview"
-        description={`${firstName ? `Welcome back, ${firstName}. ` : ""}${healthSummary}${ticketSummary}.`}
+        description={`${greeting ? `${greeting}. ` : ""}${healthSummary}${ticketSummary}.`}
         actions={
           <>
             <HeroButton href="/admin/users" icon={<Users aria-hidden="true" />}>

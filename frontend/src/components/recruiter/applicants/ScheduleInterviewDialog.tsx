@@ -1,8 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { CalendarClock, Info, Send } from "lucide-react";
+import { CalendarClock, Info, ListChecks, Send } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 import { toErrorMessage } from "@/lib/api";
+import { getQuestionSet } from "@/lib/jobsApi";
+import { useApiResource } from "@/lib/useApiResource";
+import type { ObjectId } from "@/lib/types";
 import { toDateTimeLocalValue, fromDateTimeLocalValue } from "@/lib/format";
 import { Button } from "@/components/ui/Button";
 import { Dialog } from "@/components/ui/Dialog";
@@ -34,12 +38,17 @@ const VALIDITY_PRESETS = [1, 2, 3, 7];
  * The organisational interview is no longer a slot: the candidate receives a
  * token link and takes it whenever they like inside the validity window, so the
  * only thing to choose is how long that window is.
+ *
+ * Its questions come from the job's question pool, so when `jobId` is passed
+ * an org invite is blocked (with a link to upload one) until the pool exists —
+ * the backend enforces the same rule with a 409.
  */
 export function ScheduleInterviewDialog({
   kind,
   candidateName,
   jobTitle,
   count,
+  jobId,
   onCancel,
   onSubmit,
 }: {
@@ -48,6 +57,8 @@ export function ScheduleInterviewDialog({
   jobTitle: string;
   /** Set when acting on several applicants at once. */
   count?: number;
+  /** Org invites: checks the job's question pool before allowing the invite. */
+  jobId?: ObjectId;
   onCancel: () => void;
   onSubmit: (payload: SchedulePayload) => Promise<void>;
 }) {
@@ -61,6 +72,19 @@ export function ScheduleInterviewDialog({
   const [validityDays, setValidityDays] = useState(2);
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+
+  const { token } = useAuth();
+  const checkPool = kind === "org" && Boolean(jobId);
+  const pool = useApiResource(
+    (signal) => getQuestionSet(jobId as ObjectId, token, signal),
+    [jobId, token],
+    { enabled: checkPool && Boolean(token) },
+  );
+  const poolSize = pool.data?.questions?.length ?? 0;
+  // Only block once we know for sure there's no pool; a failed check falls
+  // through to the backend, which enforces the same rule.
+  const missingPool =
+    checkPool && !pool.isLoading && !pool.error && poolSize === 0;
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -120,6 +144,7 @@ export function ScheduleInterviewDialog({
           <Button
             type="submit"
             loading={isSaving}
+            disabled={missingPool || (checkPool && pool.isLoading)}
             leadingIcon={
               kind === "ai" ? (
                 <CalendarClock aria-hidden="true" />
@@ -141,6 +166,24 @@ export function ScheduleInterviewDialog({
     >
       <div className="space-y-5">
         {error && <InlineError message={error} />}
+
+        {missingPool && jobId && (
+          <div className="flex flex-col gap-3 rounded-lg bg-warning-50 p-3 text-sm text-warning-700 ring-1 ring-inset ring-warning-200 sm:flex-row sm:items-center sm:justify-between">
+            <p>
+              This job has no question pool yet. Upload the interview questions
+              file before inviting candidates.
+            </p>
+            <Button
+              variant="secondary"
+              size="sm"
+              href={`/recruiter/jobs/${jobId}/questions`}
+              leadingIcon={<ListChecks aria-hidden="true" />}
+              className="shrink-0"
+            >
+              Upload question pool
+            </Button>
+          </div>
+        )}
 
         {kind === "ai" ? (
           <>
@@ -230,7 +273,10 @@ export function ScheduleInterviewDialog({
             <p className={helpTextClass}>
               The candidate is emailed a private link and can take the
               interview any time inside this window. Questions come from the
-              job&apos;s question pool, drawn at random per candidate.
+              job&apos;s question pool, drawn at random per candidate
+              {poolSize > 0
+                ? ` (${pool.data?.questionsPerInterview || poolSize} of ${poolSize}).`
+                : "."}
             </p>
           </div>
         )}

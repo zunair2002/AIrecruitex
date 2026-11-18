@@ -15,6 +15,7 @@ import {
   ExternalLink,
   FileText,
   Info,
+  Mail,
   Search,
   SearchX,
   Target,
@@ -59,7 +60,13 @@ import { DayPicker, type DayButtonProps } from "react-day-picker";
 type StatusFilter = "all" | ApplicationStatus;
 type DetailTab = "overview" | "ai" | "organizational" | "job";
 type InterviewCategory = "ai" | "organizational";
-type InterviewDateKind = "scheduled" | "invited" | "deadline" | "completed";
+type InterviewDateKind =
+  | "scheduled"
+  | "invited"
+  | "started"
+  | "deadline"
+  | "completed";
+type MarkerKind = Exclude<InterviewDateKind, "started">;
 
 type InterviewDate = {
   label: string;
@@ -91,7 +98,7 @@ const detailTabs: { value: DetailTab; label: string }[] = [
 ];
 
 /** Calendar marker per interview date kind (dots on days + legend). */
-const MARKERS: Record<InterviewDateKind, { label: string; dot: string }> = {
+const MARKERS: Record<MarkerKind, { label: string; dot: string }> = {
   scheduled: { label: "AI interview", dot: "bg-brand-600" },
   invited: { label: "Organisation invite", dot: "bg-brand-500" },
   deadline: { label: "Complete by", dot: "bg-brand-300" },
@@ -249,7 +256,14 @@ function InterviewSchedule({
             kind: "invited",
           });
         }
-        if (interview.expiresAt) {
+        if (interview.startedAt) {
+          dates.push({
+            label: "Started",
+            value: interview.startedAt,
+            kind: "started",
+          });
+        }
+        if (interview.expiresAt && !interview.completedAt) {
           dates.push({
             label: "Complete by",
             value: interview.expiresAt,
@@ -285,7 +299,7 @@ function InterviewSchedule({
       )
     : filteredItems;
 
-  const datesFor = (kind: InterviewDateKind) =>
+  const datesFor = (kind: MarkerKind) =>
     items.flatMap((item) =>
       item.dates
         .filter((date) => date.kind === kind)
@@ -492,6 +506,19 @@ function InterviewSchedule({
                     </p>
                   )}
 
+                  {isAi && (
+                    <p className="mt-4 flex items-start gap-2 rounded-lg bg-brand-50 px-3 py-2.5 text-sm text-brand-800 ring-1 ring-inset ring-brand-600/15">
+                      <Mail
+                        aria-hidden="true"
+                        className="mt-0.5 h-4 w-4 shrink-0 text-brand-600"
+                      />
+                      <span className="min-w-0">
+                        You&apos;ll receive the interview link by email. The AI
+                        interview can only be started from that link.
+                      </span>
+                    </p>
+                  )}
+
                   {item.category === "organizational" &&
                     orgStatus === "invited" && (
                       <p className="mt-4 flex items-start gap-2 rounded-lg bg-brand-50 px-3 py-2.5 text-sm text-brand-800 ring-1 ring-inset ring-brand-600/15">
@@ -510,9 +537,7 @@ function InterviewSchedule({
                   {((item.category === "organizational" &&
                     orgStatus === "invited" &&
                     interview?.calendarLink) ||
-                    (isAi &&
-                      (application.interviewSessionId ||
-                        application.aiInterview.calendarLink))) && (
+                    (isAi && application.aiInterview.calendarLink)) && (
                     <div className="mt-4 flex min-w-0 flex-wrap gap-2">
                       {item.category === "organizational" &&
                         orgStatus === "invited" &&
@@ -530,14 +555,6 @@ function InterviewSchedule({
                             <ExternalLink aria-hidden="true" />
                           </a>
                         )}
-                      {isAi && application.interviewSessionId && (
-                        <Button
-                          href={`/candidate/interview/session/${application.interviewSessionId}`}
-                          trailingIcon={<ArrowRight aria-hidden="true" />}
-                        >
-                          Open AI interview
-                        </Button>
-                      )}
                       {isAi && application.aiInterview.calendarLink && (
                         <a
                           href={application.aiInterview.calendarLink}
@@ -631,18 +648,7 @@ export function MyApplications() {
     null;
 
   const summary = useMemo(() => {
-    const scores = applicationList.filter(
-      (application) => typeof application.matchScore === "number",
-    );
     return {
-      averageMatch: scores.length
-        ? Math.round(
-            scores.reduce(
-              (total, application) => total + application.matchScore,
-              0,
-            ) / scores.length,
-          )
-        : 0,
       matched: applicationList.filter((application) => application.matched)
         .length,
       interviews: applicationList.filter(
@@ -732,9 +738,9 @@ export function MyApplications() {
               icon={<BriefcaseBusiness />}
             />
             <StatCard
-              label="Average match"
-              value={`${summary.averageMatch}%`}
-              sub={`${summary.matched} qualified match${summary.matched === 1 ? "" : "es"}`}
+              label="Shortlisted"
+              value={summary.matched}
+              sub={`of ${counts.all} met the match threshold`}
               icon={<Target />}
               tone="info"
             />
@@ -901,7 +907,6 @@ export function MyApplications() {
               <ApplicationDetail
                 application={selectedApplication}
                 applications={applicationList}
-                summary={summary}
                 activeTab={activeTab}
                 onTabChange={setActiveTab}
               />
@@ -925,13 +930,11 @@ export function MyApplications() {
 function ApplicationDetail({
   application,
   applications,
-  summary,
   activeTab,
   onTabChange,
 }: {
   application: Application;
   applications: Application[];
-  summary: { averageMatch: number; matched: number; interviews: number };
   activeTab: DetailTab;
   onTabChange: (tab: DetailTab) => void;
 }) {
@@ -1076,11 +1079,9 @@ function ApplicationDetail({
                   />
                 </div>
                 <p className="mt-2 text-xs text-muted">
-                  Your average across all applications is{" "}
-                  <span className="font-medium tabular-nums text-body">
-                    {summary.averageMatch}%
-                  </span>
-                  .
+                  {application.matched
+                    ? "This application met the employer's match threshold."
+                    : "This application is below the employer's match threshold."}
                 </p>
               </section>
 

@@ -329,10 +329,7 @@ export function RegisterForm({
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   // Set once signup succeeds; swaps this form for the OTP step.
-  const [pending, setPending] = useState<{
-    email: string;
-    devOtp?: string;
-  } | null>(null);
+  const [pending, setPending] = useState<{ email: string } | null>(null);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -356,7 +353,7 @@ export function RegisterForm({
         password,
         role,
       });
-      setPending({ email: result.email, devOtp: result.devOtp });
+      setPending({ email: result.email });
     } catch (err) {
       setError(
         err instanceof Error && err.message
@@ -370,7 +367,7 @@ export function RegisterForm({
   // Signing up no longer logs you in — the account must confirm the emailed
   // code first, and that is what issues the session.
   if (pending) {
-    return <VerifyEmailForm email={pending.email} devOtp={pending.devOtp} />;
+    return <VerifyEmailForm email={pending.email} />;
   }
 
   return (

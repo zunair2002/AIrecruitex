@@ -47,6 +47,8 @@ const jobFilters: { value: JobFilter; label: string }[] = [
   { value: "applied", label: "Applied" },
 ];
 
+const SKILL_PREVIEW = 4;
+
 const focusRing =
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2";
 
@@ -62,6 +64,7 @@ function JobCard({
   onApply: () => void;
 }) {
   const [expanded, setExpanded] = useState(false);
+  const [showAllSkills, setShowAllSkills] = useState(false);
   const skills = job.requiredSkills ?? [];
 
   return (
@@ -110,18 +113,27 @@ function JobCard({
         </div>
         {skills.length ? (
           <div className="flex flex-wrap gap-1.5">
-            {skills.slice(0, 4).map((skill) => (
-              <span
-                key={skill}
-                className={`${badgeClass("neutral")} max-w-full truncate`}
+            {(showAllSkills ? skills : skills.slice(0, SKILL_PREVIEW)).map(
+              (skill) => (
+                <span
+                  key={skill}
+                  className={`${badgeClass("neutral")} max-w-full truncate`}
+                >
+                  {skill}
+                </span>
+              ),
+            )}
+            {skills.length > SKILL_PREVIEW && (
+              <button
+                type="button"
+                aria-expanded={showAllSkills}
+                onClick={() => setShowAllSkills((value) => !value)}
+                className={`inline-flex items-center rounded-full border border-brand-200 bg-brand-50 px-2.5 py-0.5 text-xs font-medium text-brand-700 hover:bg-brand-100 ${focusRing}`}
               >
-                {skill}
-              </span>
-            ))}
-            {skills.length > 4 && (
-              <span className="inline-flex items-center px-1 text-xs font-medium text-muted">
-                +{skills.length - 4} more
-              </span>
+                {showAllSkills
+                  ? "Show less"
+                  : `+${skills.length - SKILL_PREVIEW} more`}
+              </button>
             )}
           </div>
         ) : (

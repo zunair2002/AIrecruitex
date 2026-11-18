@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import {
   ArrowLeft,
   CircleAlert,
@@ -435,11 +435,15 @@ export function SkillChips({
   skills,
   emptyLabel = "None",
   tone = "indigo",
+  limit,
 }: {
   skills: string[];
   emptyLabel?: string;
   tone?: "indigo" | "gray";
+  /** Show only the first `limit` chips, then a "+N more" toggle. */
+  limit?: number;
 }) {
+  const [expanded, setExpanded] = useState(false);
   if (skills.length === 0) {
     return <span className="text-sm text-muted">{emptyLabel}</span>;
   }
@@ -447,9 +451,12 @@ export function SkillChips({
     tone === "indigo"
       ? "bg-brand-50 text-brand-700 ring-brand-600/20"
       : "bg-surface-3 text-body ring-line";
+  const canCollapse = limit !== undefined && skills.length > limit;
+  const hiddenCount = canCollapse ? skills.length - limit : 0;
+  const visible = canCollapse && !expanded ? skills.slice(0, limit) : skills;
   return (
     <div className="flex flex-wrap gap-1.5">
-      {skills.map((skill) => (
+      {visible.map((skill) => (
         <span
           key={skill}
           className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ${toneClass}`}
@@ -457,6 +464,16 @@ export function SkillChips({
           {skill}
         </span>
       ))}
+      {canCollapse && (
+        <button
+          type="button"
+          aria-expanded={expanded}
+          onClick={() => setExpanded((open) => !open)}
+          className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold text-brand-700 ring-1 ring-inset ring-line transition-colors hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+        >
+          {expanded ? "Show less" : `+${hiddenCount} more`}
+        </button>
+      )}
     </div>
   );
 }

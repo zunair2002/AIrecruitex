@@ -24,6 +24,7 @@ import {
   INTERVIEW_STATUS_BADGE,
   INTERVIEW_STATUS_LABELS,
   formatDate,
+  formatDateTime,
   roundTrackLabel,
   scoreColor,
 } from "@/lib/format";
@@ -57,9 +58,9 @@ const ALL = "all";
 /**
  * The candidate's interview history, from GET /api/interview/mine.
  *
- * Organisational interviews appear here but are "hidden": the backend strips
- * score, result and per-answer feedback from them, because those are HR's to
- * see. The UI says so rather than rendering empty fields.
+ * Only PRACTICE sessions show the detailed report (questions, answers,
+ * feedback, scores). AI interviews and organisational interviews are graded by
+ * the hiring team, so they show a summary only: status and dates.
  */
 export function InterviewHistory() {
   const { token } = useAuth();
@@ -82,18 +83,21 @@ export function InterviewHistory() {
   const list = sessions.data ?? [];
   const selected = resolveSelection(list, requestedId, (s) => s.sessionId);
   const selectedId = selected?.sessionId ?? null;
+  const isPractice = selected?.type === "practice";
 
   // The list rows are summaries; the full report is fetched for the selected one.
   // The loader guards on `selectedId` itself rather than trusting `enabled` — if
   // the list empties (e.g. the type filter changes) between a render and the
   // effect firing, there is simply nothing to fetch.
+  // Only practice sessions load the full report — job interviews never show
+  // their questions, answers or scores to the candidate.
   const report = useApiResource(
     (signal) =>
-      selectedId
+      selectedId && isPractice
         ? getInterviewReport(selectedId, token, signal)
         : Promise.resolve(null),
-    [selectedId, token],
-    { enabled: Boolean(token && selectedId) },
+    [selectedId, isPractice, token],
+    { enabled: Boolean(token && selectedId && isPractice) },
   );
 
   if (sessions.isLoading) {
@@ -104,17 +108,9 @@ export function InterviewHistory() {
     );
   }
 
-  const scoredSessions = list.filter(
-    (session): session is InterviewSessionSummary & { score: number } =>
-      session.status === "completed" && typeof session.score === "number",
-  );
-  const averageScore =
-    scoredSessions.length > 0
-      ? `${Math.round(
-          scoredSessions.reduce((total, session) => total + session.score, 0) /
-            scoredSessions.length,
-        )}%`
-      : "—";
+  const practiceCount = list.filter(
+    (session) => session.type === "practice",
+  ).length;
   const completedCount = list.filter(
     (session) => session.status === "completed",
   ).length;
@@ -169,9 +165,9 @@ export function InterviewHistory() {
           tone="warning"
         />
         <StatCard
-          label="Average score"
-          value={averageScore}
-          sub={`${scoredSessions.length} scored session${scoredSessions.length === 1 ? "" : "s"}`}
+          label="Practice sessions"
+          value={practiceCount}
+          sub="With detailed feedback"
           icon={<Target aria-hidden="true" />}
           tone="info"
         />
@@ -233,7 +229,9 @@ export function InterviewHistory() {
           </Card>
 
           <div className="min-w-0 space-y-6">
-            {report.isLoading ? (
+            {selected && !isPractice ? (
+              <JobInterviewSummary session={selected} title={selectedTitle} />
+            ) : report.isLoading ? (
               <Card>
                 <LoadingBlock label="Loading report…" />
               </Card>
@@ -279,16 +277,6 @@ export function InterviewHistory() {
                           >
                             {INTERVIEW_RESULT_LABELS[report.data.result]}
                           </span>
-                        )}
-                        {selected.type === "organizational" && (
-                          <p className="mt-3 flex items-start gap-2 rounded-lg bg-brand-50 px-3 py-2.5 text-left text-sm text-brand-900 ring-1 ring-inset ring-brand-600/10">
-                            <Info
-                              aria-hidden="true"
-                              className="mt-0.5 h-4 w-4 shrink-0 text-brand-700"
-                            />
-                            This interview is graded by the hiring team. Your
-                            score and answer feedback aren&apos;t shown here.
-                          </p>
                         )}
                         <p className="mt-3 whitespace-pre-line text-sm leading-6 text-body">
                           {report.data.report?.summary ||
@@ -356,7 +344,7 @@ export function InterviewHistory() {
                         {report.data.turns.length === 1 ? "" : "s"}. Finish the
                         interview to see the outcome.
                       </p>
-                      {selected.type !== "organizational" && (
+                      {selected.type === "practice" && (
                         <Button
                           href={`/candidate/interview/session/${selected.sessionId}`}
                           trailingIcon={<ArrowRight aria-hidden="true" />}
@@ -572,7 +560,7 @@ function SessionRow({
         <p className="min-w-0 truncate text-sm font-semibold text-ink">
           {session.jobTitle ?? "Practice interview"}
         </p>
-        {session.score !== undefined && (
+        {session.type === "practice" && session.score !== undefined && (
           <span
             className={`shrink-0 font-display text-sm font-semibold tabular-nums ${scoreColor(session.score)}`}
           >
@@ -587,7 +575,7 @@ function SessionRow({
         <span className={INTERVIEW_STATUS_BADGE[session.status]}>
           {INTERVIEW_STATUS_LABELS[session.status]}
         </span>
-        {session.result && (
+        {session.type === "practice" && session.result && (
           <span className={INTERVIEW_RESULT_BADGE[session.result]}>
             {INTERVIEW_RESULT_LABELS[session.result]}
           </span>
@@ -600,5 +588,70 @@ function SessionRow({
         </span>
       </div>
     </button>
+  );
+}
+
+/**
+ * AI and organisational interviews: summary only — status and dates. The
+ * questions, answers and scores stay with the hiring team.
+ */
+function JobInterviewSummary({
+  session,
+  title,
+}: {
+  session: InterviewSessionSummary;
+  title: string | null;
+}) {
+  const completed = session.status === "completed";
+  return (
+    <Card
+      title={
+        session.type === "organizational"
+          ? "Organisational interview"
+          : "AI interview"
+      }
+      description={title ?? undefined}
+      action={
+        <span className={INTERVIEW_HISTORY_TYPE_BADGE[session.type]}>
+          {INTERVIEW_HISTORY_TYPE_LABELS[session.type]}
+        </span>
+      }
+    >
+      <dl className="grid grid-cols-1 gap-x-6 gap-y-4 border-t border-line-soft pt-5 sm:grid-cols-3">
+        <div className="min-w-0">
+          <dt className="text-xs font-medium text-muted">Status</dt>
+          <dd className="mt-1">
+            <span className={INTERVIEW_STATUS_BADGE[session.status]}>
+              {INTERVIEW_STATUS_LABELS[session.status]}
+            </span>
+          </dd>
+        </div>
+        <div className="min-w-0">
+          <dt className="text-xs font-medium text-muted">Started</dt>
+          <dd className="mt-1 text-sm tabular-nums text-ink">
+            {formatDateTime(session.createdAt)}
+          </dd>
+        </div>
+        <div className="min-w-0">
+          <dt className="text-xs font-medium text-muted">
+            {completed ? "Completed" : "Last activity"}
+          </dt>
+          <dd className="mt-1 text-sm tabular-nums text-ink">
+            {formatDateTime(session.updatedAt)}
+          </dd>
+        </div>
+      </dl>
+      <p className="mt-5 flex items-start gap-2 rounded-lg bg-brand-50 px-3 py-2.5 text-sm text-brand-900 ring-1 ring-inset ring-brand-600/10">
+        <Info
+          aria-hidden="true"
+          className="mt-0.5 h-4 w-4 shrink-0 text-brand-700"
+        />
+        <span className="min-w-0">
+          {completed
+            ? "This interview is reviewed by the hiring team. Questions, answers and scores aren't shown here — you'll hear back on your application."
+            : "Use the interview link sent to your email to take or continue this interview."}
+        </span>
+      </p>
+    </Card>
   );
 }

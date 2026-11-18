@@ -259,6 +259,7 @@ export function ShortlistedList() {
                     <SkillChips
                       skills={application.resumeSnapshotSkills}
                       emptyLabel="No matched skills recorded."
+                      limit={6}
                     />
                   </div>
 
@@ -267,6 +268,8 @@ export function ShortlistedList() {
                       <OrgInterviewPanel
                         orgInterview={application.orgInterview}
                         audience="hr"
+                        applicationId={application._id}
+                        onCancelled={applyLocalUpdate}
                       />
                     </div>
                   )}
@@ -306,6 +309,7 @@ export function ShortlistedList() {
           kind="org"
           candidateName={populated(dialogFor.candidateId)?.name ?? "Candidate"}
           jobTitle={selectedJob?.title ?? "This job"}
+          jobId={selectedJob?._id}
           onCancel={() => setDialogFor(null)}
           onSubmit={handleSchedule}
         />

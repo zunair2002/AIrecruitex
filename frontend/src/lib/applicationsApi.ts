@@ -11,6 +11,8 @@ import type {
   InterviewSessionView,
   ObjectId,
   OrgInterviewInvite,
+  OrgInterviewViolationResult,
+  OrgInterviewViolationType,
 } from "./types";
 
 /* ----------------------------------------------------------- candidate */
@@ -114,7 +116,8 @@ export function scheduleAiInterview(
  *
  * Emails the candidate a token link to the organisational interview, valid for
  * `validityDays` (server default 2). The backend rejects this unless the
- * application's status is already `selected`.
+ * application's status is already `selected` and the job has a question pool
+ * (409 otherwise — upload one at /recruiter/jobs/:jobId/questions).
  */
 export function inviteToOrgInterview(
   applicationId: ObjectId,
@@ -123,6 +126,23 @@ export function inviteToOrgInterview(
 ): Promise<Application> {
   return apiRequest<Application>(
     `/api/applications/${applicationId}/org-interview-invite`,
+    { method: "POST", body: input, token },
+  );
+}
+
+/**
+ * POST /api/applications/:applicationId/org-interview-invite/cancel — HR only
+ * (the job's owner). Withdraws an active invite: status becomes "cancelled",
+ * the candidate's link stops working and they're emailed + notified.
+ * 409 if the invite isn't active (completed, expired or already cancelled).
+ */
+export function cancelOrgInterviewInvite(
+  applicationId: ObjectId,
+  input: { reason?: string },
+  token: string | null,
+): Promise<Application> {
+  return apiRequest<Application>(
+    `/api/applications/${applicationId}/org-interview-invite/cancel`,
     { method: "POST", body: input, token },
   );
 }
@@ -202,5 +222,32 @@ export function submitOrgInterviewAnswerByToken(
   return apiRequest<InterviewSessionView>(
     `/api/applications/org-interview/${inviteToken}/answer`,
     { method: "POST", body: { answer } },
+  );
+}
+
+/**
+ * POST /api/applications/org-interview/:token/violation — reports one
+ * proctoring event. The server counts them and cancels the interview on the
+ * third (`cancelled: true` in the result); near-duplicate reports within ~2s
+ * are collapsed into one.
+ */
+export function reportOrgInterviewViolation(
+  inviteToken: string,
+  type: OrgInterviewViolationType,
+): Promise<OrgInterviewViolationResult> {
+  return apiRequest<OrgInterviewViolationResult>(
+    `/api/applications/org-interview/${inviteToken}/violation`,
+    { method: "POST", body: { type } },
+  );
+}
+
+/** POST /api/applications/org-interview/:token/cancel — candidate-side cancel. */
+export function cancelOrgInterviewByToken(
+  inviteToken: string,
+  reason?: string,
+): Promise<OrgInterviewViolationResult> {
+  return apiRequest<OrgInterviewViolationResult>(
+    `/api/applications/org-interview/${inviteToken}/cancel`,
+    { method: "POST", body: { reason } },
   );
 }

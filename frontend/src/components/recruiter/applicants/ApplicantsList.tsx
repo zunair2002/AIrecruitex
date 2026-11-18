@@ -485,6 +485,7 @@ export function ApplicantsList() {
             populated(dialog.application.candidateId)?.name ?? "Candidate"
           }
           jobTitle={selectedJob?.title ?? "This job"}
+          jobId={selectedJob?._id}
           count={selectedIds.size}
           onCancel={() => setDialog(null)}
           onSubmit={handleSchedule}
@@ -597,6 +598,7 @@ function ApplicantCard({
             <SkillChips
               skills={application.resumeSnapshotSkills}
               emptyLabel="None of the required skills were found in this resume."
+              limit={6}
             />
           </div>
 
@@ -637,7 +639,11 @@ function ApplicantCard({
                 </div>
               )}
               {orgInterview?.status && (
-                <OrgInterviewPanel orgInterview={orgInterview} audience="hr" />
+                <OrgInterviewPanel
+                  orgInterview={orgInterview}
+                  audience="hr"
+                  applicationId={application._id}
+                />
               )}
             </div>
           )}

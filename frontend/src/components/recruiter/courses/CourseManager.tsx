@@ -3,6 +3,7 @@
 import { useState } from "react";
 import {
   CirclePlay,
+  Crown,
   ExternalLink,
   GraduationCap,
   Pencil,
@@ -34,6 +35,7 @@ import {
   InlineError,
   InlineSuccess,
   PageHeader,
+  SegmentedControl,
   SkeletonCard,
   SkillChips,
 } from "@/components/ui";
@@ -56,6 +58,7 @@ const EMPTY: CourseInput = {
   description: "",
   videoUrl: "",
   topics: [],
+  tier: "free",
 };
 
 function Required() {
@@ -118,6 +121,7 @@ export function CourseManager() {
       description: course.description,
       videoUrl: course.videoUrl,
       topics: course.topics,
+      tier: course.tier ?? "free",
     });
     setEditingId(course._id);
     setSuccess(null);
@@ -137,6 +141,7 @@ export function CourseManager() {
         description: form.description.trim(),
         videoUrl: form.videoUrl.trim(),
         topics: form.topics,
+        tier: form.tier,
       };
       if (editingId) {
         await updateCourse(editingId, payload, token);
@@ -253,6 +258,26 @@ export function CourseManager() {
               )}
             </div>
 
+            <div>
+              <span id="course-tier-label" className={labelClass}>
+                Access
+              </span>
+              <SegmentedControl
+                ariaLabel="Course access"
+                value={form.tier}
+                onChange={(tier) => update("tier", tier)}
+                options={[
+                  { value: "free", label: "Free" },
+                  { value: "premium", label: "Premium", icon: <Crown aria-hidden="true" /> },
+                ]}
+              />
+              <p className={helpTextClass}>
+                {form.tier === "premium"
+                  ? "Only Premium candidates can watch it. Free candidates see it locked, with an upgrade prompt."
+                  : "Every candidate can watch it."}
+              </p>
+            </div>
+
             <fieldset>
               <legend className={labelClass}>
                 Topics <Required />
@@ -350,6 +375,15 @@ export function CourseManager() {
                             Added {formatDate(course.createdAt)}
                           </p>
                         </div>
+                        {course.tier === "premium" && (
+                          <Badge
+                            tone="brand"
+                            icon={<Crown aria-hidden="true" />}
+                            title="Premium candidates only"
+                          >
+                            Premium
+                          </Badge>
+                        )}
                         {!course.isActive && (
                           <Badge tone="neutral" title="Hidden from candidates">
                             Hidden

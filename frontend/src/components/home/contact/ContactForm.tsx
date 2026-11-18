@@ -29,7 +29,7 @@ export const ContactForm = ({
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="form-success border border-[#e0d6ea] bg-white p-8 text-center"
+        className="form-success border border-line bg-white p-8 text-center"
       >
         <motion.svg
           initial={{ scale: 0 }}
@@ -47,7 +47,7 @@ export const ContactForm = ({
           <polyline points="22 4 12 14.01 9 11.01"></polyline>
         </motion.svg>
         <h3 className="font-display mb-2 text-2xl text-ink">Thank you</h3>
-        <p className="text-[#6b5f7a]">We&apos;ll be in touch within 24 hours.</p>
+        <p className="text-muted">We&apos;ll be in touch within 24 hours.</p>
       </motion.div>
     );
   }
@@ -55,7 +55,7 @@ export const ContactForm = ({
   return (
     <form
       onSubmit={onSubmit}
-      className="border border-[#e0d6ea] bg-white p-6 sm:p-8"
+      className="border border-line bg-white p-6 sm:p-8"
     >
       <input type="hidden" name="type" value={activeMode} />
       {[
@@ -97,7 +97,7 @@ export const ContactForm = ({
             value={formData[field.id as keyof ContactFormData]}
             onChange={onInputChange}
             placeholder={field.placeholder}
-            className="w-full border border-[#e0d6ea] bg-white px-4 py-3 text-ink focus:border-ink focus:outline-none"
+            className="w-full border border-line bg-white px-4 py-3 text-ink focus:border-ink focus:outline-none"
           />
         </div>
       ))}
@@ -115,7 +115,7 @@ export const ContactForm = ({
           onChange={onInputChange}
           placeholder="Tell us about your hiring needs..."
           rows={4}
-          className="w-full resize-none border border-[#e0d6ea] bg-white px-4 py-3 text-ink focus:border-ink focus:outline-none"
+          className="w-full resize-none border border-line bg-white px-4 py-3 text-ink focus:border-ink focus:outline-none"
         />
       </div>
       <button

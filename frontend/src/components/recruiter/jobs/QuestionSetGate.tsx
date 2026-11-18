@@ -1,5 +1,6 @@
 "use client";
 
+import { ListChecks } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { listMyJobs } from "@/lib/jobsApi";
 import { useApiResource } from "@/lib/useApiResource";
@@ -17,24 +18,30 @@ export function QuestionSetGate({ jobId }: { jobId: ObjectId }) {
     enabled: Boolean(token),
   });
 
-  if (jobs.isLoading) return <LoadingBlock label="Loading job…" />;
-  if (jobs.error)
-    return <ErrorBlock message={jobs.error} onRetry={jobs.reload} />;
-
   const job = (jobs.data ?? []).find((item) => item._id === jobId);
-  if (!job) {
-    return (
-      <ErrorBlock message="That job isn't one of yours, or no longer exists." />
-    );
-  }
 
   return (
     <>
       <PageHeader
-        title="Organisational Interview Questions"
-        description="These questions are asked when you invite a selected candidate to the organisational interview."
+        title="Organisational interview questions"
+        description={
+          job
+            ? `${job.title} · asked when you invite a selected candidate to the organisational interview.`
+            : "These questions are asked when you invite a selected candidate to the organisational interview."
+        }
+        icon={<ListChecks />}
+        backHref="/recruiter/jobs"
+        backLabel="Back to my jobs"
       />
-      <QuestionSetPanel jobId={job._id} jobTitle={job.title} />
+      {jobs.isLoading ? (
+        <LoadingBlock label="Loading job…" />
+      ) : jobs.error ? (
+        <ErrorBlock message={jobs.error} onRetry={jobs.reload} />
+      ) : !job ? (
+        <ErrorBlock message="That job isn't one of yours, or no longer exists." />
+      ) : (
+        <QuestionSetPanel jobId={job._id} jobTitle={job.title} />
+      )}
     </>
   );
 }

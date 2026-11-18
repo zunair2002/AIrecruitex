@@ -3,21 +3,21 @@
 import { motion } from "framer-motion";
 
 const cvLines = [
-  { text: "✓ Experience: 5 years", color: "text-green-500", delay: 0.3 },
-  { text: "✓ Skills: React, Node", color: "text-green-500", delay: 0.4 },
+  { text: "✓ Experience: 5 years", color: "text-brand-500", delay: 0.3 },
+  { text: "✓ Skills: React, Node", color: "text-brand-500", delay: 0.4 },
   {
     text: "\u26A0 Education: Bachelor\u2019s",
-    color: "text-yellow-500",
+    color: "text-brand-300",
     delay: 0.5,
   },
-  { text: "✓ Portfolio available", color: "text-green-500", delay: 0.6 },
+  { text: "✓ Portfolio available", color: "text-brand-500", delay: 0.6 },
 ];
 
 const interviewLines = [
-  { text: "✓ Experience: 5 years", color: "text-green-500", delay: 0.8 },
-  { text: "⚠️ Skills: React, Angular", color: "text-yellow-500", delay: 0.9 },
-  { text: "✓ Portfolio mentioned", color: "text-green-500", delay: 1.0 },
-  { text: "⚠️ Education not mentioned", color: "text-yellow-500", delay: 1.1 },
+  { text: "✓ Experience: 5 years", color: "text-brand-500", delay: 0.8 },
+  { text: "⚠️ Skills: React, Angular", color: "text-brand-300", delay: 0.9 },
+  { text: "✓ Portfolio mentioned", color: "text-brand-500", delay: 1.0 },
+  { text: "⚠️ Education not mentioned", color: "text-brand-300", delay: 1.1 },
 ];
 
 export const DiscrepancySceneVisual = () => (
@@ -57,7 +57,7 @@ export const DiscrepancySceneVisual = () => (
         }}
         animate={{ rotate: [0, 10, -10, 0] }}
         transition={{ repeat: Infinity, duration: 2, delay: 1 }}
-        className="alert-badge text-yellow-500 text-4xl"
+        className="alert-badge text-brand-300 text-4xl"
       >
         ⚠️
       </motion.div>

@@ -1,5 +1,7 @@
 "use client";
 
+import { CalendarClock, CalendarPlus, Copy } from "lucide-react";
+import { Button, buttonClass } from "@/components/ui/Button";
 import {
   ORG_INTERVIEW_STATUS_BADGE,
   ORG_INTERVIEW_STATUS_LABELS,
@@ -35,18 +37,23 @@ export function OrgInterviewPanel({
     (status === "invited" && isInviteExpired(orgInterview.expiresAt));
   const effective = expired ? "expired" : status;
 
+  const showCopy = Boolean(joinLink) && effective === "invited";
+  const showCalendar =
+    Boolean(orgInterview.calendarLink) && effective === "invited";
+
   return (
     <div
-      className={`rounded border p-4 ${
- effective === "completed"
- ? "border-emerald-100 bg-emerald-50"
- : effective === "expired"
- ? "border-[#e9eaf0] bg-[#f8f8fb]"
- : "border-amber-100 bg-amber-50"
- }`}
+      className={`rounded-xl border p-4 ${
+        effective === "completed"
+          ? "border-brand-200 bg-brand-50/60"
+          : effective === "expired"
+            ? "border-line bg-surface-2"
+            : "border-brand-200 bg-brand-50/60"
+      }`}
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-xs font-bold uppercase tracking-wide text-[#686b77]">
+        <p className="flex items-center gap-2 text-sm font-semibold text-ink">
+          <CalendarClock aria-hidden="true" className="h-4 w-4 text-muted" />
           Organisational interview
         </p>
         <span className={ORG_INTERVIEW_STATUS_BADGE[effective]}>
@@ -54,67 +61,77 @@ export function OrgInterviewPanel({
         </span>
       </div>
 
-      <dl className="mt-2 space-y-1 text-sm text-[#44464f]">
+      <dl className="mt-3 grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1.5 text-sm">
         {orgInterview.invitedAt && (
-          <div className="flex gap-2">
-            <dt className="text-[#898b96]">Invited</dt>
-            <dd>{formatDateTime(orgInterview.invitedAt)}</dd>
-          </div>
+          <>
+            <dt className="text-muted">Invited</dt>
+            <dd className="text-body tabular-nums">
+              {formatDateTime(orgInterview.invitedAt)}
+            </dd>
+          </>
         )}
         {orgInterview.expiresAt && effective !== "completed" && (
-          <div className="flex gap-2">
-            <dt className="text-[#898b96]">Valid until</dt>
-            <dd>
+          <>
+            <dt className="text-muted">Valid until</dt>
+            <dd className="text-body tabular-nums">
               {formatDateTime(orgInterview.expiresAt)}
               {!expired && (
-                <span className="ml-2 text-xs font-semibold text-amber-700">
+                <span className="ml-2 text-xs font-medium text-brand-600">
                   {timeUntil(orgInterview.expiresAt)}
                 </span>
               )}
             </dd>
-          </div>
+          </>
         )}
         {orgInterview.completedAt && (
-          <div className="flex gap-2">
-            <dt className="text-[#898b96]">Completed</dt>
-            <dd>{formatDateTime(orgInterview.completedAt)}</dd>
-          </div>
+          <>
+            <dt className="text-muted">Completed</dt>
+            <dd className="text-body tabular-nums">
+              {formatDateTime(orgInterview.completedAt)}
+            </dd>
+          </>
         )}
         {orgInterview.notes && (
-          <div className="flex gap-2">
-            <dt className="text-[#898b96]">Notes</dt>
-            <dd className="whitespace-pre-line">{orgInterview.notes}</dd>
-          </div>
+          <>
+            <dt className="text-muted">Notes</dt>
+            <dd className="whitespace-pre-line break-words text-body">
+              {orgInterview.notes}
+            </dd>
+          </>
         )}
       </dl>
 
       {audience === "candidate" && effective === "invited" && (
-        <p className="mt-3 text-xs text-[#686b77]">
+        <p className="mt-3 text-xs text-muted">
           Check your email for the interview link — it works without signing in.
         </p>
       )}
 
-      <div className="mt-3 flex flex-wrap gap-3">
-        {joinLink && effective === "invited" && (
-          <button
-            type="button"
-            onClick={() => navigator.clipboard?.writeText(joinLink)}
-            className="text-xs font-semibold text-brand hover:text-brand-dark"
-          >
-            Copy candidate link
-          </button>
-        )}
-        {orgInterview.calendarLink && effective === "invited" && (
-          <a
-            href={orgInterview.calendarLink}
-            target="_blank"
-            rel="noreferrer"
-            className="text-xs font-semibold text-brand hover:text-brand-dark"
-          >
-            Add to calendar
-          </a>
-        )}
-      </div>
+      {(showCopy || showCalendar) && (
+        <div className="mt-4 flex flex-wrap gap-2">
+          {showCopy && joinLink && (
+            <Button
+              variant="secondary"
+              size="sm"
+              leadingIcon={<Copy />}
+              onClick={() => navigator.clipboard?.writeText(joinLink)}
+            >
+              Copy candidate link
+            </Button>
+          )}
+          {showCalendar && (
+            <a
+              href={orgInterview.calendarLink}
+              target="_blank"
+              rel="noreferrer"
+              className={buttonClass({ variant: "secondary", size: "sm" })}
+            >
+              <CalendarPlus aria-hidden="true" />
+              Add to calendar
+            </a>
+          )}
+        </div>
+      )}
     </div>
   );
 }

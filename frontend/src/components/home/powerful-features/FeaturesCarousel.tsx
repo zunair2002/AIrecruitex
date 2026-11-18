@@ -44,7 +44,7 @@ export const FeaturesCarousel = ({ wrapperRef }: FeaturesCarouselProps) => (
               </span>
               {scene.title}
             </h3>
-            <p className="text-[#6b5f7a]">{scene.description}</p>
+            <p className="text-muted">{scene.description}</p>
           </motion.div>
         </motion.div>
       ))}

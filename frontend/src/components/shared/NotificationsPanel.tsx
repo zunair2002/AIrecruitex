@@ -1,7 +1,15 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { Bell, ChevronDown, Mail, MailOpen } from "lucide-react";
+import {
+  Bell,
+  Check,
+  CheckCheck,
+  ChevronDown,
+  Mail,
+  MailOpen,
+  RotateCw,
+} from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useServerEvent } from "@/context/RealtimeContext";
 import { toErrorMessage } from "@/lib/api";
@@ -13,7 +21,9 @@ import { splitNotification } from "@/lib/notificationText";
 import { useApiResource } from "@/lib/useApiResource";
 import { formatDateTime, formatDate } from "@/lib/format";
 import type { ObjectId } from "@/lib/types";
+import { Button } from "@/components/ui/Button";
 import {
+  Card,
   EmptyState,
   ErrorBlock,
   InlineError,
@@ -21,7 +31,6 @@ import {
 } from "@/components/ui/Feedback";
 import {
   CountTabs,
-  HeaderAction,
   PortalHeader,
   PortalPage,
 } from "@/components/dashboard/primitives";
@@ -99,7 +108,13 @@ export function NotificationsPanel() {
             : "Updates from HR and platform admins"
         }
         action={
-          <HeaderAction onClick={notifications.reload}>Refresh</HeaderAction>
+          <Button
+            variant="secondary"
+            leadingIcon={<RotateCw />}
+            onClick={() => notifications.reload()}
+          >
+            Refresh
+          </Button>
         }
       />
 
@@ -114,12 +129,15 @@ export function NotificationsPanel() {
         />
       ) : list.length === 0 ? (
         <EmptyState
-          title="No notifications yet."
+          icon={<Bell />}
+          title="No notifications yet"
           description="Application decisions, scheduled interviews and support replies show up here."
         />
       ) : (
-        <section className="border border-[#e9eaf0] bg-white">
-          <div className="px-3 pt-3">
+        <Card padding="none">
+          {/* Full-width rule under the tabs: the wrapper draws it, so the
+              strip's own rule is dropped. */}
+          <div className="border-b border-line px-4 pt-3 sm:px-6 [&>div]:border-b-0">
             <CountTabs
               tabs={[
                 { id: "all", label: "All", count: list.length },
@@ -131,11 +149,14 @@ export function NotificationsPanel() {
           </div>
 
           {visible.length === 0 ? (
-            <p className="py-10 text-center text-[11px] text-[#9698a2]">
-              Nothing unread — you&apos;re all caught up.
-            </p>
+            <EmptyState
+              bare
+              icon={<CheckCheck />}
+              title="You're all caught up"
+              description="Nothing unread right now."
+            />
           ) : (
-            <ul>
+            <ul className="divide-y divide-line-soft">
               {visible.map((notification) => {
                 const { subject, body } = splitNotification(
                   notification.message,
@@ -147,100 +168,100 @@ export function NotificationsPanel() {
                 return (
                   <li
                     key={notification._id}
-                    className={`border-t border-[#f1f1f5] first:border-t-0 ${
-                      isUnread ? "bg-[#fbfaff]" : "bg-white"
-                    }`}
+                    className={isUnread ? "bg-brand-50/40" : "bg-surface"}
                   >
-                    <div className="flex items-start gap-2">
+                    <div className="flex items-start">
                       <button
                         type="button"
                         onClick={() =>
                           handleOpen(notification._id, notification.read)
                         }
                         aria-expanded={isOpen}
-                        className="flex min-w-0 flex-1 items-start gap-2.5 px-3 py-2.5 text-left transition-colors hover:bg-[#f8f8fb]"
+                        className="flex min-w-0 flex-1 items-start gap-3 px-4 py-4 text-left transition-colors hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-500 sm:gap-4 sm:px-6"
                       >
-                        <span
-                          className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md ${
-                            isUnread
-                              ? "bg-[#efedfd] text-[#6b5ce7]"
-                              : "bg-[#f3f3f6] text-[#9698a2]"
-                          }`}
-                        >
-                          {isUnread ? (
-                            <Mail aria-hidden="true" className="h-3.5 w-3.5" />
-                          ) : (
-                            <MailOpen
-                              aria-hidden="true"
-                              className="h-3.5 w-3.5"
+                        <span className="relative mt-0.5 shrink-0">
+                          <span
+                            className={`flex h-9 w-9 items-center justify-center rounded-lg ${
+                              isUnread
+                                ? "bg-brand-100 text-brand-700"
+                                : "bg-surface-3 text-muted"
+                            }`}
+                          >
+                            {isUnread ? (
+                              <Mail aria-hidden="true" className="h-4 w-4" />
+                            ) : (
+                              <MailOpen aria-hidden="true" className="h-4 w-4" />
+                            )}
+                          </span>
+                          {isUnread && (
+                            <span
+                              role="img"
+                              aria-label="Unread"
+                              className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-brand-600 ring-2 ring-white"
                             />
                           )}
                         </span>
 
                         <span className="min-w-0 flex-1">
-                          <span className="flex items-baseline gap-2">
+                          <span className="flex items-baseline justify-between gap-3">
                             <span
-                              className={`truncate text-[12px] ${
+                              className={`min-w-0 truncate text-sm ${
                                 isUnread
-                                  ? "font-bold text-[#292b35]"
-                                  : "font-medium text-[#44464f]"
+                                  ? "font-semibold text-ink"
+                                  : "font-medium text-body"
                               }`}
                             >
                               {subject}
                             </span>
-                            {isUnread && (
-                              <span
-                                aria-label="Unread"
-                                className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#6b5ce7]"
-                              />
-                            )}
+                            <span className="hidden shrink-0 text-xs tabular-nums text-muted sm:inline">
+                              {formatDateTime(notification.createdAt)}
+                            </span>
                           </span>
 
                           {/* Collapsed: one muted line, clipped with an
                               ellipsis. Expanded: the full text below. */}
                           {body && !isOpen && (
-                            <span className="mt-0.5 block truncate text-[11px] text-[#898b96]">
+                            <span className="mt-0.5 block truncate text-sm text-muted">
                               {body}
                             </span>
                           )}
-                          {!body && !isOpen && (
-                            <span className="mt-0.5 block text-[11px] text-[#9698a2]">
-                              {formatDate(notification.createdAt)}
-                            </span>
-                          )}
+                          <span className="mt-1 block text-xs tabular-nums text-muted sm:hidden">
+                            {formatDate(notification.createdAt)}
+                          </span>
                         </span>
 
-                        <span className="ml-2 hidden shrink-0 items-center gap-2 pt-0.5 sm:flex">
-                          <span className="text-[10px] text-[#9698a2]">
-                            {formatDateTime(notification.createdAt)}
-                          </span>
-                          <ChevronDown
-                            aria-hidden="true"
-                            className={`h-3.5 w-3.5 text-[#c9cbd4] transition-transform duration-200 ${
-                              isOpen ? "rotate-180" : "rotate-0"
-                            }`}
-                          />
-                        </span>
+                        <ChevronDown
+                          aria-hidden="true"
+                          className={`mt-2 h-4 w-4 shrink-0 text-subtle transition-transform duration-200 ${
+                            isOpen ? "rotate-180" : "rotate-0"
+                          }`}
+                        />
                       </button>
 
                       {isUnread && (
-                        <button
-                          type="button"
-                          onClick={() => handleMarkRead(notification._id)}
-                          disabled={isBusy}
-                          className="mr-3 mt-2.5 shrink-0 rounded px-2 py-1 text-[10px] font-semibold text-[#6b5ce7] transition-colors hover:bg-[#efedfd] disabled:opacity-50"
-                        >
-                          {isBusy ? "…" : "Mark read"}
-                        </button>
+                        <div className="shrink-0 py-4 pr-3 sm:pr-5">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleMarkRead(notification._id)}
+                            loading={isBusy}
+                            leadingIcon={<Check />}
+                            title="Mark read"
+                          >
+                            <span className="sr-only sm:not-sr-only">
+                              Mark read
+                            </span>
+                          </Button>
+                        </div>
                       )}
                     </div>
 
                     {isOpen && (
-                      <div className="border-t border-[#f1f1f5] bg-white px-3 py-3 pl-[3.1rem]">
-                        <p className="whitespace-pre-wrap text-[12px] leading-relaxed text-[#44464f]">
+                      <div className="px-4 pb-4 pl-16 sm:px-6 sm:pl-19">
+                        <p className="whitespace-pre-wrap break-words rounded-lg bg-surface-2 p-4 text-sm leading-relaxed text-body">
                           {notification.message}
                         </p>
-                        <p className="mt-2 text-[10px] text-[#9698a2]">
+                        <p className="mt-2 text-xs tabular-nums text-muted">
                           {formatDateTime(notification.createdAt)}
                         </p>
                       </div>
@@ -250,7 +271,7 @@ export function NotificationsPanel() {
               })}
             </ul>
           )}
-        </section>
+        </Card>
       )}
     </PortalPage>
   );

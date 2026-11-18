@@ -1,11 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { getInterviewReport } from "@/lib/interviewApi";
 import { useApiResource } from "@/lib/useApiResource";
 import type { InterviewSessionView, ObjectId } from "@/lib/types";
+import { Button } from "@/components/ui/Button";
 import { ErrorBlock, LoadingBlock } from "@/components/ui/Feedback";
 import { InterviewRunner } from "./InterviewRunner";
 
@@ -26,20 +26,19 @@ export function ScheduledInterview({ sessionId }: { sessionId: ObjectId }) {
   const session = answered ?? resource.data;
 
   if (resource.isLoading && !session) {
-    return <LoadingBlock label="Loading interview…" />;
+    return (
+      <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6 sm:py-8">
+        <LoadingBlock label="Loading interview…" />
+      </div>
+    );
   }
   if (resource.error && !session) {
     return (
-      <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
+      <div className="mx-auto w-full max-w-3xl space-y-4 px-4 py-6 sm:px-6 sm:py-8">
         <ErrorBlock message={resource.error} onRetry={resource.reload} />
-        <p className="mt-4 text-center text-sm text-[#898b96]">
-          <Link
-            href="/candidate/applications"
-            className="font-semibold text-brand hover:text-brand-dark"
-          >
-            Back to my applications
-          </Link>
-        </p>
+        <Button href="/candidate/applications" variant="secondary">
+          Back to my applications
+        </Button>
       </div>
     );
   }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { UserRound } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { toErrorMessage } from "@/lib/api";
 import {
@@ -9,14 +10,23 @@ import {
   updateCandidateProfile,
 } from "@/lib/authApi";
 import { RESUME_MAX_BYTES } from "@/lib/resumeApi";
-import { formatFileSize, initials } from "@/lib/format";
+import { badgeClass, formatFileSize } from "@/lib/format";
 import {
   Card,
   InlineError,
   InlineSuccess,
   PageHeader,
 } from "@/components/ui/Feedback";
-import { inputClass, labelClass, primaryButtonClass } from "@/components/ui/controls";
+import { Avatar } from "@/components/ui/Avatar";
+import { Button } from "@/components/ui/Button";
+import {
+  checkboxClass,
+  helpTextClass,
+  inputClass,
+  labelClass,
+  textareaClass,
+} from "@/components/ui/controls";
+import { PortalPage } from "@/components/dashboard/primitives";
 
 const MAX_MB = RESUME_MAX_BYTES / (1024 * 1024);
 const HEADLINE_MAX = 120;
@@ -95,37 +105,43 @@ export function CandidateProfile() {
   };
 
   const showExistingAvatar = Boolean(user?.avatarUrl) && !removeAvatar && !avatar;
+  const completed = [
+    Boolean(user?.avatarUrl || avatar) && !removeAvatar,
+    Boolean(headline.trim()),
+    Boolean(about.trim()),
+    parsedInterests.length > 0,
+  ].filter(Boolean).length;
+  const completion = Math.round((completed / 4) * 100);
 
   return (
-    <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
-      <div className="mx-auto max-w-2xl">
-        <PageHeader
-          title="My Profile"
-          description="How you present yourself. Your name and email come from your account and can't be changed here."
-        />
+    <PortalPage>
+      <PageHeader
+        title="My profile"
+        description="How you present yourself. Your name and email come from your account and can't be changed here."
+        icon={<UserRound />}
+      />
 
-        <Card>
+      <div className="grid grid-cols-1 gap-4 lg:gap-6 xl:grid-cols-3">
+        <Card
+          title="Profile details"
+          description="Shown to employers alongside your applications."
+          className="xl:col-span-2"
+        >
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && <InlineError message={error} />}
             {success && <InlineSuccess message={success} />}
 
-            <div className="flex items-center gap-4">
-              {showExistingAvatar ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={user!.avatarUrl}
-                  alt=""
-                  referrerPolicy="no-referrer"
-                  className="h-16 w-16 rounded-full object-cover"
-                />
-              ) : (
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-indigo-100 text-lg font-bold text-indigo-700">
-                  {initials(user?.name ?? "?")}
-                </div>
-              )}
+            <div className="flex items-center gap-4 rounded-xl bg-surface-2 p-4">
+              <Avatar
+                name={user?.name ?? "?"}
+                src={showExistingAvatar ? user!.avatarUrl : null}
+                size="xl"
+              />
               <div className="min-w-0">
-                <p className="font-semibold text-[#292b35]">{user?.name}</p>
-                <p className="truncate text-sm text-[#898b96]">{user?.email}</p>
+                <p className="truncate text-base font-semibold text-ink">
+                  {user?.name}
+                </p>
+                <p className="truncate text-sm text-muted">{user?.email}</p>
               </div>
             </div>
 
@@ -139,14 +155,14 @@ export function CandidateProfile() {
                 type="file"
                 accept={AVATAR_ACCEPT_ATTRIBUTE}
                 onChange={(event) => handleFile(event.target.files?.[0])}
-                className="w-full rounded border border-[#e9eaf0] bg-white px-4 py-3 text-sm text-[#686b77] file:mr-4 file:rounded-lg file:border-0 file:bg-indigo-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-indigo-700"
+                className="block w-full cursor-pointer rounded-lg border border-line bg-white text-sm text-muted shadow-xs transition file:mr-4 file:h-10 file:cursor-pointer file:border-0 file:border-r file:border-line file:bg-surface-2 file:px-4 file:text-sm file:font-semibold file:text-body hover:file:bg-surface-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
               />
-              <p className="mt-2 text-xs text-[#9698a2]">
+              <p className={helpTextClass}>
                 JPG, PNG or WEBP, max {MAX_MB}MB.
                 {avatar && ` Selected: ${avatar.name} · ${formatFileSize(avatar.size)}`}
               </p>
               {user?.avatarUrl && (
-                <label className="mt-2 flex items-center gap-2 text-sm text-[#686b77]">
+                <label className="mt-3 inline-flex items-center gap-2 text-sm text-body">
                   <input
                     type="checkbox"
                     checked={removeAvatar}
@@ -157,7 +173,7 @@ export function CandidateProfile() {
                         if (fileRef.current) fileRef.current.value = "";
                       }
                     }}
-                    className="h-4 w-4 rounded border-[#e3e4ec] text-indigo-600 focus:ring-indigo-500"
+                    className={checkboxClass}
                   />
                   Remove my current photo
                 </label>
@@ -177,7 +193,7 @@ export function CandidateProfile() {
                 placeholder="e.g. Frontend developer focused on React"
                 className={inputClass}
               />
-              <p className="mt-2 text-xs text-[#9698a2]">
+              <p className={`${helpTextClass} text-right tabular-nums`}>
                 {headline.length}/{HEADLINE_MAX}
               </p>
             </div>
@@ -193,9 +209,9 @@ export function CandidateProfile() {
                 value={about}
                 onChange={(event) => setAbout(event.target.value)}
                 placeholder="A short summary of your experience and what you're looking for."
-                className={`${inputClass} resize-none`}
+                className={`${textareaClass} resize-none`}
               />
-              <p className="mt-2 text-xs text-[#9698a2]">
+              <p className={`${helpTextClass} text-right tabular-nums`}>
                 {about.length}/{ABOUT_MAX}
               </p>
             </div>
@@ -212,14 +228,11 @@ export function CandidateProfile() {
                 placeholder="e.g. react, system design, machine learning"
                 className={inputClass}
               />
-              <p className="mt-2 text-xs text-[#9698a2]">Comma separated.</p>
+              <p className={helpTextClass}>Comma separated.</p>
               {parsedInterests.length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-1.5">
                   {parsedInterests.map((item) => (
-                    <span
-                      key={item}
-                      className="rounded-full border border-indigo-100 bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-700"
-                    >
+                    <span key={item} className={badgeClass("brand")}>
                       {item}
                     </span>
                   ))}
@@ -227,12 +240,74 @@ export function CandidateProfile() {
               )}
             </div>
 
-            <button type="submit" disabled={isSaving} className={primaryButtonClass}>
-              {isSaving ? "Saving…" : "Save profile"}
-            </button>
+            <div className="flex flex-col-reverse gap-3 border-t border-line-soft pt-5 sm:flex-row sm:justify-end">
+              <Button type="submit" loading={isSaving}>
+                {isSaving ? "Saving…" : "Save profile"}
+              </Button>
+            </div>
           </form>
         </Card>
+
+        <Card
+          title="Profile preview"
+          description="A live preview of your candidate profile."
+          className="xl:sticky xl:top-6 xl:self-start"
+        >
+          <div className="flex items-center gap-3">
+            <Avatar
+              name={user?.name ?? "?"}
+              src={showExistingAvatar ? user!.avatarUrl : null}
+              size="lg"
+            />
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-ink">
+                {user?.name}
+              </p>
+              <p className="text-sm text-muted">
+                {headline.trim() || "Add a headline"}
+              </p>
+            </div>
+          </div>
+          {about.trim() && (
+            <p className="mt-4 line-clamp-6 whitespace-pre-line text-sm leading-6 text-body">
+              {about}
+            </p>
+          )}
+          {parsedInterests.length > 0 && (
+            <div className="mt-4 flex flex-wrap gap-1.5">
+              {parsedInterests.map((item) => (
+                <span key={item} className={badgeClass("neutral")}>
+                  {item}
+                </span>
+              ))}
+            </div>
+          )}
+          <div className="mt-5 border-t border-line-soft pt-4">
+            <div className="flex items-center justify-between text-sm">
+              <span className="font-medium text-body">Profile strength</span>
+              <span className="font-semibold tabular-nums text-ink">
+                {completion}%
+              </span>
+            </div>
+            <div
+              role="progressbar"
+              aria-label="Profile strength"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={completion}
+              className="mt-2 h-2 overflow-hidden rounded-full bg-surface-3"
+            >
+              <div
+                className="h-full rounded-full bg-brand-600 transition-[width]"
+                style={{ width: `${completion}%` }}
+              />
+            </div>
+            <p className="mt-2 text-xs text-muted">
+              Add a photo, headline, about section and interests to stand out.
+            </p>
+          </div>
+        </Card>
       </div>
-    </div>
+    </PortalPage>
   );
 }

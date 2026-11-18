@@ -11,7 +11,7 @@ export const PricingCards = ({ compact = false }: { compact?: boolean }) => (
     whileInView="visible"
     viewport={{ once: true, amount: 0.2 }}
     variants={stagger}
-    className={`grid grid-cols-1 gap-px bg-[#e0d6ea] ${compact ? "md:grid-cols-3" : "lg:grid-cols-3"}`}
+    className={`grid grid-cols-1 gap-px bg-line ${compact ? "md:grid-cols-3" : "lg:grid-cols-3"}`}
   >
     {pricingPlans.map((plan) => (
       <motion.div
@@ -19,12 +19,12 @@ export const PricingCards = ({ compact = false }: { compact?: boolean }) => (
         variants={fadeUp}
         className={`relative flex flex-col p-8 ${
           plan.highlighted
-            ? "border-t-4 border-[#d4b8f0] bg-navy text-white"
+            ? "border-t-4 border-brand-200 bg-navy text-white"
             : "bg-white text-ink"
         }`}
       >
         {plan.highlighted && (
-          <span className="mb-4 text-[11px] font-semibold tracking-[0.16em] text-[#d4b8f0] uppercase">
+          <span className="mb-4 text-xs font-semibold tracking-[0.16em] text-brand-200 uppercase">
             Most selected
           </span>
         )}
@@ -33,7 +33,7 @@ export const PricingCards = ({ compact = false }: { compact?: boolean }) => (
           <span className="font-display text-4xl">{plan.price}</span>
           {plan.period && (
             <span
-              className={`text-sm ${plan.highlighted ? "text-[#9aa6c2]" : "text-[#6b5f7a]"}`}
+              className={`text-sm ${plan.highlighted ? "text-subtle" : "text-muted"}`}
             >
               {plan.period}
             </span>
@@ -41,7 +41,7 @@ export const PricingCards = ({ compact = false }: { compact?: boolean }) => (
         </div>
         <p
           className={`mb-6 text-sm leading-relaxed ${
-            plan.highlighted ? "text-[#9aa6c2]" : "text-[#6b5f7a]"
+            plan.highlighted ? "text-subtle" : "text-muted"
           }`}
         >
           {plan.description}
@@ -49,7 +49,7 @@ export const PricingCards = ({ compact = false }: { compact?: boolean }) => (
         <ul className="mb-8 flex-1 space-y-3">
           {plan.features.map((feature) => (
             <li key={feature} className="flex items-start gap-2 text-sm">
-              <span className={plan.highlighted ? "text-[#d4b8f0]" : "text-ink"}>
+              <span className={plan.highlighted ? "text-brand-200" : "text-ink"}>
                 —
               </span>
               {feature}
@@ -60,7 +60,7 @@ export const PricingCards = ({ compact = false }: { compact?: boolean }) => (
           href={plan.href}
           className={`block px-6 py-3 text-center text-sm font-semibold transition ${
             plan.highlighted
-              ? "bg-white text-ink hover:bg-[#f6f3f9]"
+              ? "bg-white text-ink hover:bg-canvas"
               : "bg-navy text-white hover:bg-brand"
           }`}
         >

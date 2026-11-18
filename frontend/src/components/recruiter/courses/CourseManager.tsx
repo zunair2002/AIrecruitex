@@ -1,6 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import {
+  CirclePlay,
+  ExternalLink,
+  GraduationCap,
+  Pencil,
+  Trash2,
+} from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { toErrorMessage } from "@/lib/api";
 import {
@@ -19,23 +26,25 @@ import {
 } from "@/lib/types";
 import { formatDate } from "@/lib/format";
 import {
+  Badge,
+  Button,
   Card,
   EmptyState,
   ErrorBlock,
   InlineError,
   InlineSuccess,
-  LoadingBlock,
   PageHeader,
+  SkeletonCard,
   SkillChips,
-} from "@/components/ui/Feedback";
+} from "@/components/ui";
 import {
-  dangerButtonClass,
+  errorTextClass,
+  helpTextClass,
   inputClass,
   labelClass,
-  primaryButtonClass,
-  secondaryButtonClass,
-  smallButtonClass,
+  textareaClass,
 } from "@/components/ui/controls";
+import { PortalPage } from "@/components/dashboard/primitives";
 import { useToast } from "@/context/ToastContext";
 
 const TITLE_MAX = 120;
@@ -48,6 +57,14 @@ const EMPTY: CourseInput = {
   videoUrl: "",
   topics: [],
 };
+
+function Required() {
+  return (
+    <span aria-hidden="true" className="ml-0.5 text-rose-600">
+      *
+    </span>
+  );
+}
 
 /**
  * HR's course library. `PUT` replaces every field, so editing loads the course
@@ -156,186 +173,242 @@ export function CourseManager() {
   };
 
   const list = courses.data ?? [];
+  const showVideoError = Boolean(form.videoUrl.trim()) && !isHttps;
 
   return (
-    <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
+    <PortalPage>
       <PageHeader
-        title="Learning Courses"
+        title="Learning courses"
         description="Material candidates see under Learning. Useful for the weak topics interview reports flag."
+        icon={<GraduationCap />}
       />
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
-        <div className="lg:col-span-2">
-          <Card title={editingId ? "Edit course" : "Publish a course"}>
-            <form onSubmit={handleSubmit} className="space-y-5">
-              {error && <InlineError message={error} />}
-              {success && <InlineSuccess message={success} />}
+      <div className="grid grid-cols-1 items-start gap-4 lg:gap-6 xl:grid-cols-5">
+        {/* ---- create / edit form ---- */}
+        <Card
+          title={editingId ? "Edit course" : "Publish a course"}
+          description={
+            editingId
+              ? "Changes replace the course for every candidate."
+              : "It appears in every candidate's Learning tab."
+          }
+          action={editingId ? <Badge tone="brand">Editing</Badge> : undefined}
+          className="xl:sticky xl:top-6 xl:col-span-2"
+        >
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {error && <InlineError message={error} />}
+            {success && <InlineSuccess message={success} />}
 
-              <div>
-                <label htmlFor="course-title" className={labelClass}>
-                  Title <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id="course-title"
-                  type="text"
-                  maxLength={TITLE_MAX}
-                  value={form.title}
-                  onChange={(event) => update("title", event.target.value)}
-                  placeholder="e.g. React hooks in depth"
-                  className={inputClass}
-                />
-                <p className="mt-1 text-xs text-[#9698a2]">
-                  {form.title.length}/{TITLE_MAX}
-                </p>
-              </div>
+            <div>
+              <label htmlFor="course-title" className={labelClass}>
+                Title <Required />
+              </label>
+              <input
+                id="course-title"
+                type="text"
+                maxLength={TITLE_MAX}
+                value={form.title}
+                onChange={(event) => update("title", event.target.value)}
+                placeholder="e.g. React hooks in depth"
+                className={inputClass}
+              />
+              <p className={`${helpTextClass} text-right tabular-nums`}>
+                {form.title.length}/{TITLE_MAX}
+              </p>
+            </div>
 
-              <div>
-                <label htmlFor="course-description" className={labelClass}>
-                  Description <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  id="course-description"
-                  rows={4}
-                  maxLength={DESCRIPTION_MAX}
-                  value={form.description}
-                  onChange={(event) => update("description", event.target.value)}
-                  placeholder="What the course covers and who it's for."
-                  className={`${inputClass} resize-none`}
-                />
-                <p className="mt-1 text-xs text-[#9698a2]">
-                  {form.description.length}/{DESCRIPTION_MAX}
-                </p>
-              </div>
+            <div>
+              <label htmlFor="course-description" className={labelClass}>
+                Description <Required />
+              </label>
+              <textarea
+                id="course-description"
+                rows={4}
+                maxLength={DESCRIPTION_MAX}
+                value={form.description}
+                onChange={(event) => update("description", event.target.value)}
+                placeholder="What the course covers and who it's for."
+                className={`${textareaClass} resize-y`}
+              />
+              <p className={`${helpTextClass} text-right tabular-nums`}>
+                {form.description.length}/{DESCRIPTION_MAX}
+              </p>
+            </div>
 
-              <div>
-                <label htmlFor="course-video" className={labelClass}>
-                  Video URL <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id="course-video"
-                  type="url"
-                  value={form.videoUrl}
-                  onChange={(event) => update("videoUrl", event.target.value)}
-                  placeholder="https://…"
-                  className={inputClass}
-                />
-                {form.videoUrl.trim() && !isHttps && (
-                  <p className="mt-1 text-xs font-medium text-red-600">
-                    Must start with https://
-                  </p>
-                )}
-              </div>
+            <div>
+              <label htmlFor="course-video" className={labelClass}>
+                Video URL <Required />
+              </label>
+              <input
+                id="course-video"
+                type="url"
+                value={form.videoUrl}
+                onChange={(event) => update("videoUrl", event.target.value)}
+                placeholder="https://…"
+                aria-invalid={showVideoError}
+                className={inputClass}
+              />
+              {showVideoError && (
+                <p className={errorTextClass}>Must start with https://</p>
+              )}
+            </div>
 
-              <div>
-                <span className={labelClass}>
-                  Topics <span className="text-red-500">*</span>
-                </span>
-                <TopicPicker
-                  heading="Technical"
-                  topics={[...COURSE_TECH_TOPICS]}
-                  selected={form.topics}
-                  onToggle={toggleTopic}
-                />
-                <TopicPicker
-                  heading="Behavioural"
-                  topics={[...COURSE_BASIC_TOPICS]}
-                  selected={form.topics}
-                  onToggle={toggleTopic}
-                />
-                <p className="mt-2 text-xs text-[#9698a2]">
-                  Pick at least one. These match the topics interviews are scored
-                  against.
-                </p>
-              </div>
+            <fieldset>
+              <legend className={labelClass}>
+                Topics <Required />
+              </legend>
+              <TopicPicker
+                heading="Technical"
+                topics={[...COURSE_TECH_TOPICS]}
+                selected={form.topics}
+                onToggle={toggleTopic}
+              />
+              <TopicPicker
+                heading="Behavioural"
+                topics={[...COURSE_BASIC_TOPICS]}
+                selected={form.topics}
+                onToggle={toggleTopic}
+              />
+              <p className={helpTextClass}>
+                Pick at least one. These match the topics interviews are scored
+                against.
+              </p>
+            </fieldset>
 
-              <div className="flex items-center gap-3">
-                <button
-                  type="submit"
-                  disabled={!isValid || isSaving}
-                  className={primaryButtonClass}
-                >
-                  {isSaving
-                    ? "Saving…"
-                    : editingId
-                      ? "Save changes"
-                      : "Publish course"}
-                </button>
-                {editingId && (
-                  <button
-                    type="button"
-                    onClick={resetForm}
-                    className={secondaryButtonClass}
-                  >
-                    Cancel
-                  </button>
-                )}
-              </div>
-            </form>
-          </Card>
-        </div>
+            <div className="flex flex-col-reverse gap-3 border-t border-line-soft pt-5 sm:flex-row sm:justify-end">
+              {editingId && (
+                <Button variant="secondary" onClick={resetForm}>
+                  Cancel
+                </Button>
+              )}
+              <Button
+                type="submit"
+                disabled={!isValid || isSaving}
+                loading={isSaving}
+              >
+                {isSaving
+                  ? "Saving…"
+                  : editingId
+                    ? "Save changes"
+                    : "Publish course"}
+              </Button>
+            </div>
+          </form>
+        </Card>
 
-        <div className="lg:col-span-3">
+        {/* ---- library ---- */}
+        <section aria-label="Your courses" className="min-w-0 space-y-4 xl:col-span-3">
           {courses.isLoading ? (
-            <LoadingBlock label="Loading courses…" />
+            <div
+              role="status"
+              aria-label="Loading courses…"
+              className="grid grid-cols-1 gap-4 md:grid-cols-2"
+            >
+              <SkeletonCard />
+              <SkeletonCard />
+            </div>
           ) : courses.error ? (
             <ErrorBlock message={courses.error} onRetry={courses.reload} />
           ) : list.length === 0 ? (
             <EmptyState
+              icon={<GraduationCap />}
               title="No courses yet."
               description="Publish one and it appears in every candidate's Learning tab."
             />
           ) : (
-            <div className="space-y-4">
-              {list.map((course) => (
-                <Card key={course._id}>
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <h2 className="font-bold text-[#292b35]">{course.title}</h2>
-                      <p className="mt-1 text-xs text-[#898b96]">
-                        Added {formatDate(course.createdAt)}
-                        {!course.isActive && " · hidden from candidates"}
+            <>
+              <div className="flex items-baseline justify-between gap-3">
+                <h2 className="text-base font-semibold text-ink">Your courses</h2>
+                <span className="text-sm text-muted tabular-nums">
+                  {list.length} course{list.length === 1 ? "" : "s"}
+                </span>
+              </div>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                {list.map((course) => {
+                  const isEditing = editingId === course._id;
+                  return (
+                    <article
+                      key={course._id}
+                      className={`flex min-w-0 flex-col rounded-xl border bg-surface p-5 shadow-xs transition-colors ${
+                        isEditing
+                          ? "border-brand-300 ring-2 ring-brand-500/20"
+                          : "border-line hover:border-brand-200"
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <span
+                          aria-hidden="true"
+                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-700"
+                        >
+                          <CirclePlay className="h-5 w-5" />
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <h3 className="text-base font-semibold text-ink">
+                            {course.title}
+                          </h3>
+                          <p className="mt-0.5 text-xs text-muted">
+                            Added {formatDate(course.createdAt)}
+                          </p>
+                        </div>
+                        {!course.isActive && (
+                          <Badge tone="neutral" title="Hidden from candidates">
+                            Hidden
+                          </Badge>
+                        )}
+                      </div>
+                      {!course.isActive && (
+                        <span className="sr-only">Hidden from candidates.</span>
+                      )}
+
+                      <p className="mt-4 line-clamp-3 whitespace-pre-line text-sm text-muted">
+                        {course.description}
                       </p>
-                    </div>
-                    <div className="flex shrink-0 gap-2">
-                      <button
-                        type="button"
-                        onClick={() => startEditing(course)}
-                        disabled={busyId === course._id}
-                        className={smallButtonClass}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleDelete(course)}
-                        disabled={busyId === course._id}
-                        className={dangerButtonClass}
-                      >
-                        {busyId === course._id ? "Deleting…" : "Delete"}
-                      </button>
-                    </div>
-                  </div>
-                  <p className="mt-3 whitespace-pre-line text-sm text-[#686b77]">
-                    {course.description}
-                  </p>
-                  <div className="mt-3">
-                    <SkillChips skills={course.topics.map(topicLabel)} />
-                  </div>
-                  <a
-                    href={course.videoUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-3 inline-block text-sm font-medium text-indigo-600 hover:text-indigo-800"
-                  >
-                    Open video
-                  </a>
-                </Card>
-              ))}
-            </div>
+                      <div className="mt-4 flex-1">
+                        <SkillChips
+                          skills={course.topics.map(topicLabel)}
+                          tone="gray"
+                        />
+                      </div>
+
+                      <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-line-soft pt-4">
+                        <a
+                          href={course.videoUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="mr-auto inline-flex h-8 items-center gap-1.5 rounded-lg text-sm font-medium text-brand-700 hover:text-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+                        >
+                          Open video
+                          <ExternalLink aria-hidden="true" className="h-4 w-4" />
+                        </a>
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => startEditing(course)}
+                          disabled={busyId === course._id}
+                          leadingIcon={<Pencil aria-hidden="true" />}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="danger-soft"
+                          size="sm"
+                          onClick={() => handleDelete(course)}
+                          disabled={busyId === course._id}
+                          loading={busyId === course._id}
+                          leadingIcon={<Trash2 aria-hidden="true" />}
+                        >
+                          {busyId === course._id ? "Deleting…" : "Delete"}
+                        </Button>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            </>
           )}
-        </div>
+        </section>
       </div>
-    </div>
+    </PortalPage>
   );
 }
 
@@ -352,21 +425,20 @@ function TopicPicker({
 }) {
   return (
     <div className="mt-3">
-      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#898b96]">
-        {heading}
-      </p>
-      <div className="flex flex-wrap gap-1.5">
+      <p className="mb-2 text-xs font-medium text-muted">{heading}</p>
+      <div className="flex flex-wrap gap-2">
         {topics.map((topic) => {
           const isOn = selected.includes(topic);
           return (
             <button
               key={topic}
               type="button"
+              aria-pressed={isOn}
               onClick={() => onToggle(topic)}
-              className={`rounded-full border px-2.5 py-1 text-xs font-medium transition-colors ${
+              className={`inline-flex min-h-8 items-center rounded-full border px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 ${
                 isOn
-                  ? "border-indigo-300 bg-indigo-600 text-white"
-                  : "border-[#e9eaf0] bg-white text-[#686b77] hover:bg-[#f8f8fb]"
+                  ? "border-brand-700 bg-brand-700 text-white hover:bg-brand-800"
+                  : "border-line bg-white text-body hover:border-brand-200 hover:bg-brand-50"
               }`}
             >
               {topicLabel(topic)}

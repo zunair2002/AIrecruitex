@@ -1,20 +1,32 @@
 type ScoreBarProps = {
   label: string;
   score: number;
+  /** Legacy gradient hint, kept for callers; the bar uses the brand fill. */
   gradient: string;
 };
 
+/** A labelled 0–100 score with a progress bar (stage scores in reports). */
 export function ScoreBar({ label, score }: ScoreBarProps) {
+  const width = Math.max(0, Math.min(100, score));
   return (
-    <div className="bg-white rounded border border-[#f1f1f5] p-5">
-      <div className="flex items-center justify-between mb-3">
-        <p className="text-sm font-semibold text-[#44464f]">{label}</p>
-        <p className="text-2xl font-bold text-[#292b35]">{score}%</p>
+    <div className="min-w-0 rounded-xl border border-line bg-surface p-5 shadow-xs">
+      <div className="mb-3 flex items-baseline justify-between gap-3">
+        <p className="min-w-0 text-sm font-medium text-muted">{label}</p>
+        <p className="font-display text-2xl font-semibold tracking-tight tabular-nums text-ink">
+          {score}%
+        </p>
       </div>
-      <div className="h-3 bg-[#f3f3f6] rounded-full overflow-hidden">
+      <div
+        role="progressbar"
+        aria-label={label}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={width}
+        className="h-2 overflow-hidden rounded-full bg-surface-3"
+      >
         <div
-          className="h-full rounded-full bg-brand transition-all duration-500"
-          style={{ width: `${score}%` }}
+          className="h-full rounded-full bg-brand-600 transition-[width] duration-500 motion-reduce:transition-none"
+          style={{ width: `${width}%` }}
         />
       </div>
     </div>
@@ -25,20 +37,32 @@ type FinalScoreRingProps = {
   score: number;
 };
 
+/** The big circular final score (brand gradient). */
 export function FinalScoreRing({ score }: FinalScoreRingProps) {
-  const radius = 54;
+  const radius = 52;
   const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (score / 100) * circumference;
+  const clamped = Math.max(0, Math.min(100, score));
+  const offset = circumference - (clamped / 100) * circumference;
 
   return (
-    <div className="relative w-40 h-40 mx-auto">
-      <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
+    <div className="relative mx-auto h-40 w-40">
+      <svg
+        className="h-full w-full -rotate-90"
+        viewBox="0 0 120 120"
+        aria-hidden="true"
+      >
+        <defs>
+          <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="var(--color-brand-500)" />
+            <stop offset="100%" stopColor="var(--color-brand-700)" />
+          </linearGradient>
+        </defs>
         <circle
           cx="60"
           cy="60"
           r={radius}
           fill="none"
-          stroke="#f3f4f6"
+          stroke="var(--color-surface-3)"
           strokeWidth="10"
         />
         <circle
@@ -51,18 +75,14 @@ export function FinalScoreRing({ score }: FinalScoreRingProps) {
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
-          className="transition-all duration-700"
+          className="transition-[stroke-dashoffset] duration-700 motion-reduce:transition-none"
         />
-        <defs>
-          <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#FF5A1F" />
-            <stop offset="100%" stopColor="#E04A15" />
-          </linearGradient>
-        </defs>
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <p className="text-4xl font-bold text-[#292b35]">{score}%</p>
-        <p className="text-xs text-[#898b96] font-medium mt-1">Final Score</p>
+        <p className="font-display text-4xl font-semibold tracking-tight tabular-nums text-ink">
+          {score}%
+        </p>
+        <p className="mt-1 text-xs font-medium text-muted">Final score</p>
       </div>
     </div>
   );

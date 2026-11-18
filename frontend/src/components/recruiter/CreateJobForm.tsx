@@ -1,7 +1,16 @@
 "use client";
 
-import Link from "next/link";
 import { useRef, useState } from "react";
+import {
+  CircleCheck,
+  CloudUpload,
+  ExternalLink,
+  FileText,
+  ListChecks,
+  Plus,
+  ScanSearch,
+  Sparkles,
+} from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { toErrorMessage } from "@/lib/api";
 import { createJob, JD_FILE_FIELD } from "@/lib/jobsApi";
@@ -12,16 +21,31 @@ import {
 } from "@/lib/resumeApi";
 import { formatFileSize } from "@/lib/format";
 import type { Job } from "@/lib/types";
-import { InlineError, PageHeader, SkillChips } from "@/components/ui/Feedback";
 import {
+  Button,
+  Card,
+  InlineError,
+  PageHeader,
+  SkillChips,
+} from "@/components/ui";
+import {
+  helpTextClass,
   inputClass,
   labelClass,
-  primaryButtonClass,
-  secondaryButtonClass,
+  textareaClass,
 } from "@/components/ui/controls";
+import { PortalPage } from "@/components/dashboard/primitives";
 import { useToast } from "@/context/ToastContext";
 
 const MAX_SIZE_MB = RESUME_MAX_BYTES / (1024 * 1024);
+
+function Required() {
+  return (
+    <span aria-hidden="true" className="ml-0.5 text-rose-600">
+      *
+    </span>
+  );
+}
 
 /**
  * POST /api/jobs — the backend's Job schema has exactly these writable fields:
@@ -107,167 +131,299 @@ export function CreateJobForm() {
 
   if (created) {
     return (
-      <div className="mx-auto max-w-xl py-12 text-center">
-        <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-2xl font-bold text-emerald-700">
-          OK
-        </div>
-        <h2 className="text-2xl font-bold text-[#292b35]">Job posted</h2>
-        <p className="mt-3 text-[#898b96]">
-          <span className="font-semibold text-[#44464f]">{created.title}</span>{" "}
-          is now open. Candidates can apply and will be scored against its
-          required skills.
-        </p>
+      <PortalPage>
+        <div className="mx-auto w-full max-w-xl">
+          <Card>
+            <div className="text-center">
+              <span
+                aria-hidden="true"
+                className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-brand-50 text-brand-600 ring-1 ring-inset ring-brand-600/20"
+              >
+                <CircleCheck className="h-6 w-6" />
+              </span>
+              <h1 className="mt-4 font-display text-xl font-semibold tracking-tight text-ink sm:text-2xl">
+                Job posted
+              </h1>
+              <p className="mx-auto mt-2 max-w-md text-sm text-muted">
+                <span className="font-semibold text-ink">{created.title}</span>{" "}
+                is now open. Candidates can apply and will be scored against its
+                required skills.
+              </p>
+            </div>
 
-        <div className="mt-6 rounded border border-[#f1f1f5] bg-white p-6 text-left ">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#898b96]">
-            Required skills stored ({created.requiredSkills.length})
-          </p>
-          <SkillChips skills={created.requiredSkills} />
-          {created.jdFileUrl && (
-            <a
-              href={created.jdFileUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-4 inline-block text-sm font-medium text-brand hover:text-brand-dark"
-            >
-              View uploaded job description
-            </a>
-          )}
-        </div>
+            <div className="mt-6 rounded-lg border border-line-soft bg-surface-2 p-4">
+              <p className="text-xs font-medium text-muted">
+                Required skills stored ({created.requiredSkills.length})
+              </p>
+              <div className="mt-2.5">
+                <SkillChips skills={created.requiredSkills} />
+              </div>
+              {created.jdFileUrl && (
+                <a
+                  href={created.jdFileUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-4 inline-flex items-center gap-1.5 rounded-md text-sm font-medium text-brand-700 hover:text-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+                >
+                  View uploaded job description
+                  <ExternalLink aria-hidden="true" className="h-4 w-4" />
+                </a>
+              )}
+            </div>
 
-        <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-          <Link
-            href={`/recruiter/applicants?jobId=${created._id}`}
-            className={`${primaryButtonClass} text-sm`}
-          >
-            View applicants
-          </Link>
-          <button
-            type="button"
-            onClick={resetForm}
-            className={`${secondaryButtonClass} text-sm`}
-          >
-            Post another job
-          </button>
+            <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-center">
+              <Button
+                variant="secondary"
+                onClick={resetForm}
+                leadingIcon={<Plus aria-hidden="true" />}
+              >
+                Post another job
+              </Button>
+              <Button href={`/recruiter/applicants?jobId=${created._id}`}>
+                View applicants
+              </Button>
+            </div>
+          </Card>
         </div>
-      </div>
+      </PortalPage>
     );
   }
 
   return (
-    <div className="max-w-2xl">
+    <PortalPage>
       <PageHeader
-        title="Create Job"
+        title="Create job"
         description="Candidates' resumes are matched against the required skills you list here."
+        backHref="/recruiter/jobs"
+        backLabel="Back to jobs"
       />
 
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-6 rounded border border-[#f1f1f5] bg-white p-8 "
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-6">
+        <form
+          onSubmit={handleSubmit}
+          className="min-w-0 rounded-xl border border-line bg-surface shadow-xs lg:col-span-2"
+        >
+          <div className="space-y-8 p-5 sm:p-6">
+            {error && <InlineError message={error} />}
+
+            {/* ---- details ---- */}
+            <section className="space-y-5">
+              <div>
+                <h2 className="text-base font-semibold text-ink">Job details</h2>
+                <p className="mt-1 text-sm text-muted">
+                  What candidates see when they browse open roles.
+                </p>
+              </div>
+
+              <div>
+                <label htmlFor="job-title" className={labelClass}>
+                  Job title <Required />
+                </label>
+                <input
+                  id="job-title"
+                  type="text"
+                  value={title}
+                  onChange={(event) => setTitle(event.target.value)}
+                  placeholder="e.g. React Developer"
+                  className={inputClass}
+                  required
+                />
+              </div>
+
+              <div>
+                <label htmlFor="job-description" className={labelClass}>
+                  Description <Required />
+                </label>
+                <textarea
+                  id="job-description"
+                  value={description}
+                  onChange={(event) => setDescription(event.target.value)}
+                  rows={6}
+                  placeholder="Describe the role, responsibilities and what you're looking for…"
+                  className={`${textareaClass} resize-y`}
+                  required
+                />
+              </div>
+            </section>
+
+            {/* ---- skills ---- */}
+            <section className="space-y-5 border-t border-line-soft pt-8">
+              <div>
+                <h2 className="text-base font-semibold text-ink">Matching</h2>
+                <p className="mt-1 text-sm text-muted">
+                  List the required skills, attach the job description, or both.
+                </p>
+              </div>
+
+              <div>
+                <div className="flex items-baseline justify-between gap-3">
+                  <label htmlFor="job-skills" className={labelClass}>
+                    Required skills
+                  </label>
+                  <span className="text-xs text-muted tabular-nums">
+                    {uniqueSkills.length} skill
+                    {uniqueSkills.length === 1 ? "" : "s"}
+                  </span>
+                </div>
+                <input
+                  id="job-skills"
+                  type="text"
+                  value={skillsInput}
+                  onChange={(event) => setSkillsInput(event.target.value)}
+                  placeholder="e.g. react, typescript, node.js, mongodb"
+                  aria-describedby="job-skills-help"
+                  className={inputClass}
+                />
+                <p id="job-skills-help" className={helpTextClass}>
+                  Comma separated. These are the exact terms searched in each
+                  candidate&apos;s resume text — the match score is the share of
+                  them found.
+                </p>
+                <div className="mt-3 rounded-lg border border-dashed border-line bg-surface-2 p-3">
+                  {uniqueSkills.length > 0 ? (
+                    <SkillChips skills={uniqueSkills} />
+                  ) : (
+                    <p className="text-sm text-muted">
+                      Skills you type appear here as chips.
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="job-jd" className={labelClass}>
+                  Job description file{" "}
+                  <span className="font-normal text-muted">(optional)</span>
+                </label>
+                <div
+                  className={`relative flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-6 py-8 text-center transition-colors focus-within:border-brand-500 focus-within:ring-4 focus-within:ring-brand-500/10 hover:border-brand-300 hover:bg-brand-50/50 ${
+                    jdFile
+                      ? "border-brand-200 bg-brand-50/50"
+                      : "border-line bg-surface-2/60"
+                  }`}
+                >
+                  <input
+                    id="job-jd"
+                    ref={fileInputRef}
+                    name={JD_FILE_FIELD}
+                    type="file"
+                    accept={RESUME_ACCEPT_ATTRIBUTE}
+                    onChange={(event) => handleFile(event.target.files?.[0])}
+                    aria-describedby="job-jd-help"
+                    className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                  />
+                  <span
+                    aria-hidden="true"
+                    className="flex h-10 w-10 items-center justify-center rounded-lg bg-white text-brand-700 shadow-xs ring-1 ring-inset ring-line"
+                  >
+                    {jdFile ? (
+                      <FileText className="h-5 w-5" />
+                    ) : (
+                      <CloudUpload className="h-5 w-5" />
+                    )}
+                  </span>
+                  {jdFile ? (
+                    <>
+                      <p className="max-w-full break-all text-sm font-medium text-ink">
+                        {jdFile.name}
+                      </p>
+                      <p className="text-xs text-muted">
+                        {formatFileSize(jdFile.size)} · click to replace
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-sm text-body">
+                        <span className="font-semibold text-brand-700">
+                          Click to upload
+                        </span>{" "}
+                        or drag and drop
+                      </p>
+                      <p className="text-xs text-muted">
+                        PDF or DOCX, max {MAX_SIZE_MB}MB
+                      </p>
+                    </>
+                  )}
+                </div>
+                <p id="job-jd-help" className={helpTextClass}>
+                  If you leave the skills field empty, skills are suggested from
+                  this file&apos;s text.
+                </p>
+              </div>
+            </section>
+          </div>
+
+          <div className="flex flex-col-reverse gap-3 rounded-b-xl border-t border-line-soft bg-surface-2/60 px-5 py-4 sm:flex-row sm:items-center sm:justify-end sm:px-6">
+            {!isValid && (title || description) && (
+              <p className="text-xs text-muted sm:mr-auto">
+                Add at least one required skill, or attach a job description file
+                to have them suggested.
+              </p>
+            )}
+            <Button variant="secondary" href="/recruiter/dashboard">
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={!isValid || isSubmitting}
+              loading={isSubmitting}
+            >
+              {isSubmitting ? "Posting…" : "Post job"}
+            </Button>
+          </div>
+        </form>
+
+        <aside className="min-w-0">
+          <Card
+            title="How matching works"
+            description="Every applicant is scored against this job automatically."
+            className="lg:sticky lg:top-6"
+          >
+            <ol className="space-y-4">
+              <HowStep
+                icon={<ListChecks />}
+                title="List the skills"
+                text="Each required skill is searched for in the candidate's resume text."
+              />
+              <HowStep
+                icon={<ScanSearch />}
+                title="Score every applicant"
+                text="The match score is the share of your required skills found."
+              />
+              <HowStep
+                icon={<Sparkles />}
+                title="No skills yet?"
+                text="Attach the job description and skills are suggested from its text."
+              />
+            </ol>
+          </Card>
+        </aside>
+      </div>
+    </PortalPage>
+  );
+}
+
+function HowStep({
+  icon,
+  title,
+  text,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  text: string;
+}) {
+  return (
+    <li className="flex gap-3">
+      <span
+        aria-hidden="true"
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-700 [&>svg]:h-4 [&>svg]:w-4"
       >
-        {error && <InlineError message={error} />}
-
-        <div>
-          <label htmlFor="job-title" className={labelClass}>
-            Job title <span className="text-red-500">*</span>
-          </label>
-          <input
-            id="job-title"
-            type="text"
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
-            placeholder="e.g. React Developer"
-            className={inputClass}
-            required
-          />
-        </div>
-
-        <div>
-          <label htmlFor="job-description" className={labelClass}>
-            Description <span className="text-red-500">*</span>
-          </label>
-          <textarea
-            id="job-description"
-            value={description}
-            onChange={(event) => setDescription(event.target.value)}
-            rows={6}
-            placeholder="Describe the role, responsibilities and what you're looking for…"
-            className={`${inputClass} resize-none`}
-            required
-          />
-        </div>
-
-        <div>
-          <label htmlFor="job-skills" className={labelClass}>
-            Required skills
-          </label>
-          <input
-            id="job-skills"
-            type="text"
-            value={skillsInput}
-            onChange={(event) => setSkillsInput(event.target.value)}
-            placeholder="e.g. react, typescript, node.js, mongodb"
-            className={inputClass}
-          />
-          <p className="mt-2 text-xs text-[#9698a2]">
-            Comma separated. These are the exact terms searched in each
-            candidate&apos;s resume text — the match score is the share of them
-            found.
-          </p>
-          {uniqueSkills.length > 0 && (
-            <div className="mt-3">
-              <SkillChips skills={uniqueSkills} />
-            </div>
-          )}
-        </div>
-
-        <div>
-          <label htmlFor="job-jd" className={labelClass}>
-            Job description file (optional)
-          </label>
-          <input
-            id="job-jd"
-            ref={fileInputRef}
-            name={JD_FILE_FIELD}
-            type="file"
-            accept={RESUME_ACCEPT_ATTRIBUTE}
-            onChange={(event) => handleFile(event.target.files?.[0])}
-            className="w-full rounded border border-[#e9eaf0] bg-white px-4 py-3 text-sm text-[#686b77] file:mr-4 file:rounded-lg file:border-0 file:bg-brand-light file:px-4 file:py-2 file:text-sm file:font-semibold file:text-brand-dark"
-          />
-          <p className="mt-2 text-xs text-[#9698a2]">
-            PDF or DOCX, max {MAX_SIZE_MB}MB. If you leave the skills field
-            empty, skills are suggested from this file&apos;s text.
-          </p>
-          {jdFile && (
-            <p className="mt-2 text-xs font-medium text-[#686b77]">
-              {jdFile.name} · {formatFileSize(jdFile.size)}
-            </p>
-          )}
-        </div>
-
-        <div className="flex items-center gap-3 pt-2">
-          <button
-            type="submit"
-            disabled={!isValid || isSubmitting}
-            className={primaryButtonClass}
-          >
-            {isSubmitting ? "Posting…" : "Post Job"}
-          </button>
-          <Link
-            href="/recruiter/dashboard"
-            className="px-6 py-3 font-semibold text-[#686b77] transition-colors hover:text-[#292b35]"
-          >
-            Cancel
-          </Link>
-        </div>
-
-        {!isValid && (title || description) && (
-          <p className="text-xs text-[#9698a2]">
-            Add at least one required skill, or attach a job description file to
-            have them suggested.
-          </p>
-        )}
-      </form>
-    </div>
+        {icon}
+      </span>
+      <div className="min-w-0">
+        <p className="text-sm font-medium text-ink">{title}</p>
+        <p className="mt-0.5 text-sm text-muted">{text}</p>
+      </div>
+    </li>
   );
 }

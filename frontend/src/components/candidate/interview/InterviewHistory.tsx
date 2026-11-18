@@ -1,14 +1,17 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import {
+  ArrowRight,
+  BookOpen,
   ChartNoAxesColumnIncreasing,
   CheckCircle2,
+  CircleCheck,
   Clock3,
-  MessageSquareText,
+  Info,
   Plus,
   Target,
+  TrendingUp,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { getInterviewReport, listMySessions } from "@/lib/interviewApi";
@@ -29,18 +32,25 @@ import {
   type InterviewReport,
   type InterviewHistoryType,
   type InterviewSessionSummary,
-  type InterviewTurnView,
   type ObjectId,
 } from "@/lib/types";
+import { PortalPage } from "@/components/dashboard/primitives";
+import { Badge, type BadgeTone } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 import {
   Card,
   EmptyState,
   ErrorBlock,
+  LoadingBlock,
+  PageHeader,
+  StatCard,
 } from "@/components/ui/Feedback";
+import { PageSkeleton } from "@/components/ui/Skeleton";
+import { compactInputClass } from "@/components/ui/controls";
 import { CertificatePanel } from "./CertificatePanel";
 import { FinalScoreRing } from "./ScoreBreakdown";
-import { VerdictBadge } from "@/components/shared/VerdictBadge";
 import { FailedInterviewNextSteps } from "./FailedInterviewNextSteps";
+import { ReportList, TurnHistory } from "./InterviewRunner";
 
 const ALL = "all";
 
@@ -88,20 +98,9 @@ export function InterviewHistory() {
 
   if (sessions.isLoading) {
     return (
-      <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
-        <div className="mx-auto max-w-[1500px] animate-pulse space-y-3">
-          <div className="h-9 bg-white" />
-          <div className="grid grid-cols-2 gap-2.5 xl:grid-cols-4">
-            {Array.from({ length: 4 }, (_, index) => (
-              <div key={index} className="h-[76px] bg-white" />
-            ))}
-          </div>
-          <div className="grid gap-3 lg:grid-cols-3">
-            <div className="h-80 bg-white" />
-            <div className="h-80 bg-white lg:col-span-2" />
-          </div>
-        </div>
-      </div>
+      <PortalPage>
+        <PageSkeleton label="Loading interview results…" />
+      </PortalPage>
     );
   }
 
@@ -120,110 +119,87 @@ export function InterviewHistory() {
     (session) => session.status === "completed",
   ).length;
   const inProgressCount = list.length - completedCount;
+  const selectedTitle = selected
+    ? (selected.jobTitle ?? `${roundTrackLabel(selected)} practice interview`)
+    : null;
 
   return (
-    <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
-      <div className="mx-auto max-w-[1500px] space-y-3">
-        <header className="flex min-h-8 items-center justify-between gap-3 border-b border-[#e9eaf0] pb-3">
-          <div className="flex min-w-0 items-center gap-2.5">
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#e9eaf0] bg-white text-[#767985]">
-              <ChartNoAxesColumnIncreasing
-                aria-hidden="true"
-                className="h-3 w-3"
-              />
-            </span>
-            <div className="min-w-0">
-              <h1 className="truncate text-[13px] font-semibold text-[#30323b]">
-                Interview Results
-              </h1>
-              <p className="hidden text-[10px] text-[#999ba4] sm:block">
-                Review your scores, feedback, and interview progress.
-              </p>
-            </div>
-          </div>
-          <Link
+    <PortalPage>
+      <PageHeader
+        title="Interview results"
+        description="Review your scores, feedback and interview progress."
+        icon={<ChartNoAxesColumnIncreasing />}
+        action={
+          <Button
             href="/candidate/interview/basic"
-            className="inline-flex h-7 shrink-0 items-center gap-1.5 rounded bg-[#6b5ce7] px-2.5 text-[10px] font-semibold text-white transition-colors hover:bg-[#5849d1]"
+            leadingIcon={<Plus aria-hidden="true" />}
           >
-            <Plus aria-hidden="true" className="h-3 w-3" />
             Start interview
-          </Link>
-        </header>
+          </Button>
+        }
+      />
 
-        {sessions.error && (
-          <div>
-            <ErrorBlock message={sessions.error} onRetry={sessions.reload} />
-          </div>
-        )}
+      {sessions.error && (
+        <ErrorBlock message={sessions.error} onRetry={sessions.reload} />
+      )}
 
-        <section
-          aria-label="Interview overview"
-          className="grid grid-cols-2 gap-2.5 xl:grid-cols-4"
-        >
-          <ResultMetric
-            label="Total interviews"
-            value={String(list.length)}
-            detail="In the selected category"
-            icon={
-              <ChartNoAxesColumnIncreasing
-                aria-hidden="true"
-                className="h-4 w-4"
-              />
-            }
-            iconClass="bg-[#f0efff] text-[#6b5ce7]"
-          />
-          <ResultMetric
-            label="Completed"
-            value={String(completedCount)}
-            detail="Reports available"
-            icon={<CheckCircle2 aria-hidden="true" className="h-4 w-4" />}
-            iconClass="bg-[#edf7ee] text-[#50a66d]"
-          />
-          <ResultMetric
-            label="In progress"
-            value={String(inProgressCount)}
-            detail="Interviews to finish"
-            icon={<Clock3 aria-hidden="true" className="h-4 w-4" />}
-            iconClass="bg-[#fff6e8] text-[#d99b2b]"
-          />
-          <ResultMetric
-            label="Average score"
-            value={averageScore}
-            detail={`${scoredSessions.length} scored session${scoredSessions.length === 1 ? "" : "s"}`}
-            icon={<Target aria-hidden="true" className="h-4 w-4" />}
-            iconClass="bg-[#eaf7f5] text-[#46aa9e]"
-          />
-        </section>
+      <section
+        aria-label="Interview overview"
+        className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4"
+      >
+        <StatCard
+          label="Total interviews"
+          value={list.length}
+          sub="In the selected category"
+          icon={<ChartNoAxesColumnIncreasing aria-hidden="true" />}
+          tone="brand"
+        />
+        <StatCard
+          label="Completed"
+          value={completedCount}
+          sub="Reports available"
+          icon={<CheckCircle2 aria-hidden="true" />}
+          tone="success"
+        />
+        <StatCard
+          label="In progress"
+          value={inProgressCount}
+          sub="Interviews to finish"
+          icon={<Clock3 aria-hidden="true" />}
+          tone="warning"
+        />
+        <StatCard
+          label="Average score"
+          value={averageScore}
+          sub={`${scoredSessions.length} scored session${scoredSessions.length === 1 ? "" : "s"}`}
+          icon={<Target aria-hidden="true" />}
+          tone="info"
+        />
+      </section>
 
-        {list.length === 0 ? (
-          <section className="border border-[#e9eaf0] bg-white p-4 sm:p-5">
-            <EmptyState
-              title="No interviews yet."
-              description="Take a practice interview, or wait for HR to schedule one on an application."
-              action={
-                <Link
-                  href="/candidate/interview/basic"
-                  className="inline-flex h-8 items-center gap-1.5 rounded bg-[#6b5ce7] px-3 text-[11px] font-semibold text-white transition-colors hover:bg-[#5849d1]"
-                >
-                  <Plus aria-hidden="true" className="h-3.5 w-3.5" />
-                  Start a practice interview
-                </Link>
-              }
-            />
-          </section>
-        ) : (
-          <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
-          <section className="min-w-0 border border-[#e9eaf0] bg-white lg:col-span-1">
-            <div className="flex min-h-11 items-center justify-between gap-2 border-b border-[#eeeeF2] px-3 py-2.5">
-              <div className="min-w-0">
-                <h2 className="text-[11px] font-semibold text-[#454752]">
-                  Interview history
-                </h2>
-                <p className="mt-0.5 text-[9px] text-[#999ba4]">
-                  {list.length} session{list.length === 1 ? "" : "s"}
-                </p>
-              </div>
-              <label className="relative shrink-0">
+      {list.length === 0 ? (
+        <EmptyState
+          title="No interviews yet."
+          description="Take a practice interview, or wait for HR to schedule one on an application."
+          icon={<ChartNoAxesColumnIncreasing />}
+          action={
+            <Button
+              href="/candidate/interview/basic"
+              leadingIcon={<Plus aria-hidden="true" />}
+            >
+              Start a practice interview
+            </Button>
+          }
+        />
+      ) : (
+        <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[17rem_minmax(0,1fr)] xl:grid-cols-[22rem_minmax(0,1fr)]">
+          <Card
+            title="Interview history"
+            description={`${list.length} session${list.length === 1 ? "" : "s"}`}
+            padding="none"
+            className="lg:sticky lg:top-6"
+            action={
+              <label className="block">
                 <span className="sr-only">Filter interview type</span>
                 <select
                   value={typeFilter}
@@ -232,7 +208,7 @@ export function InterviewHistory() {
                       event.target.value as InterviewHistoryType | typeof ALL,
                     )
                   }
-                  className="h-7 max-w-[130px] appearance-none border border-[#e9eaf0] bg-white py-1 pl-2 pr-6 text-[9px] text-[#666974] outline-none transition-colors focus:border-[#6b5ce7]"
+                  className={`${compactInputClass} max-w-[11rem]`}
                 >
                   <option value={ALL}>All interviews</option>
                   {INTERVIEW_HISTORY_TYPES.map((type) => (
@@ -241,15 +217,10 @@ export function InterviewHistory() {
                     </option>
                   ))}
                 </select>
-                <span
-                  aria-hidden="true"
-                  className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[8px] text-[#858793]"
-                >
-                  ▾
-                </span>
               </label>
-            </div>
-            <div className="max-h-[680px] overflow-y-auto p-2">
+            }
+          >
+            <div className="max-h-[26rem] space-y-1 overflow-y-auto border-t border-line-soft p-2 lg:max-h-[calc(100dvh-12rem)]">
               {list.map((session) => (
                 <SessionRow
                   key={session.sessionId}
@@ -259,59 +230,48 @@ export function InterviewHistory() {
                 />
               ))}
             </div>
-          </section>
+          </Card>
 
-          <section className="min-w-0 space-y-3 lg:col-span-2">
-            <div className="flex min-h-11 items-center justify-between gap-3 border border-[#e9eaf0] bg-white px-3 py-2.5">
-              <div className="min-w-0">
-                <h2 className="text-[11px] font-semibold text-[#454752]">
-                  Interview report
-                </h2>
-                {selected && (
-                  <p className="mt-0.5 truncate text-[9px] text-[#999ba4]">
-                    {selected.jobTitle ??
-                      `${roundTrackLabel(selected)} practice interview`}
-                    <span className="mx-1.5">·</span>
-                    {formatDate(selected.createdAt)}
-                  </p>
-                )}
-              </div>
-              {selected && (
-                <span
-                  className={`shrink-0 ${INTERVIEW_HISTORY_TYPE_BADGE[selected.type]}`}
-                >
-                  {INTERVIEW_HISTORY_TYPE_LABELS[selected.type]}
-                </span>
-              )}
-            </div>
-
+          <div className="min-w-0 space-y-6">
             {report.isLoading ? (
-              <div
-                role="status"
-                className="flex min-h-48 items-center justify-center border border-[#e9eaf0] bg-white text-[11px] text-[#858793]"
-              >
-                Loading report…
-              </div>
+              <Card>
+                <LoadingBlock label="Loading report…" />
+              </Card>
             ) : report.error ? (
               <ErrorBlock message={report.error} onRetry={report.reload} />
             ) : report.data && selected ? (
               report.data.status === "completed" ? (
                 <>
-                  <section className="border border-[#e9eaf0] bg-white p-4 sm:p-5">
-                    <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start">
+                  <Card
+                    title="Interview report"
+                    description={
+                      <>
+                        {selectedTitle}
+                        <span aria-hidden="true" className="mx-1.5">
+                          ·
+                        </span>
+                        {formatDate(selected.createdAt)}
+                      </>
+                    }
+                    action={
+                      <span className={INTERVIEW_HISTORY_TYPE_BADGE[selected.type]}>
+                        {INTERVIEW_HISTORY_TYPE_LABELS[selected.type]}
+                      </span>
+                    }
+                  >
+                    <div className="flex flex-col items-center gap-6 border-t border-line-soft pt-5 sm:flex-row sm:items-center">
                       {report.data.score !== undefined ? (
-                        <div className="shrink-0 scale-[0.82]">
+                        <div className="shrink-0">
                           <FinalScoreRing score={report.data.score} />
                         </div>
                       ) : null}
-                      <div className="flex-1 text-center sm:text-left">
-                        <p className="text-[9px] font-semibold uppercase tracking-[0.07em] text-[#92949e]">
+                      <div className="min-w-0 flex-1 text-center sm:text-left">
+                        <p className="text-xs font-medium uppercase tracking-wider text-muted">
                           {report.data.turns.length} question
                           {report.data.turns.length === 1 ? "" : "s"} answered
                         </p>
-                        <h3 className="mt-1 text-[15px] font-semibold text-[#30323b]">
-                          {selected.jobTitle ??
-                            `${roundTrackLabel(selected)} practice interview`}
+                        <h3 className="mt-1 font-display text-lg font-semibold tracking-tight text-ink">
+                          {selectedTitle}
                         </h3>
                         {report.data.result && (
                           <span
@@ -321,19 +281,23 @@ export function InterviewHistory() {
                           </span>
                         )}
                         {selected.type === "organizational" && (
-                          <p className="mt-3 border-l-2 border-[#d8d5f7] bg-[#f8f7ff] px-3 py-2 text-left text-[10px] leading-4 text-[#666974]">
+                          <p className="mt-3 flex items-start gap-2 rounded-lg bg-brand-50 px-3 py-2.5 text-left text-sm text-brand-900 ring-1 ring-inset ring-brand-600/10">
+                            <Info
+                              aria-hidden="true"
+                              className="mt-0.5 h-4 w-4 shrink-0 text-brand-700"
+                            />
                             This interview is graded by the hiring team. Your
                             score and answer feedback aren&apos;t shown here.
                           </p>
                         )}
-                        <p className="mt-3 whitespace-pre-line text-[11px] leading-5 text-[#666974]">
+                        <p className="mt-3 whitespace-pre-line text-sm leading-6 text-body">
                           {report.data.report?.summary ||
                             report.data.feedback ||
                             "No overall feedback was returned."}
                         </p>
                       </div>
                     </div>
-                  </section>
+                  </Card>
 
                   {report.data.report?.reportType === "candidate" && (
                     <InterviewReportDetails
@@ -353,7 +317,7 @@ export function InterviewHistory() {
                     />
                   )}
 
-                  <InterviewQuestionHistory
+                  <TurnHistory
                     turns={report.data.turns}
                     title="Questions & answers"
                   />
@@ -368,34 +332,52 @@ export function InterviewHistory() {
                   )}
                 </>
               ) : (
-                <Card title="Interview in progress">
-                  <p className="text-[11px] leading-5 text-[#666974]">
-                    You&apos;ve answered {report.data.turns.length} question
-                    {report.data.turns.length === 1 ? "" : "s"}. Finish the
-                    interview to see the outcome.
-                  </p>
-                  {selected.type !== "organizational" && (
-                    <Link
-                      href={`/candidate/interview/session/${selected.sessionId}`}
-                      className="mt-3 inline-flex h-8 items-center rounded bg-[#6b5ce7] px-3 text-[10px] font-semibold text-white transition-colors hover:bg-[#5849d1]"
-                    >
-                      Continue interview
-                    </Link>
-                  )}
-                  <div className="mt-5">
-                    <InterviewQuestionHistory
-                      turns={report.data.turns}
-                      title="Questions answered so far"
-                    />
-                  </div>
-                </Card>
+                <>
+                  <Card
+                    title="Interview in progress"
+                    description={
+                      <>
+                        {selectedTitle}
+                        <span aria-hidden="true" className="mx-1.5">
+                          ·
+                        </span>
+                        {formatDate(selected.createdAt)}
+                      </>
+                    }
+                    action={
+                      <span className={INTERVIEW_HISTORY_TYPE_BADGE[selected.type]}>
+                        {INTERVIEW_HISTORY_TYPE_LABELS[selected.type]}
+                      </span>
+                    }
+                  >
+                    <div className="flex flex-col gap-4 border-t border-line-soft pt-5 sm:flex-row sm:items-center sm:justify-between">
+                      <p className="text-sm text-body">
+                        You&apos;ve answered {report.data.turns.length} question
+                        {report.data.turns.length === 1 ? "" : "s"}. Finish the
+                        interview to see the outcome.
+                      </p>
+                      {selected.type !== "organizational" && (
+                        <Button
+                          href={`/candidate/interview/session/${selected.sessionId}`}
+                          trailingIcon={<ArrowRight aria-hidden="true" />}
+                          className="w-full sm:w-auto"
+                        >
+                          Continue interview
+                        </Button>
+                      )}
+                    </div>
+                  </Card>
+                  <TurnHistory
+                    turns={report.data.turns}
+                    title="Questions answered so far"
+                  />
+                </>
               )
             ) : null}
-          </section>
+          </div>
         </div>
-        )}
-      </div>
-    </div>
+      )}
+    </PortalPage>
   );
 }
 
@@ -450,30 +432,37 @@ function InterviewReportDetails({
             ? "Completed"
             : "Locked";
   const sections = [
-    { title: "Strengths", items: report.strengths, tone: "emerald" },
+    {
+      title: "Strengths",
+      items: report.strengths,
+      icon: <CircleCheck aria-hidden="true" className="h-4 w-4" />,
+      tile: "bg-brand-50 text-brand-600",
+      dot: "bg-brand-500",
+    },
     {
       title: "Areas to improve",
       items: report.areasToImprove,
-      tone: "amber",
+      icon: <TrendingUp aria-hidden="true" className="h-4 w-4" />,
+      tile: "bg-brand-50 text-brand-500",
+      dot: "bg-brand-300",
     },
-    { title: "Learning plan", items: report.learningPlan, tone: "violet" },
-  ] as const;
+    {
+      title: "Learning plan",
+      items: report.learningPlan,
+      icon: <BookOpen aria-hidden="true" className="h-4 w-4" />,
+      tile: "bg-brand-50 text-brand-700",
+      dot: "bg-brand-500",
+    },
+  ];
 
   return (
     <>
-      <section className="border border-[#e9eaf0] bg-white p-3 sm:p-4">
-        <div className="mb-3 flex items-center justify-between gap-3">
-          <div>
-            <h3 className="text-[11px] font-semibold text-[#30323b]">
-              Round progress
-            </h3>
-            <p className="mt-0.5 text-[9px] text-[#92949e]">
-              Scores and status for each interview round
-            </p>
-          </div>
-          <span className="text-[9px] text-[#92949e]">Pass mark: 70%</span>
-        </div>
-        <div className="grid gap-2.5 sm:grid-cols-2">
+      <Card
+        title="Round progress"
+        description="Scores and status for each interview round"
+        action={<span className="text-sm text-muted">Pass mark: 70%</span>}
+      >
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
           <RoundProgressCard
             title="Round 1"
             subtitle="Basic"
@@ -489,40 +478,18 @@ function InterviewReportDetails({
             tone="blue"
           />
         </div>
-      </section>
+      </Card>
 
-      {sections.map(({ title, items, tone }) =>
+      {sections.map(({ title, items, icon, tile, dot }) =>
         items && items.length > 0 ? (
-          <section
+          <ReportList
             key={title}
-            className="border border-[#e9eaf0] bg-white px-3 py-3 sm:px-4"
-          >
-            <div className="mb-2.5 flex items-center gap-2">
-              <span
-                className={`h-1.5 w-1.5 rounded-full ${
-                  tone === "emerald"
-                    ? "bg-[#48a875]"
-                    : tone === "amber"
-                      ? "bg-[#d99b2b]"
-                      : "bg-[#6b5ce7]"
-                }`}
-              />
-              <h3 className="text-[11px] font-semibold text-[#30323b]">
-                {title}
-              </h3>
-            </div>
-            <ul className="space-y-2">
-              {items.map((item) => (
-                <li
-                  key={item}
-                  className="flex items-start gap-2 border-t border-[#f1f1f4] pt-2 text-[10px] leading-4 text-[#666974] first:border-0 first:pt-0"
-                >
-                  <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-[#a5a6af]" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </section>
+            title={title}
+            items={items}
+            icon={icon}
+            tile={tile}
+            dot={dot}
+          />
         ) : null,
       )}
     </>
@@ -544,146 +511,39 @@ function RoundProgressCard({
 }) {
   const percentage =
     score === undefined ? undefined : Math.max(0, Math.min(100, score * 10));
-  const statusTone =
+  const badgeTone: BadgeTone =
     status === "Passed" || status === "Completed"
-      ? "bg-[#edf7ee] text-[#39865a]"
+      ? "success"
       : status === "Needs improvement"
-        ? "bg-[#fff3e8] text-[#b66b20]"
+        ? "warning"
         : status === "Unlocked"
-          ? "bg-[#f0efff] text-[#6658d9]"
-          : "bg-[#f3f4f6] text-[#777a85]";
-  const accent = tone === "violet" ? "#6b5ce7" : "#4b8acb";
+          ? "brand"
+          : "neutral";
 
   return (
-    <article className="border border-[#ececf1] bg-[#fcfcfd] px-3 py-2.5">
+    <article className="min-w-0 rounded-lg border border-line-soft bg-surface-2 p-4">
       <div className="flex items-start justify-between gap-2">
-        <div>
-          <p className="text-[10px] font-semibold text-[#30323b]">{title}</p>
-          <p className="mt-0.5 text-[9px] text-[#92949e]">{subtitle}</p>
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-ink">{title}</p>
+          <p className="mt-0.5 text-xs text-muted">{subtitle}</p>
         </div>
-        <span
-          className={`inline-flex items-center px-1.5 py-1 text-[8px] font-semibold ${statusTone}`}
-        >
-          {status}
-        </span>
+        <Badge tone={badgeTone}>{status}</Badge>
       </div>
-      <div className="mt-2.5 flex items-center justify-between gap-2">
-        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-[#ececf1]">
+      <div className="mt-4 flex items-center justify-between gap-3">
+        <div className="h-2 flex-1 overflow-hidden rounded-full bg-surface-3">
           {percentage !== undefined && (
             <div
-              className="h-full rounded-full transition-[width]"
-              style={{ width: `${percentage}%`, backgroundColor: accent }}
+              className={`h-full rounded-full transition-[width] motion-reduce:transition-none ${
+                tone === "violet" ? "bg-chart-1" : "bg-chart-5"
+              }`}
+              style={{ width: `${percentage}%` }}
             />
           )}
         </div>
-        <span className="min-w-[48px] text-right text-[10px] font-semibold text-[#454752]">
+        <span className="min-w-12 text-right font-display text-sm font-semibold tabular-nums text-ink">
           {score === undefined ? "—" : `${score.toFixed(1)}/10`}
         </span>
       </div>
-    </article>
-  );
-}
-
-function InterviewQuestionHistory({
-  turns,
-  title,
-}: {
-  turns: InterviewTurnView[];
-  title: string;
-}) {
-  if (turns.length === 0) return null;
-
-  return (
-    <section className="border border-[#e9eaf0] bg-white">
-      <div className="flex items-center justify-between gap-3 border-b border-[#eeeeF2] px-3 py-2.5 sm:px-4">
-        <h3 className="text-[11px] font-semibold text-[#30323b]">{title}</h3>
-        <span className="text-[9px] text-[#92949e]">
-          {turns.length} question{turns.length === 1 ? "" : "s"}
-        </span>
-      </div>
-      <div className="px-3 sm:px-4">
-        {turns.map((turn) => (
-          <article
-            key={turn.questionNumber}
-            className="flex gap-2.5 border-b border-dashed border-[#e9eaf0] py-3 last:border-0"
-          >
-            <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center bg-[#f0efff] text-[#6658d9]">
-              <MessageSquareText aria-hidden="true" className="h-3 w-3" />
-            </span>
-            <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-start justify-between gap-2">
-                <div className="min-w-0">
-                  <p className="text-[8px] font-semibold uppercase tracking-[0.06em] text-[#92949e]">
-                    Round {turn.round} · Question {turn.questionNumber}
-                  </p>
-                  <h4 className="mt-1 text-[10px] font-semibold leading-4 text-[#383a44]">
-                    {turn.question}
-                  </h4>
-                </div>
-                <div className="flex shrink-0 items-center gap-1.5">
-                  <VerdictBadge verdict={turn.verdict} />
-                  {turn.score !== undefined && (
-                    <span className="bg-[#f4f3ff] px-1.5 py-1 text-[8px] font-semibold text-[#6658d9]">
-                      {turn.score}/10
-                    </span>
-                  )}
-                </div>
-              </div>
-              <div className="mt-2 border-l-2 border-[#e4e2f5] bg-[#fafafe] px-2.5 py-2">
-                <p className="text-[8px] font-semibold uppercase tracking-[0.05em] text-[#92949e]">
-                  Your answer
-                </p>
-                <p className="mt-1 whitespace-pre-line text-[9px] leading-4 text-[#666974]">
-                  {turn.answer || "No answer provided."}
-                </p>
-              </div>
-              {turn.feedback && (
-                <p className="mt-2 whitespace-pre-line text-[9px] leading-4 text-[#666974]">
-                  <span className="font-semibold text-[#454752]">Feedback: </span>
-                  {turn.feedback}
-                </p>
-              )}
-              {turn.improvementTip && (
-                <p className="mt-1.5 whitespace-pre-line text-[9px] leading-4 text-[#39865a]">
-                  <span className="font-semibold">Tip: </span>
-                  {turn.improvementTip}
-                </p>
-              )}
-            </div>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function ResultMetric({
-  label,
-  value,
-  detail,
-  icon,
-  iconClass,
-}: {
-  label: string;
-  value: string;
-  detail: string;
-  icon: React.ReactNode;
-  iconClass: string;
-}) {
-  return (
-    <article className="flex min-h-[76px] items-center justify-between gap-3 border border-[#ececf1] bg-white px-3 py-3 sm:px-4">
-      <div className="min-w-0">
-        <p className="truncate text-[9px] font-semibold uppercase tracking-[0.07em] text-[#898b96]">
-          {label}
-        </p>
-        <p className="mt-1 text-[19px] font-bold leading-none tracking-[-0.04em] text-[#292b35]">
-          {value}
-        </p>
-        <p className="mt-1 truncate text-[9px] text-[#9698a2]">{detail}</p>
-      </div>
-      <span className={`flex h-8 w-8 shrink-0 items-center justify-center ${iconClass}`}>
-        {icon}
-      </span>
     </article>
   );
 }
@@ -702,20 +562,20 @@ function SessionRow({
       type="button"
       onClick={onSelect}
       aria-pressed={isActive}
-      className={`mb-1.5 w-full border p-3 text-left transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#6b5ce7] ${
+      className={`block w-full rounded-lg border p-3.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 ${
         isActive
-          ? "border-[#d8d5f7] bg-[#f7f6ff]"
-          : "border-[#f0f0f3] bg-white hover:border-[#e3e0fa] hover:bg-[#fcfbff]"
+          ? "border-brand-200 bg-brand-50"
+          : "border-transparent hover:bg-surface-2"
       }`}
     >
-      <div className="flex items-center justify-between gap-2">
-        <p
-          className="truncate text-[11px] font-semibold text-[#30323b]"
-        >
+      <div className="flex items-center justify-between gap-3">
+        <p className="min-w-0 truncate text-sm font-semibold text-ink">
           {session.jobTitle ?? "Practice interview"}
         </p>
         {session.score !== undefined && (
-          <span className={`shrink-0 text-[11px] font-bold ${scoreColor(session.score)}`}>
+          <span
+            className={`shrink-0 font-display text-sm font-semibold tabular-nums ${scoreColor(session.score)}`}
+          >
             {session.score}%
           </span>
         )}
@@ -733,11 +593,9 @@ function SessionRow({
           </span>
         )}
       </div>
-      <div className="mt-2 flex items-center justify-between gap-2 text-[9px] text-[#92949e]">
-        <span className="truncate">
-          {roundTrackLabel(session)}
-        </span>
-        <span className="shrink-0">
+      <div className="mt-2 flex items-center justify-between gap-2 text-xs text-muted">
+        <span className="min-w-0 truncate">{roundTrackLabel(session)}</span>
+        <span className="shrink-0 tabular-nums">
           {formatDate(session.createdAt)}
         </span>
       </div>

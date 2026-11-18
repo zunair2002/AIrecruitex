@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { Search, Trash2, Users } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { toErrorMessage } from "@/lib/api";
 import {
@@ -10,15 +11,24 @@ import {
   setUserRole,
 } from "@/lib/adminApi";
 import { useApiResource } from "@/lib/useApiResource";
-import { USER_ROLES, type ObjectId, type UserRole } from "@/lib/types";
+import {
+  USER_ROLES,
+  type ObjectId,
+  type User,
+  type UserRole,
+} from "@/lib/types";
 import {
   AUTH_PROVIDER_LABEL,
   ROLE_LABELS,
   activeBadge,
   formatDate,
-  initials,
 } from "@/lib/format";
+import { Avatar } from "@/components/ui/Avatar";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { ConfirmDialog } from "@/components/ui/Dialog";
 import {
+  Card,
   EmptyState,
   ErrorBlock,
   InlineError,
@@ -27,9 +37,19 @@ import {
 } from "@/components/ui/Feedback";
 import {
   compactInputClass,
-  dangerButtonClass,
-  smallButtonClass,
+  inputClass,
+  selectClass,
 } from "@/components/ui/controls";
+import {
+  stackedItemClass,
+  tableClass,
+  tableScrollClass,
+  tdClass,
+  thClass,
+  trClass,
+} from "@/components/ui/table";
+import { PortalPage } from "@/components/dashboard/primitives";
+import { ToggleSwitch } from "./SettingsForm";
 
 /**
  * GET /api/admin/users with its three query filters, plus the three mutations:
@@ -45,6 +65,10 @@ export function UserManagement() {
   const [appliedSearch, setAppliedSearch] = useState("");
   const [busyId, setBusyId] = useState<ObjectId | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<{
+    id: ObjectId;
+    name: string;
+  } | null>(null);
 
   const users = useApiResource(
     (signal) =>
@@ -70,199 +94,285 @@ export function UserManagement() {
   );
 
   const handleDelete = (userId: ObjectId, name: string) => {
-    if (
-      !window.confirm(
-        `Permanently delete ${name}? This removes the user account and cannot be undone.`,
-      )
-    ) {
-      return;
-    }
-    runMutation(userId, () => deleteUser(userId, token));
+    setPendingDelete({ id: userId, name });
   };
+
+  const confirmDelete = async () => {
+    if (!pendingDelete) return;
+    const { id } = pendingDelete;
+    await runMutation(id, () => deleteUser(id, token));
+    setPendingDelete(null);
+  };
+
+  const changeRole = (item: User, next: UserRole) =>
+    runMutation(item._id, () => setUserRole(item._id, next, token));
+
+  const toggleActive = (item: User) =>
+    runMutation(item._id, () => setUserActive(item._id, !item.isActive, token));
 
   const list = users.data ?? [];
 
   return (
-    <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
+    <PortalPage>
       <PageHeader
-        title="User Management"
+        icon={<Users />}
+        title="User management"
         description="Every account on the platform. Role and active-status changes are written to the audit log."
       />
 
-      <form
-        onSubmit={(event) => {
-          event.preventDefault();
-          setAppliedSearch(search.trim());
-        }}
-        className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center"
-      >
-        <input
-          type="text"
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          placeholder="Search name or email…"
-          className={`${compactInputClass} flex-1`}
-        />
-        <select
-          value={role}
-          onChange={(event) => setRole(event.target.value as UserRole | "")}
-          className={compactInputClass}
-        >
-          <option value="">All roles</option>
-          {USER_ROLES.map((option) => (
-            <option key={option} value={option}>
-              {ROLE_LABELS[option]}
-            </option>
-          ))}
-        </select>
-        <select
-          value={isActive}
-          onChange={(event) =>
-            setIsActive(event.target.value as "true" | "false" | "")
-          }
-          className={compactInputClass}
-        >
-          <option value="">Active &amp; inactive</option>
-          <option value="true">Active only</option>
-          <option value="false">Deactivated only</option>
-        </select>
-        <button type="submit" className={smallButtonClass}>
-          Search
-        </button>
-      </form>
+      {error && <InlineError message={error} />}
 
-      {error && (
-        <div className="mb-6">
-          <InlineError message={error} />
-        </div>
-      )}
+      <Card padding="none">
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            setAppliedSearch(search.trim());
+          }}
+          className="flex flex-col gap-3 border-b border-line-soft p-4 sm:flex-row sm:flex-wrap sm:items-center sm:px-6"
+        >
+          <div className="relative w-full sm:min-w-56 sm:flex-1">
+            <Search
+              aria-hidden="true"
+              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-subtle"
+            />
+            <input
+              type="text"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search name or email…"
+              aria-label="Search users by name or email"
+              className={`${inputClass} pl-9`}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3 sm:flex sm:items-center">
+            <select
+              value={role}
+              onChange={(event) => setRole(event.target.value as UserRole | "")}
+              aria-label="Filter by role"
+              className={`${selectClass} sm:w-36`}
+            >
+              <option value="">All roles</option>
+              {USER_ROLES.map((option) => (
+                <option key={option} value={option}>
+                  {ROLE_LABELS[option]}
+                </option>
+              ))}
+            </select>
+            <select
+              value={isActive}
+              onChange={(event) =>
+                setIsActive(event.target.value as "true" | "false" | "")
+              }
+              aria-label="Filter by status"
+              className={`${selectClass} sm:w-44`}
+            >
+              <option value="">Active &amp; inactive</option>
+              <option value="true">Active only</option>
+              <option value="false">Deactivated only</option>
+            </select>
+          </div>
+          <Button type="submit" variant="secondary">
+            Search
+          </Button>
+        </form>
 
-      {users.isLoading ? (
-        <LoadingBlock label="Loading users…" />
-      ) : users.error ? (
-        <ErrorBlock message={users.error} onRetry={users.reload} />
-      ) : list.length === 0 ? (
-        <EmptyState title="No users match these filters." />
-      ) : (
-        <div className="overflow-hidden rounded border border-[#f1f1f5] bg-white ">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-[#f1f1f5] bg-[#f8f8fb]">
-                  <th className="px-6 py-4 text-left font-semibold text-[#686b77]">
-                    User
-                  </th>
-                  <th className="px-6 py-4 text-left font-semibold text-[#686b77]">
-                    Role
-                  </th>
-                  <th className="px-6 py-4 text-left font-semibold text-[#686b77]">
-                    Sign-in
-                  </th>
-                  <th className="px-6 py-4 text-left font-semibold text-[#686b77]">
-                    Status
-                  </th>
-                  <th className="px-6 py-4 text-left font-semibold text-[#686b77]">
-                    Joined
-                  </th>
-                  <th className="px-6 py-4 text-left font-semibold text-[#686b77]">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {list.map((item) => {
-                  const isSelf = currentUser?.id === item._id;
-                  const isBusy = busyId === item._id;
-                  return (
-                    <tr
-                      key={item._id}
-                      className="border-b border-[#f1f1f5] transition-colors hover:bg-[#f8f8fb]/50"
-                    >
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-light text-xs font-bold text-brand-dark">
-                            {initials(item.name)}
+        {users.isLoading ? (
+          <LoadingBlock label="Loading users…" />
+        ) : users.error ? (
+          <div className="p-4 sm:p-6">
+            <ErrorBlock message={users.error} onRetry={users.reload} />
+          </div>
+        ) : list.length === 0 ? (
+          <EmptyState
+            bare
+            icon={<Users />}
+            title="No users match these filters"
+            description="Try a different name, role or status."
+          />
+        ) : (
+          <>
+            <p className="px-4 pt-3 text-xs text-muted sm:px-6 md:hidden">
+              {list.length} {list.length === 1 ? "user" : "users"}
+            </p>
+
+            {/* desktop / tablet: table */}
+            <div className={`hidden md:block ${tableScrollClass}`}>
+              <table className={tableClass}>
+                <thead>
+                  <tr>
+                    <th scope="col" className={thClass}>
+                      User · {list.length}
+                    </th>
+                    <th scope="col" className={thClass}>
+                      Role
+                    </th>
+                    <th scope="col" className={thClass}>
+                      Status
+                    </th>
+                    <th scope="col" className={thClass}>
+                      Joined
+                    </th>
+                    <th scope="col" className={thClass}>
+                      <span className="sr-only">Actions</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {list.map((item) => {
+                    const isSelf = currentUser?.id === item._id;
+                    const isBusy = busyId === item._id;
+                    return (
+                      <tr key={item._id} className={trClass}>
+                        <td className={tdClass}>
+                          <div className="flex min-w-0 items-center gap-3">
+                            <Avatar name={item.name} size="sm" />
+                            <div className="min-w-0">
+                              <p className="flex items-center gap-2 font-medium text-ink">
+                                <span className="truncate">{item.name}</span>
+                                {isSelf && <Badge tone="brand">You</Badge>}
+                              </p>
+                              <p className="max-w-64 truncate text-xs text-muted">
+                                {item.email}
+                              </p>
+                            </div>
                           </div>
-                          <div className="min-w-0">
-                            <p className="truncate font-semibold text-[#292b35]">
-                              {item.name}
-                              {isSelf && (
-                                <span className="ml-2 text-xs font-normal text-[#9698a2]">
-                                  (you)
-                                </span>
-                              )}
-                            </p>
-                            <p className="truncate text-xs text-[#898b96]">
-                              {item.email}
-                            </p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <select
-                          value={item.role}
-                          onChange={(event) =>
-                            runMutation(item._id, () =>
-                              setUserRole(
-                                item._id,
-                                event.target.value as UserRole,
-                                token,
-                              ),
-                            )
-                          }
-                          disabled={isSelf || isBusy}
-                          className={compactInputClass}
-                        >
-                          {USER_ROLES.map((option) => (
-                            <option key={option} value={option}>
-                              {ROLE_LABELS[option]}
-                            </option>
-                          ))}
-                        </select>
-                      </td>
-                      <td className="px-6 py-4 text-[#686b77]">
-                        {AUTH_PROVIDER_LABEL[item.authProvider]}
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className={activeBadge(item.isActive)}>
-                          {item.isActive ? "Active" : "Deactivated"}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-[#898b96]">
-                        {formatDate(item.createdAt)}
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              runMutation(item._id, () =>
-                                setUserActive(item._id, !item.isActive, token),
-                              )
+                        </td>
+                        <td className={tdClass}>
+                          <select
+                            value={item.role}
+                            onChange={(event) =>
+                              changeRole(item, event.target.value as UserRole)
                             }
                             disabled={isSelf || isBusy}
-                            className={smallButtonClass}
+                            aria-label={`Role for ${item.name}`}
+                            className={`${compactInputClass} w-32`}
                           >
-                            {item.isActive ? "Deactivate" : "Activate"}
-                          </button>
-                          <button
-                            type="button"
+                            {USER_ROLES.map((option) => (
+                              <option key={option} value={option}>
+                                {ROLE_LABELS[option]}
+                              </option>
+                            ))}
+                          </select>
+                        </td>
+                        <td className={tdClass}>
+                          <div className="flex items-center gap-3">
+                            <ToggleSwitch
+                              checked={item.isActive}
+                              onChange={() => toggleActive(item)}
+                              disabled={isSelf || isBusy}
+                              label={`${item.isActive ? "Deactivate" : "Activate"} ${item.name}`}
+                            />
+                            <span className={activeBadge(item.isActive)}>
+                              {item.isActive ? "Active" : "Deactivated"}
+                            </span>
+                          </div>
+                        </td>
+                        <td className={`${tdClass} whitespace-nowrap`}>
+                          <p className="text-body tabular-nums">
+                            {formatDate(item.createdAt)}
+                          </p>
+                          <p className="text-xs text-muted">
+                            {AUTH_PROVIDER_LABEL[item.authProvider]}
+                          </p>
+                        </td>
+                        <td className={`${tdClass} text-right`}>
+                          <Button
+                            variant="danger-soft"
+                            size="sm"
+                            leadingIcon={<Trash2 />}
                             onClick={() => handleDelete(item._id, item.name)}
                             disabled={isSelf || isBusy}
-                            className={dangerButtonClass}
+                            aria-label={`Delete ${item.name}`}
                           >
                             Delete
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-    </div>
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* phones: stacked cards */}
+            <ul className="divide-y divide-line-soft md:hidden">
+              {list.map((item) => {
+                const isSelf = currentUser?.id === item._id;
+                const isBusy = busyId === item._id;
+                return (
+                  <li key={item._id} className={`${stackedItemClass} space-y-4`}>
+                    <div className="flex items-start gap-3">
+                      <Avatar name={item.name} size="md" />
+                      <div className="min-w-0 flex-1">
+                        <p className="flex flex-wrap items-center gap-2 text-sm font-medium text-ink">
+                          <span className="min-w-0 break-words">{item.name}</span>
+                          {isSelf && <Badge tone="brand">You</Badge>}
+                        </p>
+                        <p className="break-all text-xs text-muted">
+                          {item.email}
+                        </p>
+                        <p className="mt-1 text-xs text-muted">
+                          Joined {formatDate(item.createdAt)} ·{" "}
+                          {AUTH_PROVIDER_LABEL[item.authProvider]}
+                        </p>
+                      </div>
+                      <span className={activeBadge(item.isActive)}>
+                        {item.isActive ? "Active" : "Deactivated"}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+                      <select
+                        value={item.role}
+                        onChange={(event) =>
+                          changeRole(item, event.target.value as UserRole)
+                        }
+                        disabled={isSelf || isBusy}
+                        aria-label={`Role for ${item.name}`}
+                        className={selectClass}
+                      >
+                        {USER_ROLES.map((option) => (
+                          <option key={option} value={option}>
+                            {ROLE_LABELS[option]}
+                          </option>
+                        ))}
+                      </select>
+                      <div className="flex h-10 items-center gap-2 text-sm text-body">
+                        <ToggleSwitch
+                          checked={item.isActive}
+                          onChange={() => toggleActive(item)}
+                          disabled={isSelf || isBusy}
+                          label={`${item.isActive ? "Deactivate" : "Activate"} ${item.name}`}
+                        />
+                        <span aria-hidden="true">Active</span>
+                      </div>
+                    </div>
+                    <Button
+                      variant="danger-soft"
+                      fullWidth
+                      leadingIcon={<Trash2 />}
+                      onClick={() => handleDelete(item._id, item.name)}
+                      disabled={isSelf || isBusy}
+                    >
+                      Delete user
+                    </Button>
+                  </li>
+                );
+              })}
+            </ul>
+          </>
+        )}
+      </Card>
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        tone="danger"
+        title={`Delete ${pendingDelete?.name ?? "this user"}?`}
+        description="This permanently removes the user account and cannot be undone."
+        confirmLabel="Delete user"
+        loading={pendingDelete !== null && busyId === pendingDelete.id}
+        onConfirm={confirmDelete}
+        onClose={() => setPendingDelete(null)}
+      />
+    </PortalPage>
   );
 }

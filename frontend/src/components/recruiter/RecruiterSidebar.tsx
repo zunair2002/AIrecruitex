@@ -12,11 +12,13 @@ import {
   Users,
 } from "lucide-react";
 
+import type { ReactNode } from "react";
 import {
   PortalSidebar,
   type NavGroup,
   type NavItem,
 } from "@/components/layout/PortalSidebar";
+import { PortalShell, type PortalConfig } from "@/components/layout/PortalShell";
 
 const navGroups: NavGroup[] = [
   {
@@ -31,8 +33,8 @@ const navGroups: NavGroup[] = [
   {
     title: "Hiring",
     items: [
-      { href: "/recruiter/jobs/create", label: "Create Job", icon: SquarePlus },
-      { href: "/recruiter/jobs", label: "My Jobs", icon: BriefcaseBusiness },
+      { href: "/recruiter/jobs/create", label: "Create job", icon: SquarePlus },
+      { href: "/recruiter/jobs", label: "My jobs", icon: BriefcaseBusiness },
     ],
   },
   {
@@ -41,7 +43,7 @@ const navGroups: NavGroup[] = [
       { href: "/recruiter/applicants", label: "Applicants", icon: Users },
       {
         href: "/recruiter/reports",
-        label: "Interview Reports",
+        label: "Interview reports",
         icon: ClipboardList,
       },
       { href: "/recruiter/shortlisted", label: "Selected", icon: Star },
@@ -52,7 +54,7 @@ const navGroups: NavGroup[] = [
     items: [
       {
         href: "/recruiter/courses",
-        label: "Learning Courses",
+        label: "Learning courses",
         icon: GraduationCap,
       },
       {
@@ -80,15 +82,21 @@ const accountMenu: NavItem[] = [
   { href: "/recruiter/support", label: "Support", icon: MessageCircle },
 ];
 
+/** The HR portal's chrome: nav, account shortcuts, home and login. */
+export const RECRUITER_PORTAL: PortalConfig = {
+  portalName: "HR Portal",
+  portalTagline: "Hiring Dashboard",
+  navGroups,
+  accountMenu,
+  homeHref: "/recruiter/dashboard",
+  loginPath: "/login/recruiter",
+};
+
 export function RecruiterSidebar() {
-  return (
-    <PortalSidebar
-      portalName="HR Portal"
-      portalTagline="Hiring Dashboard"
-      navGroups={navGroups}
-      accountMenu={accountMenu}
-      homeHref="/recruiter/dashboard"
-      loginPath="/login/recruiter"
-    />
-  );
+  return <PortalSidebar {...RECRUITER_PORTAL} />;
+}
+
+/** Responsive portal frame (sidebar / top bar / drawer) for the HR portal. */
+export function RecruiterShell({ children }: { children: ReactNode }) {
+  return <PortalShell portal={RECRUITER_PORTAL}>{children}</PortalShell>;
 }

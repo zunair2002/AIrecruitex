@@ -79,7 +79,7 @@ export const MoreFeaturesToggle = () => {
                   background: openPill === i ? "#f3e8ff" : "#fff",
                   fontSize: "13px",
                   fontWeight: 600,
-                  color: openPill === i ? "#4a148c" : "#374151",
+                  color: openPill === i ? "#3f3177" : "#374151",
                   cursor: "pointer",
                   boxShadow: "0 1px 4px rgba(0,0,0,.04)",
                 }}

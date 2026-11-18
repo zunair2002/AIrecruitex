@@ -19,7 +19,7 @@ export const TwentyFourSevenVisual = () => (
       >
         <div className="device-header flex justify-between mb-2">
           <span className="device-time font-bold">9:42 AM</span>
-          <div className="device-status w-2 h-2 bg-green-500 rounded-full"></div>
+          <div className="device-status w-2 h-2 bg-brand-500 rounded-full"></div>
         </div>
         <div className="device-chat">
           <motion.div
@@ -55,7 +55,7 @@ export const TwentyFourSevenVisual = () => (
       >
         <div className="device-header flex justify-between mb-2">
           <span className="device-time font-bold">7:42 PM</span>
-          <div className="device-status w-2 h-2 bg-green-500 rounded-full"></div>
+          <div className="device-status w-2 h-2 bg-brand-500 rounded-full"></div>
         </div>
         <div className="device-chat">
           <div className="chat-line ai h-2 w-24 bg-accent rounded mb-1"></div>

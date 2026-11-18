@@ -2,44 +2,53 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { ArrowRight, GripVertical } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { badgeClass, type StatusTone } from "@/lib/format";
+import { buttonClass } from "@/components/ui/Button";
+import { CardHeader, KpiCard, PageHeader } from "@/components/ui/Feedback";
+import { tabBarClass, tabClass, tabCountClass, tabListClass } from "@/components/ui/Tabs";
 
 /**
- * Shared dashboard chrome for the HR and candidate portals, so both read as one
- * product: flat white panels on a tinted page, hairline borders, small uppercase
- * labels, and tight tracking on numerals.
+ * Shared dashboard chrome for the candidate, HR and admin portals. Everything
+ * here renders the same card / header / badge recipes as `components/ui`, so a
+ * screen can mix the two sets freely.
  */
 
-/** A titled panel. `aside` renders the denser variant used in the side columns. */
+/** A titled card. `aside` renders the slightly denser variant for side columns. */
 export function Panel({
   title,
   action,
   children,
   aside = false,
   className = "",
+  description,
 }: {
   title: string;
   action?: ReactNode;
   children: ReactNode;
   aside?: boolean;
   className?: string;
+  /** One line under the title. */
+  description?: ReactNode;
 }) {
   return (
     <section
-      className={`min-w-0 border border-[#e9eaf0] bg-white ${aside ? "p-4" : "p-4 sm:p-5"} ${className}`}
+      className={`min-w-0 rounded-xl border border-line bg-surface shadow-xs ${
+        aside ? "p-5" : "p-5 sm:p-6"
+      } ${className}`}
     >
-      <div className="mb-4 flex min-h-6 items-center justify-between gap-3">
-        <h2 className="flex items-center gap-1.5 text-[13px] font-bold tracking-[-0.01em] text-[#292b35]">
-          <GripVertical aria-hidden="true" className="h-3.5 w-3.5 text-[#c9cbd4]" />
-          {title}
-        </h2>
-        {action}
-      </div>
+      <CardHeader
+        title={title}
+        description={description}
+        action={action}
+        className={aside ? "mb-4" : "mb-5"}
+      />
       {children}
     </section>
   );
 }
 
+/** "View all →" link for a panel header. */
 export function PanelLink({
   href,
   children,
@@ -50,15 +59,15 @@ export function PanelLink({
   return (
     <Link
       href={href}
-      className="inline-flex shrink-0 items-center gap-1 text-[10px] font-medium text-[#686b77] transition-colors hover:text-brand"
+      className="inline-flex shrink-0 items-center gap-1 rounded-md text-sm font-medium text-brand-700 transition-colors hover:text-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
     >
       {children}
-      <ArrowRight aria-hidden="true" className="h-3 w-3" />
+      <ArrowRight aria-hidden="true" className="h-4 w-4" />
     </Link>
   );
 }
 
-/** Label-above-value pair, as used down the reference's side columns. */
+/** Label-above-value pair for side columns. */
 export function Field({
   label,
   children,
@@ -67,15 +76,14 @@ export function Field({
   children: ReactNode;
 }) {
   return (
-    <div>
-      <p className="text-[9px] font-semibold uppercase tracking-[0.07em] text-[#898b96]">
-        {label}
-      </p>
-      <div className="mt-1 text-[13px] font-medium text-[#292b35]">{children}</div>
+    <div className="min-w-0">
+      <p className="text-xs font-medium text-muted">{label}</p>
+      <div className="mt-1 text-sm font-medium text-ink">{children}</div>
     </div>
   );
 }
 
+/** KPI card — same look as `StatCard`. `iconClass` tints the 40px icon tile. */
 export function MetricCard({
   label,
   value,
@@ -90,28 +98,19 @@ export function MetricCard({
   iconClass: string;
 }) {
   return (
-    <article className="flex min-h-[76px] items-center justify-between gap-3 border border-[#ececf1] bg-white px-3 py-3 sm:px-4">
-      <div className="min-w-0">
-        <p className="truncate text-[9px] font-semibold uppercase tracking-[0.07em] text-[#898b96]">
-          {label}
-        </p>
-        <p className="mt-1 text-[19px] font-bold leading-none tracking-[-0.04em] text-[#292b35]">
-          {value}
-        </p>
-        <p className="mt-1 truncate text-[9px] text-[#9698a2]">{detail}</p>
-      </div>
-      <span
-        className={`flex h-8 w-8 shrink-0 items-center justify-center ${iconClass}`}
-      >
-        {icon}
-      </span>
-    </article>
+    <KpiCard
+      label={label}
+      value={value}
+      detail={detail}
+      icon={icon}
+      iconClassName={iconClass}
+    />
   );
 }
 
 /**
- * One row of a feed: a pastel icon tile, a title with a muted timestamp, and a
- * line of detail underneath — the activity pattern from the reference.
+ * One row of an activity feed: a tinted icon tile, a title with a muted
+ * timestamp, a line of detail underneath, and an optional trailing slot.
  */
 export function FeedRow({
   icon,
@@ -129,53 +128,61 @@ export function FeedRow({
   trailing?: ReactNode;
 }) {
   return (
-    <div className="flex items-start gap-3 border-b border-[#f1f1f5] py-3 last:border-b-0">
+    <div className="flex items-start gap-3 border-b border-line-soft py-3.5 last:border-b-0">
       <span
-        className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md ${iconClass}`}
+        aria-hidden="true"
+        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg [&>svg]:h-4 [&>svg]:w-4 ${iconClass}`}
       >
         {icon}
       </span>
       <div className="min-w-0 flex-1">
-        <p className="flex flex-wrap items-baseline gap-x-2 text-[12px] font-semibold text-[#292b35]">
-          <span className="truncate">{title}</span>
+        <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-sm font-medium text-ink">
+          <span className="min-w-0 truncate">{title}</span>
           {meta && (
-            <span className="text-[10px] font-normal text-[#9698a2]">{meta}</span>
+            <span className="text-xs font-normal text-muted">{meta}</span>
           )}
         </p>
-        {detail && (
-          <div className="mt-0.5 text-[11px] text-[#686b77]">{detail}</div>
-        )}
+        {detail && <div className="mt-1 text-sm text-muted">{detail}</div>}
       </div>
-      {trailing && <div className="shrink-0">{trailing}</div>}
+      {trailing && <div className="shrink-0 self-center">{trailing}</div>}
     </div>
   );
 }
 
-/** Small pill used for statuses and tags. */
+const CHIP_TONES: Record<string, StatusTone> = {
+  neutral: "neutral",
+  brand: "brand",
+  amber: "warning",
+  emerald: "success",
+  rose: "danger",
+  success: "success",
+  warning: "warning",
+  danger: "danger",
+  info: "info",
+};
+
+/** Small status/tag pill — the Badge look. */
 export function Chip({
   children,
   tone = "neutral",
 }: {
   children: ReactNode;
-  tone?: "neutral" | "brand" | "amber" | "emerald" | "rose";
+  tone?:
+    | "neutral"
+    | "brand"
+    | "amber"
+    | "emerald"
+    | "rose"
+    | "success"
+    | "warning"
+    | "danger"
+    | "info";
 }) {
-  const tones = {
-    neutral: "bg-[#f3f3f6] text-[#686b77]",
-    brand: "bg-brand-light text-brand-dark",
-    amber: "bg-amber-50 text-amber-700",
-    emerald: "bg-emerald-50 text-emerald-700",
-    rose: "bg-rose-50 text-rose-700",
-  } as const;
-  return (
-    <span
-      className={`inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium ${tones[tone]}`}
-    >
-      {children}
-    </span>
-  );
+  const resolved = CHIP_TONES[tone] ?? "neutral";
+  return <span className={badgeClass(resolved)}>{children}</span>;
 }
 
-/** Tab strip with counts, as across the top of the reference's centre column. */
+/** Underline tab strip with counts, for filtering a panel's list. */
 export function CountTabs<T extends string>({
   tabs,
   value,
@@ -186,39 +193,31 @@ export function CountTabs<T extends string>({
   onChange: (id: T) => void;
 }) {
   return (
-    <div className="flex flex-wrap items-center gap-1 border-b border-[#eceef3] pb-2">
-      {tabs.map((tab) => {
-        const isActive = tab.id === value;
-        return (
-          <button
-            key={tab.id}
-            type="button"
-            aria-pressed={isActive}
-            onClick={() => onChange(tab.id)}
-            className={`flex items-center gap-1.5 rounded px-2.5 py-1.5 text-[11px] font-medium transition-colors ${
-              isActive
-                ? "bg-[#f3f3f6] text-[#292b35]"
-                : "text-[#898b96] hover:text-[#292b35]"
-            }`}
-          >
-            {tab.label}
-            {tab.count !== undefined && (
-              <span
-                className={`rounded px-1 text-[9px] font-semibold ${
-                  isActive ? "bg-white text-[#686b77]" : "bg-[#f3f3f6] text-[#9698a2]"
-                }`}
-              >
-                {tab.count}
-              </span>
-            )}
-          </button>
-        );
-      })}
+    <div className={tabBarClass}>
+      <div className={tabListClass}>
+        {tabs.map((tab) => {
+          const isActive = tab.id === value;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              aria-pressed={isActive}
+              onClick={() => onChange(tab.id)}
+              className={tabClass(isActive)}
+            >
+              {tab.label}
+              {tab.count !== undefined && (
+                <span className={tabCountClass(isActive)}>{tab.count}</span>
+              )}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
 
-/** Horizontal share-of-total bar, for status breakdowns. */
+/** Horizontal share-of-total bar with a legend, for status breakdowns. */
 export function BreakdownBar({
   rows,
   total,
@@ -227,50 +226,53 @@ export function BreakdownBar({
   total: number;
 }) {
   return (
-    <div className="space-y-2.5">
-      <div className="flex h-2 overflow-hidden rounded bg-[#f3f3f6]">
-        {rows.map((row) => (
-          <div
-            key={row.label}
-            className={row.className}
-            style={{ width: total ? `${(row.value / total) * 100}%` : "0%" }}
-            title={`${row.label}: ${row.value}`}
-          />
-        ))}
+    <div className="space-y-4">
+      <div className="flex h-2 gap-0.5 overflow-hidden rounded-full bg-surface-3">
+        {rows.map((row) =>
+          row.value > 0 ? (
+            <div
+              key={row.label}
+              className={row.className}
+              style={{ width: total ? `${(row.value / total) * 100}%` : "0%" }}
+              title={`${row.label}: ${row.value}`}
+            />
+          ) : null,
+        )}
       </div>
-      <div className="space-y-1.5">
+      <ul className="space-y-2.5">
         {rows.map((row) => (
-          <div
+          <li
             key={row.label}
-            className="flex items-center justify-between text-[11px]"
+            className="flex items-center justify-between gap-3 text-sm"
           >
-            <span className="flex items-center gap-1.5 text-[#686b77]">
-              <span className={`h-2 w-2 rounded-sm ${row.className}`} />
-              {row.label}
+            <span className="flex min-w-0 items-center gap-2 text-body">
+              <span
+                aria-hidden="true"
+                className={`h-2.5 w-2.5 shrink-0 rounded-full ${row.className}`}
+              />
+              <span className="truncate">{row.label}</span>
             </span>
-            <span className="font-semibold text-[#292b35]">
+            <span className="shrink-0 font-medium tabular-nums text-ink">
               {row.value}
-              <span className="ml-1 text-[9px] font-normal text-[#9698a2]">
+              <span className="ml-1.5 text-xs font-normal text-muted">
                 {total ? Math.round((row.value / total) * 100) : 0}%
               </span>
             </span>
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   );
 }
 
+/** Quiet one-line empty message inside a panel. */
 export function EmptyLine({ children }: { children: ReactNode }) {
-  return (
-    <p className="py-6 text-center text-[11px] text-[#9698a2]">{children}</p>
-  );
+  return <p className="py-8 text-center text-sm text-muted">{children}</p>;
 }
 
 /**
- * The page frame every portal screen sits in — tinted page, centred column,
- * consistent gutters. Candidate, HR and Admin all use this, so the three
- * portals line up pixel-for-pixel.
+ * The page container every portal screen sits in. The shell supplies the
+ * background; this only centres the column and sets gutters + rhythm.
  */
 export function PortalPage({
   children,
@@ -281,16 +283,16 @@ export function PortalPage({
 }) {
   return (
     <div
-      className={`min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6 ${className}`}
+      className={`mx-auto w-full max-w-7xl space-y-6 px-4 py-6 sm:px-6 sm:py-8 lg:px-8 ${className}`}
     >
-      <div className="mx-auto max-w-[1500px] space-y-3">{children}</div>
+      {children}
     </div>
   );
 }
 
 /**
- * The header row at the top of a portal screen: a small outlined icon tile,
- * the screen name with a muted subtitle, and an optional action on the right.
+ * The header row at the top of a portal screen: icon tile, title, one-line
+ * subtitle and an optional action. Same component as `PageHeader`.
  */
 export function PortalHeader({
   icon,
@@ -304,28 +306,11 @@ export function PortalHeader({
   action?: ReactNode;
 }) {
   return (
-    <header className="flex min-h-8 items-center justify-between gap-3">
-      <div className="flex min-w-0 items-center gap-2.5">
-        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#e9eaf0] bg-white text-[#767985] [&>svg]:h-3 [&>svg]:w-3">
-          {icon}
-        </span>
-        <div className="min-w-0">
-          <h1 className="truncate text-[13px] font-semibold text-[#30323b]">
-            {title}
-          </h1>
-          {subtitle && (
-            <p className="hidden truncate text-[10px] text-[#999ba4] sm:block">
-              {subtitle}
-            </p>
-          )}
-        </div>
-      </div>
-      {action && <div className="shrink-0">{action}</div>}
-    </header>
+    <PageHeader icon={icon} title={title} description={subtitle} action={action} />
   );
 }
 
-/** The single accent button used for a screen's primary action. */
+/** The primary action button for a screen header (md primary Button). */
 export function HeaderAction({
   href,
   onClick,
@@ -337,8 +322,7 @@ export function HeaderAction({
   children: ReactNode;
   disabled?: boolean;
 }) {
-  const className =
-    "inline-flex h-7 shrink-0 items-center gap-1.5 rounded bg-[#6b5ce7] px-2.5 text-[10px] font-semibold text-white transition-colors hover:bg-[#5849d1] disabled:cursor-not-allowed disabled:opacity-50";
+  const className = buttonClass({ variant: "primary", size: "md" });
   if (href) {
     return (
       <Link href={href} className={className}>
@@ -358,7 +342,7 @@ export function HeaderAction({
   );
 }
 
-/** A plain key/value row, for dense definition lists inside a Panel. */
+/** A key/value row for dense definition lists inside a Panel. */
 export function DataRow({
   label,
   children,
@@ -367,11 +351,10 @@ export function DataRow({
   children: ReactNode;
 }) {
   return (
-    <div className="flex items-start justify-between gap-3 border-b border-[#f1f1f5] py-2 last:border-b-0">
-      <span className="text-[11px] text-[#686b77]">{label}</span>
-      <span className="text-right text-[11px] font-semibold text-[#292b35]">
-        {children}
-      </span>
+    <div className="flex items-start justify-between gap-4 border-b border-line-soft py-2.5 text-sm last:border-b-0">
+      <span className="text-muted">{label}</span>
+      <span className="min-w-0 text-right font-medium text-ink">{children}</span>
     </div>
   );
 }
+

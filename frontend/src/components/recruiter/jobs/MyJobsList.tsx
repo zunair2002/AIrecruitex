@@ -1,20 +1,28 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
+import {
+  BarChart3,
+  BriefcaseBusiness,
+  ChevronDown,
+  ExternalLink,
+  ListChecks,
+  Plus,
+  Users,
+} from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { listMyJobs } from "@/lib/jobsApi";
 import { useApiResource } from "@/lib/useApiResource";
 import { JOB_STATUS_BADGE, JOB_STATUS_LABELS, formatDate } from "@/lib/format";
 import {
-  Card,
+  Button,
   EmptyState,
   ErrorBlock,
-  LoadingBlock,
   PageHeader,
+  SkeletonCard,
   SkillChips,
-} from "@/components/ui/Feedback";
-import { primaryButtonClass } from "@/components/ui/controls";
+} from "@/components/ui";
+import { PortalPage } from "@/components/dashboard/primitives";
 
 /** GET /api/jobs/mine — everything the Job schema stores for the HR user's postings. */
 export function MyJobsList() {
@@ -24,103 +32,130 @@ export function MyJobsList() {
   });
 
   return (
-    <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
+    <PortalPage>
       <PageHeader
-        title="My Jobs"
+        title="My jobs"
         description="Every job you've posted, newest first."
+        icon={<BriefcaseBusiness />}
         action={
-          <Link
+          <Button
             href="/recruiter/jobs/create"
-            className={`${primaryButtonClass} text-sm`}
+            leadingIcon={<Plus aria-hidden="true" />}
           >
             Create job
-          </Link>
+          </Button>
         }
       />
 
       {jobs.isLoading ? (
-        <LoadingBlock label="Loading your jobs…" />
+        <div
+          role="status"
+          aria-label="Loading your jobs…"
+          className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-6"
+        >
+          <SkeletonCard lines={4} />
+          <SkeletonCard lines={4} />
+        </div>
       ) : jobs.error ? (
         <ErrorBlock message={jobs.error} onRetry={jobs.reload} />
       ) : (jobs.data ?? []).length === 0 ? (
         <EmptyState
+          icon={<BriefcaseBusiness />}
           title="You haven't posted any jobs yet."
           description="Post one and candidates can start applying immediately."
           action={
-            <Link
+            <Button
               href="/recruiter/jobs/create"
-              className={`${primaryButtonClass} text-sm`}
+              leadingIcon={<Plus aria-hidden="true" />}
             >
               Create your first job
-            </Link>
+            </Button>
           }
         />
       ) : (
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-6">
           {(jobs.data ?? []).map((job) => (
-            <Card key={job._id}>
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <h2 className="text-lg font-bold text-[#292b35]">
-                    {job.title}
-                  </h2>
-                  <p className="mt-1 text-xs text-[#898b96]">
-                    Posted {formatDate(job.createdAt)}
-                  </p>
+            <article
+              key={job._id}
+              className="flex min-w-0 flex-col rounded-xl border border-line bg-surface shadow-xs transition-colors hover:border-brand-200"
+            >
+              <div className="flex-1 p-5 sm:p-6">
+                <div className="flex items-start gap-3">
+                  <span
+                    aria-hidden="true"
+                    className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-700 sm:flex"
+                  >
+                    <BriefcaseBusiness className="h-5 w-5" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <h2 className="text-base font-semibold text-ink">
+                      {job.title}
+                    </h2>
+                    <p className="mt-0.5 text-xs text-muted">
+                      Posted {formatDate(job.createdAt)}
+                    </p>
+                  </div>
+                  <span className={JOB_STATUS_BADGE[job.status]}>
+                    {JOB_STATUS_LABELS[job.status]}
+                  </span>
                 </div>
-                <span className={JOB_STATUS_BADGE[job.status]}>
-                  {JOB_STATUS_LABELS[job.status]}
-                </span>
-              </div>
 
-              <p className="mt-4 line-clamp-3 whitespace-pre-line text-sm text-[#686b77]">
-                {job.description}
-              </p>
-
-              <div className="mt-4">
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#898b96]">
-                  Required skills ({job.requiredSkills.length})
+                <p className="mt-4 line-clamp-3 whitespace-pre-line text-sm text-muted">
+                  {job.description}
                 </p>
-                <SkillChips skills={job.requiredSkills} />
+
+                <div className="mt-4">
+                  <p className="mb-2 text-xs font-medium text-muted">
+                    Required skills ({job.requiredSkills.length})
+                  </p>
+                  <SkillChips skills={job.requiredSkills} />
+                </div>
+
+                {job.jdRawText && <JdRawText text={job.jdRawText} />}
               </div>
 
-              {job.jdRawText && <JdRawText text={job.jdRawText} />}
-
-              <div className="mt-5 flex flex-wrap items-center gap-4">
-                <Link
+              <div className="flex flex-wrap items-center gap-2 border-t border-line-soft px-5 py-3 sm:px-6">
+                <Button
+                  variant="soft"
+                  size="sm"
                   href={`/recruiter/applicants?jobId=${job._id}`}
-                  className="text-sm font-semibold text-brand hover:text-brand-dark"
+                  leadingIcon={<Users aria-hidden="true" />}
                 >
-                  View applicants →
-                </Link>
-                <Link
+                  View applicants
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
                   href={`/recruiter/reports?jobId=${job._id}`}
-                  className="text-sm font-semibold text-brand hover:text-brand-dark"
+                  leadingIcon={<BarChart3 aria-hidden="true" />}
                 >
-                  Interview reports →
-                </Link>
-                <Link
+                  Interview reports
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
                   href={`/recruiter/jobs/${job._id}/questions`}
-                  className="text-sm font-semibold text-brand hover:text-brand-dark"
+                  leadingIcon={<ListChecks aria-hidden="true" />}
                 >
-                  Question pool →
-                </Link>
+                  Question pool
+                </Button>
                 {job.jdFileUrl && (
                   <a
                     href={job.jdFileUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-sm font-medium text-[#898b96] hover:text-[#292b35]"
+                    className="ml-auto inline-flex h-8 items-center gap-1.5 rounded-lg px-2 text-sm font-medium text-muted transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
                   >
                     JD file
+                    <ExternalLink aria-hidden="true" className="h-4 w-4" />
                   </a>
                 )}
               </div>
-            </Card>
+            </article>
           ))}
         </div>
       )}
-    </div>
+    </PortalPage>
   );
 }
 
@@ -136,13 +171,18 @@ function JdRawText({ text }: { text: string }) {
       <button
         type="button"
         onClick={() => setIsOpen((value) => !value)}
-        className="text-xs font-semibold text-brand hover:text-brand-dark"
+        aria-expanded={isOpen}
+        className="inline-flex items-center gap-1 rounded-md text-sm font-medium text-brand-700 hover:text-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
       >
         {isOpen ? "Hide" : "Show"} extracted JD text (
         {text.length.toLocaleString()} chars)
+        <ChevronDown
+          aria-hidden="true"
+          className={`h-4 w-4 transition-transform ${isOpen ? "rotate-180" : ""}`}
+        />
       </button>
       {isOpen && (
-        <pre className="mt-2 max-h-64 overflow-auto whitespace-pre-wrap rounded bg-[#f8f8fb] p-4 text-xs leading-relaxed text-[#686b77]">
+        <pre className="mt-2 max-h-64 overflow-auto whitespace-pre-wrap rounded-lg border border-line-soft bg-surface-2 p-4 font-sans text-xs leading-relaxed text-body">
           {text}
         </pre>
       )}

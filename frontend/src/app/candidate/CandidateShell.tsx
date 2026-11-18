@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { CandidateSidebar } from "@/components/candidate/CandidateSidebar";
+import { CandidatePortalShell } from "@/components/candidate/CandidateSidebar";
 import { RequireAuth } from "@/components/auth/RequireAuth";
 
 /**
@@ -23,12 +23,7 @@ export function CandidateShell({ children }: { children: React.ReactNode }) {
 
   return (
     <RequireAuth roles={["candidate"]} loginPath="/login/candidate">
-      <div className="flex h-dvh overflow-hidden">
-        <CandidateSidebar />
-        <main className="h-dvh min-h-0 min-w-0 flex-1 overflow-y-auto bg-[#f7f8fa]">
-          {children}
-        </main>
-      </div>
+      <CandidatePortalShell>{children}</CandidatePortalShell>
     </RequireAuth>
   );
 }

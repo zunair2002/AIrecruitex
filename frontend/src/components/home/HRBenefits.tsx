@@ -48,7 +48,7 @@ export const HRBenefits = () => (
         <h2 className="font-display mt-5 text-4xl text-ink md:text-5xl">
           Hire with a brief, not a pile of CVs
         </h2>
-        <p className="mt-4 text-lg leading-relaxed text-[#6b5f7a]">
+        <p className="mt-4 text-lg leading-relaxed text-muted">
           Screening, interviews, and ranked shortlists — so the team meets only
           the strongest fits.
         </p>
@@ -67,11 +67,11 @@ export const HRBenefits = () => (
             variants={fadeUp}
             className="framed-card p-7"
           >
-            <p className="inline-flex bg-brand-light px-2.5 py-1 text-[11px] font-bold tracking-[0.16em] text-brand uppercase">
+            <p className="inline-flex bg-brand-light px-2.5 py-1 text-xs font-bold tracking-[0.16em] text-brand uppercase">
               {String(index + 1).padStart(2, "0")}
             </p>
             <h3 className="font-display mt-4 text-xl text-ink">{item.title}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-[#6b5f7a]">
+            <p className="mt-2 text-sm leading-relaxed text-muted">
               {item.description}
             </p>
           </motion.div>

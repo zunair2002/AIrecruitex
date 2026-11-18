@@ -1,18 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState, type ReactNode } from "react";
+import { useMemo, useState } from "react";
 import {
-  ArrowDownRight,
   ArrowRight,
   Bell,
   BriefcaseBusiness,
+  CalendarClock,
   CalendarDays,
   Check,
-  ChevronDown,
-  Circle,
   Clock3,
   FileCheck2,
+  FileText,
   Search,
   Target,
 } from "lucide-react";
@@ -38,14 +37,48 @@ import {
   type ApplicationStatus,
   type Notification,
 } from "@/lib/types";
-import { ErrorBlock } from "@/components/ui/Feedback";
+import { Avatar } from "@/components/ui/Avatar";
+import { Button } from "@/components/ui/Button";
+import { Badge, StatusBadge } from "@/components/ui/Badge";
+import {
+  SegmentedControl,
+  tabClass,
+  tabCountClass,
+  tabListClass,
+} from "@/components/ui/Tabs";
+import { Card, EmptyState, ErrorBlock } from "@/components/ui/Feedback";
+import { PageSkeleton } from "@/components/ui/Skeleton";
+import { compactInputClass } from "@/components/ui/controls";
+import { PanelLink, PortalPage } from "@/components/dashboard/primitives";
+import {
+  DashboardHero,
+  HeroButton,
+  HeroMeter,
+} from "@/components/dashboard/DashboardHero";
 
 type ChartRange = "Monthly" | "Weekly" | "Quarterly";
 type StatusFilter = "all" | ApplicationStatus;
+type SeriesKey = "count" | "matched" | "selected";
+type ActivityBucket = Record<SeriesKey, number> & { label: string };
+type NextEvent = {
+  application: Application;
+  kind: "ai" | "org";
+  at: Date | null;
+  isFuture: boolean;
+};
 
 const EMPTY_APPLICATIONS: Application[] = [];
 const EMPTY_NOTIFICATIONS: Notification[] = [];
 const chartRanges: ChartRange[] = ["Monthly", "Weekly", "Quarterly"];
+const chartRangeOptions = chartRanges.map((range) => ({
+  value: range,
+  label: range,
+}));
+const RANGE_SPAN: Record<ChartRange, string> = {
+  Monthly: "6 months",
+  Weekly: "6 weeks",
+  Quarterly: "6 quarters",
+};
 const statusFilters: StatusFilter[] = [
   "all",
   "pending",
@@ -53,144 +86,102 @@ const statusFilters: StatusFilter[] = [
   "rejected",
 ];
 
-const statusColors: Record<ApplicationStatus, string> = {
-  pending: "#f6b94a",
-  selected: "#45b9a7",
-  rejected: "#ef7474",
-};
+/** Chart palette per application status (pending amber, selected teal, rejected rose). */
+const STATUS_CHART: Record<ApplicationStatus, { color: string; swatch: string }> =
+  {
+    pending: { color: "var(--color-chart-3)", swatch: "bg-chart-3" },
+    selected: { color: "var(--color-chart-2)", swatch: "bg-chart-2" },
+    rejected: { color: "var(--color-chart-4)", swatch: "bg-chart-4" },
+  };
 
-const statusClasses: Record<ApplicationStatus, string> = {
-  pending: "bg-amber-50 text-amber-700",
-  selected: "bg-emerald-50 text-emerald-700",
-  rejected: "bg-[#f3f3f6] text-[#898b96]",
-};
-
-function Panel({
-  title,
-  action,
-  children,
-  className = "",
-}: {
-  title: string;
-  action?: ReactNode;
-  children: ReactNode;
-  className?: string;
-}) {
-  return (
-    <section
-      className={`min-w-0 border border-[#e9eaf0] bg-white p-4 sm:p-5 ${className}`}
-    >
-      <div className="mb-4 flex min-h-6 items-center justify-between gap-3">
-        <h2 className="text-[13px] font-bold tracking-[-0.01em] text-[#292b35]">
-          {title}
-        </h2>
-        {action}
-      </div>
-      {children}
-    </section>
-  );
-}
-
-function PanelLink({
-  href,
-  children,
-}: {
-  href: string;
-  children: ReactNode;
-}) {
-  return (
-    <Link
-      href={href}
-      className="inline-flex shrink-0 items-center gap-1 text-[10px] font-medium text-[#686b77] transition-colors hover:text-violet-700"
-    >
-      {children}
-      <ArrowRight aria-hidden="true" className="h-3 w-3" />
-    </Link>
-  );
-}
-
-function RangeTabs({
-  value,
-  onChange,
-}: {
-  value: ChartRange;
-  onChange: (range: ChartRange) => void;
-}) {
-  return (
-    <div
-      aria-label="Activity chart range"
-      className="flex items-center rounded border border-[#ececf1] p-0.5"
-    >
-      {chartRanges.map((range) => (
-        <button
-          key={range}
-          type="button"
-          aria-pressed={value === range}
-          onClick={() => onChange(range)}
-          className={`rounded px-2 py-1 text-[9px] transition-colors sm:px-2.5 ${
-            value === range
-              ? "bg-[#f0efff] font-semibold text-[#6658d9]"
-              : "text-[#858793] hover:text-[#454752]"
-          }`}
-        >
-          {range}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-function MetricCard({
-  label,
-  value,
-  detail,
-  icon,
-  iconClass,
-}: {
+const SERIES: {
+  key: SeriesKey;
   label: string;
-  value: string;
-  detail: string;
-  icon: ReactNode;
-  iconClass: string;
-}) {
-  return (
-    <article className="flex min-h-[76px] items-center justify-between gap-3 border border-[#ececf1] bg-white px-3 py-3 sm:px-4">
-      <div className="min-w-0">
-        <p className="truncate text-[9px] font-semibold uppercase tracking-[0.07em] text-[#898b96]">
-          {label}
-        </p>
-        <p className="mt-1 text-[19px] font-bold leading-none tracking-[-0.04em] text-[#292b35]">
-          {value}
-        </p>
-        <p className="mt-1 truncate text-[9px] text-[#9698a2]">{detail}</p>
-      </div>
-      <span className={`flex h-8 w-8 shrink-0 items-center justify-center ${iconClass}`}>
-        {icon}
-      </span>
-    </article>
-  );
+  color: string;
+  swatch: string;
+  dashed?: boolean;
+}[] = [
+  {
+    key: "count",
+    label: "Applications",
+    color: "var(--color-chart-1)",
+    swatch: "bg-chart-1",
+  },
+  {
+    key: "matched",
+    label: "Profile matches",
+    color: "var(--color-chart-2)",
+    swatch: "bg-chart-2",
+  },
+  {
+    key: "selected",
+    label: "Selected",
+    color: "var(--color-chart-3)",
+    swatch: "bg-chart-3",
+    dashed: true,
+  },
+];
+
+const linkClass =
+  "inline-flex items-center gap-1 rounded-md text-sm font-medium text-brand-700 transition-colors hover:text-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2";
+
+function scoreBarClass(score: number): string {
+  if (score >= 80) return "bg-success-400";
+  if (score >= 50) return "bg-warning-400";
+  return "bg-danger-400";
 }
 
-function DashboardLoading() {
-  return (
-    <div className="min-h-full bg-[#f7f8fa] p-4 sm:p-6">
-      <div className="mx-auto max-w-[1500px] animate-pulse space-y-4">
-        <div className="h-8 bg-white" />
-        <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-          {Array.from({ length: 4 }, (_, index) => (
-            <div key={index} className="h-20 bg-white" />
-          ))}
-        </div>
-        <div className="grid gap-3 lg:grid-cols-2">
-          <div className="h-64 bg-white" />
-          <div className="h-64 bg-white" />
-        </div>
-      </div>
-    </div>
-  );
+function toDate(value?: string): Date | null {
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
 }
 
-function getActivityBuckets(applications: Application[], range: ChartRange) {
+/** The nearest upcoming step for an application (future first). */
+function getNextEvent(application: Application, now: number): NextEvent {
+  const events: NextEvent[] = [];
+  if (application.aiInterview.scheduled) {
+    const at = toDate(application.aiInterview.dateTime);
+    events.push({
+      application,
+      kind: "ai",
+      at,
+      isFuture: Boolean(at && at.getTime() >= now),
+    });
+  }
+  if (application.orgInterview?.status === "invited") {
+    const at = toDate(application.orgInterview.expiresAt);
+    events.push({
+      application,
+      kind: "org",
+      at,
+      isFuture: Boolean(at && at.getTime() >= now),
+    });
+  }
+  const future = events
+    .filter((event) => event.isFuture)
+    .sort((a, b) => (a.at?.getTime() ?? 0) - (b.at?.getTime() ?? 0));
+  return future[0] ?? events[0];
+}
+
+function relativeDay(date: Date, now: number): string {
+  const startOf = (value: number) => {
+    const day = new Date(value);
+    day.setHours(0, 0, 0, 0);
+    return day.getTime();
+  };
+  const days = Math.round((startOf(date.getTime()) - startOf(now)) / 86_400_000);
+  if (days === 0) return "Today";
+  if (days === 1) return "Tomorrow";
+  if (days > 1) return `In ${days} days`;
+  if (days === -1) return "Yesterday";
+  return `${-days} days ago`;
+}
+
+function getActivityBuckets(
+  applications: Application[],
+  range: ChartRange,
+): ActivityBucket[] {
   const now = new Date();
   const buckets = Array.from({ length: 6 }, (_, index) => {
     let start: Date;
@@ -253,11 +244,244 @@ function getActivityBuckets(applications: Application[], range: ChartRange) {
   return buckets;
 }
 
+/**
+ * Fluid line chart: the SVG stretches to its box (non-scaling strokes), the
+ * dots and axis labels are HTML so they stay round and readable at any width.
+ */
+function ActivityChart({
+  buckets,
+  range,
+}: {
+  buckets: ActivityBucket[];
+  range: ChartRange;
+}) {
+  const peak = Math.max(
+    1,
+    ...buckets.flatMap((bucket) => [bucket.count, bucket.matched, bucket.selected]),
+  );
+  const yMax = Math.max(4, Math.ceil(peak / 4) * 4);
+  const ticks = [4, 3, 2, 1, 0].map((step) => (yMax / 4) * step);
+  const x = (index: number) => ((index + 0.5) / buckets.length) * 100;
+  const y = (value: number) => 100 - (value / yMax) * 100;
+  const linePoints = (key: SeriesKey) =>
+    buckets.map((bucket, index) => `${x(index)},${y(bucket[key])}`).join(" ");
+  const areaPath = `M${x(0)},100 L${buckets
+    .map((bucket, index) => `${x(index)},${y(bucket.count)}`)
+    .join(" L")} L${x(buckets.length - 1)},100 Z`;
+
+  return (
+    <div>
+      <div className="flex items-start gap-3">
+        <div aria-hidden="true" className="relative h-44 w-5 shrink-0 sm:h-52">
+          {ticks.map((tick) => (
+            <span
+              key={tick}
+              className="absolute right-0 -translate-y-1/2 text-xs leading-none tabular-nums text-muted"
+              style={{ top: `${y(tick)}%` }}
+            >
+              {tick}
+            </span>
+          ))}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="relative h-44 sm:h-52">
+            <svg
+              role="img"
+              aria-label={`${range} application activity chart`}
+              viewBox="0 0 100 100"
+              preserveAspectRatio="none"
+              className="absolute inset-0 h-full w-full overflow-visible"
+            >
+              <defs>
+                <linearGradient
+                  id="candidate-activity-fill"
+                  x1="0"
+                  x2="0"
+                  y1="0"
+                  y2="1"
+                >
+                  <stop offset="0%" stopColor="var(--color-chart-1)" stopOpacity="0.28" />
+                  <stop offset="100%" stopColor="var(--color-chart-1)" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              {ticks.map((tick) => (
+                <line
+                  key={tick}
+                  x1="0"
+                  x2="100"
+                  y1={y(tick)}
+                  y2={y(tick)}
+                  stroke={tick === 0 ? "var(--color-line)" : "var(--color-line-soft)"}
+                  strokeWidth="1"
+                  strokeDasharray={tick === 0 ? undefined : "3 4"}
+                  vectorEffect="non-scaling-stroke"
+                />
+              ))}
+              <path d={areaPath} fill="url(#candidate-activity-fill)" />
+              {[...SERIES].reverse().map((series) => (
+                <polyline
+                  key={series.key}
+                  points={linePoints(series.key)}
+                  fill="none"
+                  stroke={series.color}
+                  strokeWidth={series.key === "count" ? 2.5 : 2}
+                  strokeDasharray={series.dashed ? "5 5" : undefined}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  vectorEffect="non-scaling-stroke"
+                />
+              ))}
+            </svg>
+            {buckets.map((bucket, index) => (
+              <span
+                key={`${bucket.label}-${index}`}
+                aria-hidden="true"
+                title={`${bucket.label}: ${bucket.count} application${bucket.count === 1 ? "" : "s"}`}
+                className="absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-chart-1 bg-surface shadow-xs"
+                style={{ left: `${x(index)}%`, top: `${y(bucket.count)}%` }}
+              />
+            ))}
+          </div>
+          <div
+            aria-hidden="true"
+            className="mt-3 grid grid-cols-6 text-center text-xs text-muted"
+          >
+            {buckets.map((bucket, index) => (
+              <span key={`${bucket.label}-${index}`} className="truncate px-0.5">
+                {bucket.label}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+      <ul className="sr-only">
+        {buckets.map((bucket, index) => (
+          <li key={`${bucket.label}-${index}`}>
+            {bucket.label}: {bucket.count} applications, {bucket.matched} profile
+            matches, {bucket.selected} selected
+          </li>
+        ))}
+      </ul>
+      <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-line-soft pt-4 text-sm text-body">
+        {SERIES.map((series) => (
+          <span key={series.key} className="inline-flex items-center gap-2">
+            <span
+              aria-hidden="true"
+              className={`h-2.5 w-2.5 rounded-full ${series.swatch}`}
+            />
+            {series.label}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function StatusDonut({
+  items,
+  total,
+}: {
+  items: { status: ApplicationStatus; count: number }[];
+  total: number;
+}) {
+  const radius = 40;
+  const circumference = 2 * Math.PI * radius;
+  const gap = items.filter((item) => item.count > 0).length > 1 ? 1.5 : 0;
+  const segments = items.reduce<
+    { status: ApplicationStatus; start: number; length: number }[]
+  >((list, item) => {
+    const previous = list[list.length - 1];
+    list.push({
+      status: item.status,
+      start: previous ? previous.start + previous.length : 0,
+      length: total ? (item.count / total) * circumference : 0,
+    });
+    return list;
+  }, []);
+
+  return (
+    <div className="flex flex-col items-center gap-6 sm:flex-row sm:justify-center sm:gap-10 lg:flex-col lg:gap-6">
+      <div className="relative aspect-square w-40 shrink-0">
+        <svg
+          role="img"
+          aria-label={`Application status breakdown, ${total} total`}
+          viewBox="0 0 100 100"
+          className="h-full w-full -rotate-90"
+        >
+          <circle
+            cx="50"
+            cy="50"
+            r={radius}
+            fill="none"
+            stroke="var(--color-surface-3)"
+            strokeWidth="12"
+          />
+          {segments.map((segment) => {
+            const drawn = Math.max(segment.length - gap, 0);
+            return (
+              <circle
+                key={segment.status}
+                cx="50"
+                cy="50"
+                r={radius}
+                fill="none"
+                stroke={STATUS_CHART[segment.status].color}
+                strokeWidth="12"
+                strokeDasharray={`${drawn} ${circumference - drawn}`}
+                strokeDashoffset={-segment.start}
+              />
+            );
+          })}
+        </svg>
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <span className="font-display text-3xl font-semibold tracking-tight tabular-nums text-ink">
+            {total}
+          </span>
+          <span className="text-xs text-muted">Applications</span>
+        </div>
+      </div>
+      <ul className="w-full max-w-xs space-y-3 lg:max-w-none">
+        {items.map(({ status, count }) => {
+          const percent = total ? Math.round((count / total) * 100) : 0;
+          return (
+            <li key={status} className="text-sm">
+              <div className="flex items-center justify-between gap-3">
+                <span className="flex min-w-0 items-center gap-2.5 text-body">
+                  <span
+                    aria-hidden="true"
+                    className={`h-2.5 w-2.5 shrink-0 rounded-full ${STATUS_CHART[status].swatch}`}
+                  />
+                  {APPLICATION_STATUS_LABELS[status]}
+                </span>
+                <span className="shrink-0 tabular-nums">
+                  <span className="font-semibold text-ink">{count}</span>
+                  <span className="ml-2 text-xs text-muted">{percent}%</span>
+                </span>
+              </div>
+              <div
+                aria-hidden="true"
+                className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface-3"
+              >
+                <div
+                  className={`h-full rounded-full ${STATUS_CHART[status].swatch}`}
+                  style={{ width: `${percent}%` }}
+                />
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
 export function CandidateDashboard() {
   const { user, token } = useAuth();
   const [chartRange, setChartRange] = useState<ChartRange>("Monthly");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [search, setSearch] = useState("");
+  // Reference time for "next up" countdowns, fixed for the life of the page.
+  const [now] = useState(() => Date.now());
   const enabled = Boolean(token);
 
   const applications = useApiResource(
@@ -342,303 +566,191 @@ export function CandidateDashboard() {
   ).length;
 
   if (applications.isLoading) {
-    return <DashboardLoading />;
+    return (
+      <PortalPage>
+        <PageSkeleton label="Loading dashboard…" />
+      </PortalPage>
+    );
   }
 
-  const maxActivity = Math.max(
-    ...activityBuckets.flatMap((bucket) => [
-      bucket.count,
-      bucket.matched,
-      bucket.selected,
-    ]),
-    1,
-  );
-  const getChartPoints = (key: "count" | "matched" | "selected") =>
-    activityBuckets
-      .map((bucket, index) => {
-        const x = 20 + index * 84;
-        const y = 124 - (bucket[key] / maxActivity) * 86;
-        return `${x},${y}`;
-      })
-      .join(" ");
   const statusTotal = statusSummary.reduce((sum, item) => sum + item.count, 0);
-  const circumference = 2 * Math.PI * 39;
-  let segmentOffset = 0;
   const recentNotifications = notificationList.slice(0, 5);
+  const recentApplications = filteredApplications.slice(0, 5);
+  const periodTotal = activityBuckets.reduce((sum, bucket) => sum + bucket.count, 0);
+  const nextEvents = summary.upcoming
+    .map((application) => getNextEvent(application, now))
+    .sort((a, b) => {
+      if (a.isFuture !== b.isFuture) return a.isFuture ? -1 : 1;
+      return (a.at?.getTime() ?? Infinity) - (b.at?.getTime() ?? Infinity);
+    });
+  const [nextUp, ...laterEvents] = nextEvents;
+
+  const firstName = user?.name.split(/\s+/)[0];
+  const upcomingCount = summary.upcoming.length;
+  const heroSummary = [
+    upcomingCount
+      ? `${upcomingCount} interview${upcomingCount === 1 ? "" : "s"} coming up`
+      : null,
+    summary.selected
+      ? `${summary.selected} application${summary.selected === 1 ? "" : "s"} selected`
+      : null,
+    summary.pending ? `${summary.pending} awaiting a response` : null,
+  ].filter(Boolean);
+  const today = new Date(now).toLocaleDateString(undefined, {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
 
   return (
-    <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
-      <div className="mx-auto max-w-[1500px] space-y-3">
-        <header className="flex min-h-8 items-center justify-between gap-3">
-          <div className="flex min-w-0 items-center gap-2.5">
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#e9eaf0] bg-white text-[#767985]">
-              <BriefcaseBusiness aria-hidden="true" className="h-3 w-3" />
-            </span>
-            <div className="min-w-0">
-              <h1 className="truncate text-[13px] font-semibold text-[#30323b]">
-                Dashboard
-              </h1>
-              <p className="hidden text-[10px] text-[#999ba4] sm:block">
-                {user ? `Welcome back, ${user.name}` : "Your candidate overview"}
-              </p>
-            </div>
-          </div>
-          <Link
-            href="/candidate/jobs"
-            className="inline-flex h-7 shrink-0 items-center gap-1.5 rounded bg-[#6b5ce7] px-2.5 text-[10px] font-semibold text-white transition-colors hover:bg-[#5849d1]"
-          >
-            <span aria-hidden="true" className="text-sm leading-none">+</span>
-            Find jobs
-          </Link>
-        </header>
+    <PortalPage>
+      <DashboardHero
+        eyebrow={<span suppressHydrationWarning>{today}</span>}
+        title={firstName ? `Welcome back, ${firstName}` : "Welcome back"}
+        description={
+          heroSummary.length
+            ? heroSummary.join(" · ")
+            : "Browse open roles and apply with your resume to get started."
+        }
+        actions={
+          <>
+            <HeroButton href="/candidate/jobs" icon={<Search aria-hidden="true" />}>
+              Find jobs
+            </HeroButton>
+            <HeroButton
+              href="/candidate/resume"
+              variant="ghost"
+              icon={<FileText aria-hidden="true" />}
+            >
+              Update resume
+            </HeroButton>
+          </>
+        }
+        aside={
+          <HeroMeter
+            value={summary.averageMatch}
+            label="Average match"
+            caption={`${summary.matched} of ${summary.total} application${summary.total === 1 ? "" : "s"} matched your profile`}
+          />
+        }
+        stats={[
+          {
+            label: "Applications",
+            value: summary.total,
+            detail: `${summary.pending} awaiting response`,
+            icon: <FileCheck2 />,
+          },
+          {
+            label: "Matched",
+            value: summary.matched,
+            detail: `of ${summary.total} submitted`,
+            icon: <Target />,
+            trend: summary.matched > 0 ? "up" : "neutral",
+          },
+          {
+            label: "Selected",
+            value: summary.selected,
+            detail: `${upcomingCount} interview${upcomingCount === 1 ? "" : "s"} scheduled`,
+            icon: <Check />,
+            trend: summary.selected > 0 ? "up" : "neutral",
+          },
+          {
+            label: "Open jobs",
+            value: jobs.data?.length ?? 0,
+            detail: unreadCount
+              ? `${unreadCount} unread notification${unreadCount === 1 ? "" : "s"}`
+              : "No new notifications",
+            icon: <BriefcaseBusiness />,
+            trend: unreadCount ? "down" : "neutral",
+          },
+        ]}
+      />
 
-        {applications.error && (
-          <ErrorBlock
-            message={applications.error}
-            onRetry={applications.reload}
-          />
-        )}
+      {applications.error && (
+        <ErrorBlock
+          message={applications.error}
+          onRetry={applications.reload}
+        />
+      )}
 
-        <section
-          aria-label="Application overview"
-          className="grid grid-cols-2 gap-2.5 xl:grid-cols-4"
-        >
-          <MetricCard
-            label="Applications"
-            value={String(summary.total)}
-            detail={`${summary.pending} awaiting response`}
-            icon={<FileCheck2 aria-hidden="true" className="h-4 w-4" />}
-            iconClass="bg-[#f0efff] text-[#6b5ce7]"
-          />
-          <MetricCard
-            label="Matched applications"
-            value={String(summary.matched)}
-            detail={`${summary.averageMatch}% average match`}
-            icon={<Target aria-hidden="true" className="h-4 w-4" />}
-            iconClass="bg-[#eaf7f5] text-[#46aa9e]"
-          />
-          <MetricCard
-            label="Selected by employers"
-            value={String(summary.selected)}
-            detail={`${summary.upcoming.length} interview${summary.upcoming.length === 1 ? "" : "s"} scheduled`}
-            icon={<Check aria-hidden="true" className="h-4 w-4" />}
-            iconClass="bg-[#edf7ee] text-[#50a66d]"
-          />
-          <MetricCard
-            label="Open jobs"
-            value={String(jobs.data?.length ?? 0)}
-            detail={
-              unreadCount
-                ? `${unreadCount} unread notification${unreadCount === 1 ? "" : "s"}`
-                : "No new notifications"
-            }
-            icon={<BriefcaseBusiness aria-hidden="true" className="h-4 w-4" />}
-            iconClass="bg-[#fff4e8] text-[#e29a42]"
-          />
-        </section>
-
-        <section className="grid gap-3 lg:grid-cols-[minmax(0,1.65fr)_minmax(285px,1fr)]">
-          <Panel
-            title="Application Overview"
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-6">
+        <div className="min-w-0 space-y-4 lg:col-span-2 lg:space-y-6">
+          <Card
+            title="Next up"
+            description="Your nearest interview or follow-up."
             action={
-              <RangeTabs value={chartRange} onChange={setChartRange} />
+              <PanelLink href="/candidate/interview/result">View all</PanelLink>
             }
           >
-            <div className="mb-1 flex items-baseline gap-2">
-              <span className="text-[18px] font-bold tracking-tight text-[#30323b]">
-                {summary.total}
-              </span>
-              <span className="text-[9px] text-[#92949d]">
-                applications submitted
-              </span>
-            </div>
-            <div className="relative">
-              <div className="pointer-events-none absolute inset-0 flex flex-col justify-between pb-5 pt-1">
-                {[0, 1, 2, 3].map((line) => (
-                  <div
-                    key={line}
-                    className="border-t border-dashed border-[#eef0f4]"
-                  />
-                ))}
-              </div>
-              <svg
-                role="img"
-                aria-label={`${chartRange} application activity chart`}
-                viewBox="0 0 440 142"
-                className="relative h-[138px] w-full overflow-visible"
-                preserveAspectRatio="none"
-              >
-                <polyline
-                  points={getChartPoints("count")}
-                  fill="none"
-                  stroke="#7163df"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  vectorEffect="non-scaling-stroke"
-                />
-                <polyline
-                  points={getChartPoints("matched")}
-                  fill="none"
-                  stroke="#65c4cf"
-                  strokeWidth="1.7"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  vectorEffect="non-scaling-stroke"
-                />
-                <polyline
-                  points={getChartPoints("selected")}
-                  fill="none"
-                  stroke="#b8bbc4"
-                  strokeWidth="1.4"
-                  strokeDasharray="4 4"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  vectorEffect="non-scaling-stroke"
-                />
-                {activityBuckets.map((bucket, index) => {
-                  const x = 20 + index * 84;
-                  const y = 124 - (bucket.count / maxActivity) * 86;
-                  return (
-                    <circle
-                      key={`${bucket.label}-${index}`}
-                      cx={x}
-                      cy={y}
-                      r="2.5"
-                      fill="white"
-                      stroke="#7163df"
-                      strokeWidth="1.5"
-                      vectorEffect="non-scaling-stroke"
-                    >
-                      <title>
-                        {bucket.label}: {bucket.count} application
-                        {bucket.count === 1 ? "" : "s"}
-                      </title>
-                    </circle>
-                  );
-                })}
-              </svg>
-              <div className="grid grid-cols-6 text-center text-[9px] text-[#92949d]">
-                {activityBuckets.map((bucket, index) => (
-                  <span key={`${bucket.label}-${index}`}>{bucket.label}</span>
-                ))}
-              </div>
-            </div>
-            <div className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 border-t border-[#f0f0f3] pt-2.5 text-[9px] text-[#777a85]">
-              <span className="inline-flex items-center gap-1.5">
-                <span className="h-1.5 w-4 rounded-full bg-[#7163df]" />
-                Applications
-              </span>
-              <span className="inline-flex items-center gap-1.5">
-                <span className="h-1.5 w-4 rounded-full bg-[#65c4cf]" />
-                Profile matches
-              </span>
-              <span className="inline-flex items-center gap-1.5">
-                <span className="h-1.5 w-4 rounded-full border-t border-dashed border-[#b8bbc4]" />
-                Selected
-              </span>
-            </div>
-          </Panel>
-
-          <Panel
-            title="Application Status"
-            action={
-              <span className="inline-flex items-center gap-1 rounded border border-[#ececf1] px-2 py-1 text-[9px] text-[#858792]">
-                All applications
-                <ChevronDown aria-hidden="true" className="h-3 w-3" />
-              </span>
-            }
-          >
-            <div className="flex min-h-[190px] flex-col items-center justify-center gap-5 sm:flex-row lg:flex-col xl:flex-row">
-              <div className="relative h-[132px] w-[132px] shrink-0">
-                <svg
-                  role="img"
-                  aria-label={`Application status breakdown, ${statusTotal} total`}
-                  viewBox="0 0 100 100"
-                  className="h-full w-full -rotate-90"
-                >
-                  <circle
-                    cx="50"
-                    cy="50"
-                    r="39"
-                    fill="none"
-                    stroke="#f0f1f5"
-                    strokeWidth="11"
-                  />
-                  {statusSummary.map(({ status, count }) => {
-                    const length = statusTotal
-                      ? (count / statusTotal) * circumference
-                      : 0;
-                    const circle = (
-                      <circle
-                        key={status}
-                        cx="50"
-                        cy="50"
-                        r="39"
-                        fill="none"
-                        stroke={statusColors[status]}
-                        strokeWidth="11"
-                        strokeDasharray={`${length} ${circumference - length}`}
-                        strokeDashoffset={-segmentOffset}
-                        strokeLinecap="butt"
-                      />
-                    );
-                    segmentOffset += length;
-                    return circle;
-                  })}
-                </svg>
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-[21px] font-bold text-[#30323b]">
-                    {statusTotal}
-                  </span>
-                  <span className="text-[9px] text-[#9698a1]">Applications</span>
-                </div>
-              </div>
-              <div className="w-full max-w-[195px] space-y-2.5">
-                {statusSummary.map(({ status, count }) => {
-                  const percent = statusTotal
-                    ? Math.round((count / statusTotal) * 100)
-                    : 0;
-                  return (
-                    <div
-                      key={status}
-                      className="flex items-center justify-between gap-3 border-b border-[#f2f2f5] pb-2 last:border-0"
-                    >
-                      <span className="flex min-w-0 items-center gap-2 text-[10px] text-[#666974]">
-                        <span
-                          className="h-2 w-2 shrink-0 rounded-full"
-                          style={{ backgroundColor: statusColors[status] }}
+            {nextUp ? (
+              <>
+                <NextUpHighlight event={nextUp} now={now} />
+                {laterEvents.length > 0 && (
+                  <div className="mt-5">
+                    <p className="text-xs font-medium uppercase tracking-wider text-muted">
+                      Also coming up
+                    </p>
+                    <ul className="mt-2 divide-y divide-line-soft">
+                      {laterEvents.slice(0, 3).map((event) => (
+                        <LaterEventRow
+                          key={event.application._id}
+                          event={event}
                         />
-                        {APPLICATION_STATUS_LABELS[status]}
-                      </span>
-                      <span className="shrink-0 text-[9px] text-[#888a94]">
-                        {percent}%
-                        <span className="ml-1.5 font-semibold text-[#42444e]">
-                          {count}
-                        </span>
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </Panel>
-        </section>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </>
+            ) : (
+              <EmptyState
+                bare
+                icon={<CalendarDays />}
+                title="Nothing to follow up yet"
+                description="Interview invitations and scheduled steps will appear here."
+                action={
+                  <Button
+                    href="/candidate/jobs"
+                    variant="secondary"
+                    trailingIcon={<ArrowRight aria-hidden="true" />}
+                  >
+                    Browse jobs
+                  </Button>
+                }
+              />
+            )}
+          </Card>
 
-        <section className="grid gap-3 lg:grid-cols-[minmax(0,1.65fr)_minmax(285px,1fr)]">
-          <Panel
-            title="Recent Applications"
+          <Card
+            title="Application activity"
+            description={`${periodTotal} application${periodTotal === 1 ? "" : "s"} in the last ${RANGE_SPAN[chartRange]}`}
+            action={
+              <SegmentedControl
+                ariaLabel="Activity chart range"
+                size="sm"
+                options={chartRangeOptions}
+                value={chartRange}
+                onChange={setChartRange}
+              />
+            }
+          >
+            <ActivityChart buckets={activityBuckets} range={chartRange} />
+          </Card>
+
+          <Card
+            title="Recent applications"
+            className="overflow-hidden"
             action={
               <PanelLink href="/candidate/applications">View all</PanelLink>
             }
           >
-            <div className="mb-3 flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
+            <div className="flex flex-col-reverse gap-3 border-b border-line sm:flex-row sm:items-end sm:justify-between">
               <div
                 role="tablist"
                 aria-label="Filter applications by status"
-                className="flex min-w-0 items-center gap-0.5 overflow-x-auto border-b border-[#eeeeF2]"
+                className={`${tabListClass} min-w-0`}
               >
                 {statusFilters.map((filter) => {
+                  const isActive = statusFilter === filter;
                   const count =
                     filter === "all"
                       ? applicationList.length
@@ -654,269 +766,302 @@ export function CandidateDashboard() {
                       id={`application-filter-${filter}`}
                       type="button"
                       role="tab"
-                      aria-selected={statusFilter === filter}
+                      aria-selected={isActive}
                       onClick={() => setStatusFilter(filter)}
-                      className={`shrink-0 border-b-2 px-2 py-2 text-[9px] transition-colors ${
-                        statusFilter === filter
-                          ? "border-[#6b5ce7] font-semibold text-[#5b4ed1]"
-                          : "border-transparent text-[#898b95] hover:text-[#50525d]"
-                      }`}
+                      className={tabClass(isActive)}
                     >
                       {label}
-                      <span className="ml-1 text-[8px] text-[#a3a5ad]">
-                        {count}
-                      </span>
+                      <span className={tabCountClass(isActive)}>{count}</span>
                     </button>
                   );
                 })}
               </div>
-              <label className="flex h-7 w-full items-center gap-1.5 border border-[#e9eaf0] px-2 sm:max-w-[165px]">
+              <div className="relative w-full sm:mb-2.5 sm:w-56">
                 <Search
                   aria-hidden="true"
-                  className="h-3 w-3 shrink-0 text-[#9a9ca5]"
+                  className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-subtle"
                 />
                 <input
                   type="search"
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
                   placeholder="Search applications"
-                  className="min-w-0 flex-1 bg-transparent text-[9px] text-[#42444e] outline-none placeholder:text-[#a3a5ad]"
+                  className={`${compactInputClass} w-full pl-9`}
                   aria-label="Search applications by job title"
                 />
-              </label>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[510px] table-fixed border-collapse text-left">
-                <thead>
-                  <tr className="border-y border-[#f0f0f3] text-[8px] font-semibold uppercase tracking-[0.05em] text-[#999ba4]">
-                    <th className="w-[39%] py-2 pr-2">Position</th>
-                    <th className="w-[20%] py-2 pr-2">Applied</th>
-                    <th className="w-[19%] py-2 pr-2">Status</th>
-                    <th className="w-[22%] py-2 text-right">Match</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredApplications.slice(0, 5).map((application) => (
-                    <ApplicationTableRow
-                      key={application._id}
-                      application={application}
-                    />
-                  ))}
-                </tbody>
-              </table>
-              {filteredApplications.length === 0 && (
-                <div className="py-8 text-center">
-                  <p className="text-[11px] font-medium text-[#626570]">
-                    {applicationList.length
-                      ? "No applications match your search."
-                      : "No applications yet."}
-                  </p>
-                  {!applicationList.length && (
-                    <Link
-                      href="/candidate/jobs"
-                      className="mt-1 inline-block text-[10px] font-semibold text-[#6658d9] hover:text-[#5143c3]"
-                    >
-                      Browse open jobs
-                    </Link>
-                  )}
-                </div>
-              )}
-            </div>
-          </Panel>
-
-          <Panel
-            title="Tasks & Follow-ups"
-            action={
-              <PanelLink href="/candidate/interview/result">
-                View all
-              </PanelLink>
-            }
-          >
-            {summary.upcoming.length === 0 ? (
-              <div className="flex min-h-[190px] flex-col items-center justify-center px-3 text-center">
-                <span className="mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-[#f4f3ff] text-[#7668de]">
-                  <CalendarDays aria-hidden="true" className="h-4 w-4" />
-                </span>
-                <p className="text-[11px] font-semibold text-[#454752]">
-                  Nothing to follow up yet
-                </p>
-                <p className="mt-1 max-w-[210px] text-[9px] leading-4 text-[#92949d]">
-                  Interview invitations and scheduled steps will appear here.
-                </p>
-                <Link
-                  href="/candidate/jobs"
-                  className="mt-3 inline-flex h-7 items-center gap-1 rounded bg-[#6b5ce7] px-2.5 text-[9px] font-semibold text-white hover:bg-[#5849d1]"
-                >
-                  Browse jobs <ArrowRight className="h-3 w-3" />
-                </Link>
               </div>
+            </div>
+
+            {recentApplications.length === 0 ? (
+              <EmptyState
+                bare
+                icon={<FileText />}
+                title={
+                  applicationList.length
+                    ? "No applications match your search."
+                    : "No applications yet."
+                }
+                description={
+                  applicationList.length
+                    ? "Try another status or search term."
+                    : "Apply to an open role and it will show up here."
+                }
+                action={
+                  applicationList.length ? undefined : (
+                    <Button href="/candidate/jobs">Browse open jobs</Button>
+                  )
+                }
+              />
             ) : (
-              <div className="divide-y divide-[#f1f1f4]">
-                {summary.upcoming.slice(0, 4).map((application) => (
-                  <InterviewFollowUp
+              <ul className="-mx-5 -mb-5 divide-y divide-line-soft sm:-mx-6 sm:-mb-6">
+                {recentApplications.map((application) => (
+                  <ApplicationRow
                     key={application._id}
                     application={application}
                   />
                 ))}
-              </div>
+              </ul>
             )}
-          </Panel>
-        </section>
-
-        <Panel
-          title="Recent Activity"
-          action={
-            <div className="flex items-center gap-3">
-              <span className="hidden items-center gap-1 text-[9px] text-[#8a8c96] sm:inline-flex">
-                <ArrowDownRight aria-hidden="true" className="h-3 w-3" />
-                Latest updates
-              </span>
-              <PanelLink href="/candidate/notifications">View all</PanelLink>
-            </div>
-          }
-        >
-          {notifications.error ? (
-            <ErrorBlock
-              message={notifications.error}
-              onRetry={notifications.reload}
-            />
-          ) : recentNotifications.length === 0 ? (
-            <div className="flex items-center gap-3 py-4">
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#f5f5f8] text-[#858792]">
-                <Bell aria-hidden="true" className="h-3.5 w-3.5" />
-              </span>
-              <div>
-                <p className="text-[10px] font-semibold text-[#50525d]">
-                  You’re all caught up
-                </p>
-                <p className="mt-0.5 text-[9px] text-[#999ba4]">
-                  New account and application updates appear here.
-                </p>
-              </div>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[440px] table-fixed border-collapse text-left">
-                <thead>
-                  <tr className="border-y border-[#f0f0f3] text-[8px] font-semibold uppercase tracking-[0.05em] text-[#999ba4]">
-                    <th className="w-[63%] py-2 pr-3">Update</th>
-                    <th className="w-[20%] py-2 pr-2">Type</th>
-                    <th className="w-[17%] py-2 text-right">Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recentNotifications.map((notification) => (
-                    <ActivityTableRow
-                      key={notification._id}
-                      notification={notification}
-                    />
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </Panel>
-
-        {jobs.error && <ErrorBlock message={jobs.error} onRetry={jobs.reload} />}
-      </div>
-    </div>
-  );
-}
-
-function ApplicationTableRow({ application }: { application: Application }) {
-  const job = populated(application.jobId);
-  return (
-    <tr className="border-b border-[#f3f3f6] last:border-0">
-      <td className="py-2.5 pr-2">
-        <p className="truncate text-[10px] font-semibold text-[#454752]">
-          {job?.title ?? "Job removed"}
-        </p>
-      </td>
-      <td className="py-2.5 pr-2 text-[9px] text-[#858792]">
-        {formatDate(application.createdAt)}
-      </td>
-      <td className="py-2.5 pr-2">
-        <span
-          className={`inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[8px] font-medium ${statusClasses[application.status]}`}
-        >
-          <Circle
-            aria-hidden="true"
-            className="h-1.5 w-1.5 fill-current stroke-none"
-          />
-          {APPLICATION_STATUS_LABELS[application.status]}
-        </span>
-      </td>
-      <td className="py-2.5 text-right">
-        <span
-          className={`text-[9px] font-semibold tabular-nums ${scoreColor(application.matchScore)}`}
-        >
-          {application.matchScore}%
-        </span>
-      </td>
-    </tr>
-  );
-}
-
-function InterviewFollowUp({ application }: { application: Application }) {
-  const job = populated(application.jobId);
-  return (
-    <div className="flex items-start gap-2.5 py-3 first:pt-1">
-      <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#f4f3ff] text-[#7465dd]">
-        {application.aiInterview.scheduled ? (
-          <CalendarDays aria-hidden="true" className="h-3 w-3" />
-        ) : (
-          <Clock3 aria-hidden="true" className="h-3 w-3" />
-        )}
-      </span>
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-[10px] font-semibold text-[#4a4c56]">
-          {job?.title ?? "Job removed"}
-        </p>
-        {application.aiInterview.scheduled && (
-          <p className="mt-1 truncate text-[9px] text-[#858792]">
-            AI interview · {formatDateTime(application.aiInterview.dateTime)}
-          </p>
-        )}
-        {application.orgInterview?.status === "invited" && (
-          <p className="mt-1 truncate text-[9px] text-[#858792]">
-            Organisation interview ·{" "}
-            {timeUntil(application.orgInterview.expiresAt)}
-          </p>
-        )}
-        {application.interviewSessionId && (
-          <Link
-            href={`/candidate/interview/session/${application.interviewSessionId}`}
-            className="mt-1 inline-flex items-center gap-1 text-[9px] font-semibold text-[#6658d9] hover:text-[#5143c3]"
-          >
-            Open interview <ArrowRight className="h-2.5 w-2.5" />
-          </Link>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function ActivityTableRow({ notification }: { notification: Notification }) {
-  return (
-    <tr className="border-b border-[#f3f3f6] last:border-0">
-      <td className="py-2.5 pr-3">
-        <div className="flex min-w-0 items-center gap-2">
-          <span
-            className={`h-1.5 w-1.5 shrink-0 rounded-full ${
-              notification.read ? "bg-[#d6d8df]" : "bg-[#6b5ce7]"
-            }`}
-          />
-          <p className="truncate text-[9px] text-[#555762]">
-            {notification.message}
-          </p>
+          </Card>
         </div>
-      </td>
-      <td className="py-2.5 pr-2 text-[9px] text-[#858792]">
-        {notification.read ? "Read" : "New update"}
-      </td>
-      <td className="py-2.5 text-right text-[9px] text-[#858792]">
-        {formatDate(notification.createdAt)}
-      </td>
-    </tr>
+
+        <div className="min-w-0 space-y-4 lg:space-y-6">
+          <Card
+            title="Application status"
+            description="Where all your applications stand."
+          >
+            <StatusDonut items={statusSummary} total={statusTotal} />
+          </Card>
+
+          <Card
+            title="Recent activity"
+            action={
+              <PanelLink href="/candidate/notifications">View all</PanelLink>
+            }
+          >
+            {notifications.error ? (
+              <ErrorBlock
+                message={notifications.error}
+                onRetry={notifications.reload}
+              />
+            ) : recentNotifications.length === 0 ? (
+              <EmptyState
+                bare
+                icon={<Bell />}
+                title="You’re all caught up"
+                description="New account and application updates appear here."
+              />
+            ) : (
+              <ol className="relative ml-1 border-l border-line">
+                {recentNotifications.map((notification) => (
+                  <ActivityItem
+                    key={notification._id}
+                    notification={notification}
+                  />
+                ))}
+              </ol>
+            )}
+          </Card>
+        </div>
+      </div>
+
+      {jobs.error && <ErrorBlock message={jobs.error} onRetry={jobs.reload} />}
+    </PortalPage>
+  );
+}
+
+function DateTile({ date, size = "lg" }: { date: Date | null; size?: "lg" | "sm" }) {
+  const large = size === "lg";
+  return (
+    <span
+      aria-hidden="true"
+      className={`flex shrink-0 flex-col items-center justify-center rounded-xl bg-white text-brand-700 shadow-xs ring-1 ring-inset ring-brand-100 ${
+        large ? "h-16 w-16 sm:h-20 sm:w-20" : "h-11 w-11"
+      }`}
+    >
+      {date ? (
+        <>
+          <span
+            className={`font-semibold uppercase tracking-wider text-brand-600 ${
+              large ? "text-xs" : "text-xs leading-none"
+            }`}
+          >
+            {date.toLocaleDateString(undefined, { month: "short" })}
+          </span>
+          <span
+            className={`font-display font-semibold leading-none tabular-nums text-ink ${
+              large ? "mt-1 text-2xl sm:text-3xl" : "mt-0.5 text-base"
+            }`}
+          >
+            {date.getDate()}
+          </span>
+        </>
+      ) : (
+        <CalendarClock className={large ? "h-6 w-6" : "h-4 w-4"} />
+      )}
+    </span>
+  );
+}
+
+function NextUpHighlight({ event, now }: { event: NextEvent; now: number }) {
+  const { application, kind, at } = event;
+  const job = populated(application.jobId);
+  const isAi = kind === "ai";
+  const when =
+    isAi
+      ? formatDateTime(application.aiInterview.dateTime)
+      : `Respond by ${formatDate(application.orgInterview?.expiresAt)}`;
+  const countdown = isAi
+    ? at
+      ? relativeDay(at, now)
+      : null
+    : timeUntil(application.orgInterview?.expiresAt);
+
+  return (
+    <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-brand-50 via-brand-50/60 to-surface p-4 ring-1 ring-inset ring-brand-100 sm:p-5">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+        <div className="flex min-w-0 flex-1 items-start gap-4">
+          <DateTile date={at} />
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge tone={isAi ? "brand" : "info"}>
+                {isAi ? "AI interview" : "Organisation interview"}
+              </Badge>
+              {countdown && (
+                <span className="text-xs font-medium text-muted">{countdown}</span>
+              )}
+            </div>
+            <p className="mt-2 font-display text-lg font-semibold tracking-tight text-ink sm:text-xl">
+              {job?.title ?? "Job removed"}
+            </p>
+            <p className="mt-1 flex items-center gap-1.5 text-sm text-muted">
+              <Clock3 aria-hidden="true" className="h-4 w-4 shrink-0" />
+              {when}
+            </p>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2 sm:shrink-0 sm:flex-col sm:items-stretch">
+          {application.interviewSessionId ? (
+            <Button
+              href={`/candidate/interview/session/${application.interviewSessionId}`}
+              trailingIcon={<ArrowRight aria-hidden="true" />}
+            >
+              Open interview
+            </Button>
+          ) : (
+            <Button
+              href="/candidate/applications"
+              trailingIcon={<ArrowRight aria-hidden="true" />}
+            >
+              View application
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LaterEventRow({ event }: { event: NextEvent }) {
+  const { application, kind, at } = event;
+  const job = populated(application.jobId);
+  const isAi = kind === "ai";
+  return (
+    <li className="flex items-center gap-3 py-3">
+      <DateTile date={at} size="sm" />
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-medium text-ink">
+          {job?.title ?? "Job removed"}
+        </p>
+        <p className="mt-0.5 text-xs text-muted">
+          {isAi
+            ? `AI interview · ${formatDateTime(application.aiInterview.dateTime)}`
+            : `Organisation interview · ${timeUntil(application.orgInterview?.expiresAt)}`}
+        </p>
+      </div>
+      {application.interviewSessionId && (
+        <Link
+          href={`/candidate/interview/session/${application.interviewSessionId}`}
+          className={`${linkClass} shrink-0`}
+        >
+          <span className="hidden sm:inline">Open</span>
+          <ArrowRight aria-hidden="true" className="h-4 w-4" />
+          <span className="sr-only">Open interview for {job?.title ?? "this job"}</span>
+        </Link>
+      )}
+    </li>
+  );
+}
+
+function ApplicationRow({ application }: { application: Application }) {
+  const job = populated(application.jobId);
+  const title = job?.title ?? "Job removed";
+  const score = application.matchScore;
+  const status = (
+    <StatusBadge
+      status={application.status}
+      label={APPLICATION_STATUS_LABELS[application.status]}
+      dot
+    />
+  );
+  return (
+    <li className="flex items-center gap-3 px-5 py-4 transition-colors hover:bg-surface-2/60 sm:gap-4 sm:px-6">
+      <Avatar name={title} size="md" />
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-medium text-ink">{title}</p>
+        <p className="mt-0.5 text-xs text-muted">
+          Applied {formatDate(application.createdAt)}
+        </p>
+        <div className="mt-2 sm:hidden">{status}</div>
+      </div>
+      <div className="hidden w-28 shrink-0 sm:block">{status}</div>
+      <div className="w-20 shrink-0 text-right sm:w-28">
+        <span className={`text-sm font-semibold tabular-nums ${scoreColor(score)}`}>
+          {score}%<span className="sr-only"> match</span>
+        </span>
+        <div
+          aria-hidden="true"
+          className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-surface-3"
+        >
+          <div
+            className={`h-full rounded-full ${scoreBarClass(score)}`}
+            style={{ width: `${Math.min(Math.max(score, 0), 100)}%` }}
+          />
+        </div>
+      </div>
+    </li>
+  );
+}
+
+function ActivityItem({ notification }: { notification: Notification }) {
+  return (
+    <li className="relative pb-5 pl-6 last:pb-0">
+      <span
+        aria-hidden="true"
+        className={`absolute -left-[5px] top-1.5 h-2.5 w-2.5 rounded-full ring-4 ring-surface ${
+          notification.read ? "bg-line" : "bg-brand-500"
+        }`}
+      />
+      <p
+        className={`text-sm ${
+          notification.read ? "text-body" : "font-medium text-ink"
+        }`}
+      >
+        {notification.message}
+      </p>
+      <div className="mt-1.5 flex flex-wrap items-center gap-2">
+        <time
+          dateTime={notification.createdAt}
+          className="text-xs tabular-nums text-muted"
+        >
+          {formatDate(notification.createdAt)}
+        </time>
+        {notification.read ? (
+          <span className="text-xs text-muted">· Read</span>
+        ) : (
+          <Badge tone="brand">New update</Badge>
+        )}
+      </div>
+    </li>
   );
 }

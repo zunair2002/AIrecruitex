@@ -5,7 +5,10 @@ import { useRouter } from "next/navigation";
 import { useAuth, homePathForRole } from "@/context/AuthContext";
 import { toErrorMessage } from "@/lib/api";
 import { AuthError } from "./AuthCardParts";
+import { MailCheck } from "lucide-react";
 import { InlineSuccess } from "@/components/ui/Feedback";
+import { Button } from "@/components/ui/Button";
+import { helpTextClass, labelClass } from "@/components/ui/controls";
 
 /**
  * Step two of signing up: the backend emails a 6-digit OTP and only issues a
@@ -79,11 +82,17 @@ export function VerifyEmailForm({
   return (
     <form className="space-y-5" onSubmit={handleSubmit} noValidate>
       <div>
-        <h2 className="text-lg font-bold text-[#292b35]">Check your email</h2>
-        <p className="mt-1 text-sm text-[#898b96]">
+        <span
+          aria-hidden="true"
+          className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-50 text-brand-700 ring-1 ring-inset ring-brand-600/10"
+        >
+          <MailCheck className="h-5 w-5" />
+        </span>
+        <h2 className="mt-4 text-lg font-semibold text-ink">Check your email</h2>
+        <p className="mt-1 text-sm text-muted">
           We sent a 6-digit code to{" "}
-          <span className="font-semibold text-[#44464f]">{email}</span>. Enter it
-          to finish setting up your account.
+          <span className="break-all font-medium text-ink">{email}</span>. Enter
+          it to finish setting up your account.
         </p>
       </div>
 
@@ -91,10 +100,7 @@ export function VerifyEmailForm({
       <InlineSuccess message={notice} />
 
       <div>
-        <label
-          htmlFor="verify-otp"
-          className="mb-2 block text-sm font-medium text-[#44464f]"
-        >
+        <label htmlFor="verify-otp" className={labelClass}>
           Verification code
         </label>
         <input
@@ -111,29 +117,30 @@ export function VerifyEmailForm({
             setOtp(event.target.value.replace(/\D/g, "").slice(0, 6))
           }
           placeholder="123456"
-          className="w-full rounded border border-[#e9eaf0] bg-white px-4 py-3 text-center text-2xl font-bold tracking-[0.4em] text-[#292b35] placeholder:tracking-normal placeholder:text-[#c9cbd4] focus:border-transparent focus:outline-none focus:ring-2 focus:ring-brand"
+          className="block h-14 w-full rounded-lg border border-line bg-white px-4 text-center font-display text-2xl font-semibold tracking-[0.4em] tabular-nums text-ink shadow-xs transition placeholder:font-normal placeholder:tracking-normal placeholder:text-subtle focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/10"
         />
-        <p className="mt-2 text-xs text-[#9698a2]">
-          The code expires in 10 minutes.
-        </p>
+        <p className={helpTextClass}>The code expires in 10 minutes.</p>
       </div>
 
-      <button
+      <Button
         type="submit"
-        disabled={otp.length !== 6 || isSubmitting}
-        className="w-full rounded bg-brand px-4 py-3 font-semibold text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50"
+        size="lg"
+        fullWidth
+        disabled={otp.length !== 6}
+        loading={isSubmitting}
       >
         {isSubmitting ? "Verifying…" : "Verify and continue"}
-      </button>
+      </Button>
 
-      <button
-        type="button"
+      <Button
+        variant="ghost"
+        fullWidth
         onClick={handleResend}
         disabled={secondsLeft > 0}
-        className="w-full text-sm font-medium text-brand transition-colors hover:text-brand disabled:text-[#9698a2]"
+        className="tabular-nums"
       >
         {secondsLeft > 0 ? `Resend code in ${secondsLeft}s` : "Resend code"}
-      </button>
+      </Button>
     </form>
   );
 }

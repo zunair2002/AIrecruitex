@@ -192,91 +192,212 @@ export const SUPPORT_STATUS_LABELS: Record<SupportTicketStatus, string> = {
 
 /* -------------------------------------------------------------- styles */
 
-const BADGE_BASE =
-  "inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full";
+/**
+ * The six status tones. Every badge, chip and status pill in the product maps
+ * onto one of these through `statusTone`, so a status reads the same on every
+ * screen (see DESIGN_SPEC "Status → tone mapping").
+ */
+export type StatusTone =
+  | "success"
+  | "warning"
+  | "danger"
+  | "info"
+  | "brand"
+  | "neutral";
 
-export const badgeClass = (tone: string) => `${BADGE_BASE} ${tone}`;
+/**
+ * Where a status word came from — only needed for the few words that mean
+ * different things in different places ("open" job vs "open" support ticket,
+ * an "inactive" user vs an "inactive" course).
+ */
+export type StatusContext = "job" | "support" | "course" | "user";
+
+const STATUS_TONES: Record<string, StatusTone> = {
+  // success
+  selected: "success",
+  open: "success",
+  completed: "success",
+  pass: "success",
+  passed: "success",
+  resolved: "success",
+  active: "success",
+  parsed: "success",
+  shortlist: "success",
+  shortlisted: "success",
+  correct: "success",
+  strong: "success",
+  round2_unlocked: "success",
+  paid: "success",
+  // warning
+  pending: "warning",
+  in_progress: "warning",
+  hold: "warning",
+  partially_correct: "warning",
+  adequate: "warning",
+  needs_improvement: "warning",
+  estimated: "warning",
+  // danger
+  rejected: "danger",
+  reject: "danger",
+  fail: "danger",
+  failed: "danger",
+  expired: "danger",
+  incorrect: "danger",
+  weak: "danger",
+  no_answer: "danger",
+  retry_round1: "danger",
+  inactive: "danger",
+  deactivated: "danger",
+  // info
+  invited: "info",
+  scheduled: "info",
+  practice: "info",
+  // brand
+  matched: "brand",
+  ai_interview: "brand",
+  hr: "brand",
+  // neutral
+  closed: "neutral",
+  off_topic: "neutral",
+  organizational: "neutral",
+  admin: "neutral",
+  candidate: "neutral",
+  draft: "neutral",
+  unknown: "neutral",
+};
+
+const hasOwn = (record: object, key: string) =>
+  Object.prototype.hasOwnProperty.call(record, key);
+
+/**
+ * Tone for any status/enum value ("in_progress", "Rejected", "round2_unlocked"…).
+ * Unknown values are neutral. Pass `context` for words with two meanings.
+ */
+export function statusTone(
+  status: string | null | undefined,
+  context?: StatusContext,
+): StatusTone {
+  if (!status) return "neutral";
+  const key = status.trim().toLowerCase().replace(/[\s-]+/g, "_");
+  if (key === "open" && context === "support") return "warning";
+  if ((key === "inactive" || key === "draft") && context === "course") {
+    return "neutral";
+  }
+  return hasOwn(STATUS_TONES, key) ? STATUS_TONES[key] : "neutral";
+}
+
+/** Shape shared by every badge (ui/Badge renders exactly this). */
+export const BADGE_BASE =
+  "inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset";
+
+/** Colour recipe per tone. */
+export const BADGE_TONES: Record<StatusTone, string> = {
+  success: "bg-success-50 text-success-700 ring-success-200",
+  warning: "bg-warning-50 text-warning-700 ring-warning-200",
+  danger: "bg-danger-50 text-danger-700 ring-danger-200",
+  info: "bg-info-50 text-info-700 ring-info-200",
+  brand: "bg-brand-50 text-brand-700 ring-brand-200",
+  neutral: "bg-surface-3 text-body ring-line",
+};
+
+/** Status dot colour per tone (badges with `dot`, legends, timelines). */
+export const BADGE_DOTS: Record<StatusTone, string> = {
+  success: "bg-success-500",
+  warning: "bg-warning-500",
+  danger: "bg-danger-500",
+  info: "bg-info-500",
+  brand: "bg-brand-500",
+  neutral: "bg-subtle",
+};
+
+/**
+ * Full badge class for a tone: `badgeClass("success")`. A raw colour string is
+ * still accepted for old call sites and is appended to the badge shape.
+ */
+export const badgeClass = (tone: StatusTone | string): string =>
+  `${BADGE_BASE} ${hasOwn(BADGE_TONES, tone) ? BADGE_TONES[tone as StatusTone] : tone}`;
+
+const statusBadge = (status: string, context?: StatusContext) =>
+  badgeClass(statusTone(status, context));
 
 export const ROLE_BADGE: Record<UserRole, string> = {
-  candidate: badgeClass("bg-blue-50 text-blue-700"),
-  hr: badgeClass("bg-brand-light text-brand-dark"),
-  admin: badgeClass("bg-[#f3f3f6] text-[#44464f]"),
+  candidate: statusBadge("candidate"),
+  hr: statusBadge("hr"),
+  admin: statusBadge("admin"),
 };
 
 export const APPLICATION_STATUS_BADGE: Record<ApplicationStatus, string> = {
-  pending: badgeClass("bg-amber-50 text-amber-700"),
-  selected: badgeClass("bg-emerald-50 text-emerald-700"),
-  rejected: badgeClass("bg-red-50 text-red-700"),
+  pending: statusBadge("pending"),
+  selected: statusBadge("selected"),
+  rejected: statusBadge("rejected"),
 };
 
 export const JOB_STATUS_BADGE: Record<JobStatus, string> = {
-  open: badgeClass("bg-emerald-50 text-emerald-700"),
-  closed: badgeClass("bg-[#f3f3f6] text-[#686b77]"),
+  open: statusBadge("open", "job"),
+  closed: statusBadge("closed", "job"),
 };
 
 export const INTERVIEW_STATUS_BADGE: Record<InterviewStatus, string> = {
-  in_progress: badgeClass("bg-amber-50 text-amber-700"),
-  completed: badgeClass("bg-emerald-50 text-emerald-700"),
-  expired: badgeClass("bg-rose-50 text-rose-700"),
+  in_progress: statusBadge("in_progress"),
+  completed: statusBadge("completed"),
+  expired: statusBadge("expired"),
 };
 
 export const INTERVIEW_RESULT_BADGE: Record<InterviewResultVerdict, string> = {
-  pass: badgeClass("bg-emerald-50 text-emerald-700"),
-  fail: badgeClass("bg-red-50 text-red-700"),
+  pass: statusBadge("pass"),
+  fail: statusBadge("fail"),
 };
 
 export const TURN_VERDICT_BADGE: Record<TurnVerdict, string> = {
-  correct: badgeClass("bg-emerald-50 text-emerald-700"),
-  strong: badgeClass("bg-emerald-50 text-emerald-700"),
-  partially_correct: badgeClass("bg-amber-50 text-amber-700"),
-  adequate: badgeClass("bg-amber-50 text-amber-700"),
-  incorrect: badgeClass("bg-red-50 text-red-700"),
-  no_answer: badgeClass("bg-red-50 text-red-700"),
-  weak: badgeClass("bg-red-50 text-red-700"),
-  off_topic: badgeClass("bg-[#f3f3f6] text-[#686b77]"),
+  correct: statusBadge("correct"),
+  strong: statusBadge("strong"),
+  partially_correct: statusBadge("partially_correct"),
+  adequate: statusBadge("adequate"),
+  incorrect: statusBadge("incorrect"),
+  no_answer: statusBadge("no_answer"),
+  weak: statusBadge("weak"),
+  off_topic: statusBadge("off_topic"),
 };
 
 export const INTERVIEW_DECISION_BADGE: Record<InterviewDecision, string> = {
-  pass: badgeClass("bg-emerald-50 text-emerald-700"),
-  round2_unlocked: badgeClass("bg-emerald-50 text-emerald-700"),
-  shortlist: badgeClass("bg-emerald-50 text-emerald-700"),
-  hold: badgeClass("bg-amber-50 text-amber-700"),
-  needs_improvement: badgeClass("bg-amber-50 text-amber-700"),
-  retry_round1: badgeClass("bg-red-50 text-red-700"),
-  reject: badgeClass("bg-red-50 text-red-700"),
+  pass: statusBadge("pass"),
+  round2_unlocked: statusBadge("round2_unlocked"),
+  shortlist: statusBadge("shortlist"),
+  hold: statusBadge("hold"),
+  needs_improvement: statusBadge("needs_improvement"),
+  retry_round1: statusBadge("retry_round1"),
+  reject: statusBadge("reject"),
 };
 
 export const ORG_INTERVIEW_STATUS_BADGE: Record<OrgInterviewStatus, string> = {
-  invited: badgeClass("bg-amber-50 text-amber-700"),
-  completed: badgeClass("bg-emerald-50 text-emerald-700"),
-  expired: badgeClass("bg-[#f3f3f6] text-[#686b77]"),
+  invited: statusBadge("invited"),
+  completed: statusBadge("completed"),
+  expired: statusBadge("expired"),
 };
 
 export const INTERVIEW_HISTORY_TYPE_BADGE: Record<
   InterviewHistoryType,
   string
 > = {
-  practice: badgeClass("bg-sky-50 text-sky-700"),
-  ai_interview: badgeClass("bg-brand-light text-brand-dark"),
-  organizational: badgeClass("bg-[#f8f8fb] text-[#292b35]"),
+  practice: statusBadge("practice"),
+  ai_interview: statusBadge("ai_interview"),
+  organizational: statusBadge("organizational"),
 };
 
 export const SUPPORT_STATUS_BADGE: Record<SupportTicketStatus, string> = {
-  open: badgeClass("bg-amber-50 text-amber-700"),
-  resolved: badgeClass("bg-emerald-50 text-emerald-700"),
+  open: statusBadge("open", "support"),
+  resolved: statusBadge("resolved", "support"),
 };
 
 /** `isActive` on the User schema. */
 export const activeBadge = (isActive: boolean): string =>
-  badgeClass(
-    isActive ? "bg-emerald-50 text-emerald-700" : "bg-[#f3f3f6] text-[#686b77]",
-  );
+  statusBadge(isActive ? "active" : "inactive", "user");
 
 /** matchScore / interview score colouring, 0-100. */
 export function scoreColor(score: number): string {
-  if (score >= 80) return "text-emerald-600";
-  if (score >= 50) return "text-amber-600";
-  return "text-red-600";
+  if (score >= 80) return "text-success-600";
+  if (score >= 50) return "text-warning-600";
+  return "text-danger-600";
 }
 
 export function initials(name: string): string {

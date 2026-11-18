@@ -1,17 +1,22 @@
 "use client";
 
-import Link from "next/link";
 import { useMemo, useState } from "react";
 import {
   ArrowRight,
+  Bot,
   BriefcaseBusiness,
+  Building2,
   CalendarDays,
   Check,
   CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
   Clock3,
   ExternalLink,
   FileText,
+  Info,
   Search,
+  SearchX,
   Target,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -20,6 +25,7 @@ import { listMyApplications } from "@/lib/applicationsApi";
 import { useApiResource } from "@/lib/useApiResource";
 import {
   APPLICATION_STATUS_LABELS,
+  ORG_INTERVIEW_STATUS_BADGE,
   ORG_INTERVIEW_STATUS_LABELS,
   formatDate,
   formatDateTime,
@@ -32,7 +38,22 @@ import {
   type Application,
   type ApplicationStatus,
 } from "@/lib/types";
-import { ErrorBlock } from "@/components/ui/Feedback";
+import {
+  Badge,
+  Button,
+  Card,
+  EmptyState,
+  ErrorBlock,
+  PageHeader,
+  Skeleton,
+  SkeletonCard,
+  StatCard,
+  StatusBadge,
+  Tabs,
+  iconButtonClass,
+  inputClass,
+} from "@/components/ui";
+import { PortalPage } from "@/components/dashboard/primitives";
 import { DayPicker, type DayButtonProps } from "react-day-picker";
 
 type StatusFilter = "all" | ApplicationStatus;
@@ -55,18 +76,6 @@ type InterviewItem = {
 
 const EMPTY_APPLICATIONS: Application[] = [];
 
-const statusColors: Record<ApplicationStatus, string> = {
-  pending: "#d99b2b",
-  selected: "#279773",
-  rejected: "#858995",
-};
-
-const statusStyles: Record<ApplicationStatus, string> = {
-  pending: "bg-amber-50 text-amber-700",
-  selected: "bg-emerald-50 text-emerald-700",
-  rejected: "bg-[#f3f3f6] text-[#686b77]",
-};
-
 const statusFilters: { value: StatusFilter; label: string }[] = [
   { value: "all", label: "All" },
   { value: "pending", label: "Pending" },
@@ -81,41 +90,24 @@ const detailTabs: { value: DetailTab; label: string }[] = [
   { value: "job", label: "Job description" },
 ];
 
-function Panel({
-  title,
-  action,
-  children,
-  className = "",
-}: {
-  title: string;
-  action?: React.ReactNode;
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <section
-      className={`min-w-0 border border-[#e9eaf0] bg-white ${className}`}
-    >
-      <div className="flex min-h-10 items-center justify-between gap-3 border-b border-[#eeeeF2] px-3 py-2">
-        <h2 className="text-[11px] font-semibold text-[#454752]">{title}</h2>
-        {action}
-      </div>
-      {children}
-    </section>
-  );
-}
+/** Calendar marker per interview date kind (dots on days + legend). */
+const MARKERS: Record<InterviewDateKind, { label: string; dot: string }> = {
+  scheduled: { label: "AI interview", dot: "bg-brand-600" },
+  invited: { label: "Organisation invite", dot: "bg-brand-500" },
+  deadline: { label: "Complete by", dot: "bg-brand-300" },
+  completed: { label: "Completed", dot: "bg-brand-500" },
+};
 
-function ApplicationStatus({ status }: { status: ApplicationStatus }) {
+/** Secondary-button look that may wrap (long external-link labels on phones). */
+const wrappingLinkClass =
+  "inline-flex min-h-10 max-w-full items-center gap-2 rounded-lg border border-line bg-white px-4 py-2 text-left text-sm font-semibold text-body shadow-xs transition-colors hover:bg-surface-2 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 [&_svg]:size-4 [&_svg]:shrink-0";
+
+const layoutGridClass =
+  "grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,17rem)_minmax(0,1fr)] lg:gap-6 xl:grid-cols-[minmax(0,20rem)_minmax(0,1fr)]";
+
+function ApplicationStatusBadge({ status }: { status: ApplicationStatus }) {
   return (
-    <span
-      className={`inline-flex items-center gap-1 rounded px-1.5 py-1 text-[8px] font-medium ${statusStyles[status]}`}
-    >
-      <span
-        className="h-1.5 w-1.5 rounded-full"
-        style={{ backgroundColor: statusColors[status] }}
-      />
-      {APPLICATION_STATUS_LABELS[status]}
-    </span>
+    <StatusBadge status={status} label={APPLICATION_STATUS_LABELS[status]} dot />
   );
 }
 
@@ -127,11 +119,11 @@ function DetailValue({
   children: React.ReactNode;
 }) {
   return (
-    <div>
-      <dt className="text-[8px] font-semibold uppercase tracking-[0.06em] text-[#999ba4]">
-        {label}
-      </dt>
-      <dd className="mt-1 text-[10px] leading-4 text-[#555762]">{children}</dd>
+    <div className="min-w-0">
+      <dt className="text-xs font-medium text-muted">{label}</dt>
+      <dd className="mt-1 break-words text-sm font-medium text-ink">
+        {children}
+      </dd>
     </div>
   );
 }
@@ -149,6 +141,17 @@ function isSameCalendarDay(first: Date, second: Date): boolean {
   );
 }
 
+function CalendarChevron({
+  orientation,
+  className,
+}: {
+  orientation?: "up" | "down" | "left" | "right";
+  className?: string;
+}) {
+  const Icon = orientation === "left" ? ChevronLeft : ChevronRight;
+  return <Icon aria-hidden="true" className={className} />;
+}
+
 function InterviewCalendarDayButton({
   day,
   modifiers,
@@ -157,49 +160,45 @@ function InterviewCalendarDayButton({
   ...buttonProps
 }: DayButtonProps) {
   const markers = [
-    modifiers.scheduledInterview && {
-      label: "AI interview",
-      color: "#6b5ce7",
-    },
-    modifiers.inviteDate && {
-      label: "Organisation invite",
-      color: "#8b83d8",
-    },
-    modifiers.deadline && {
-      label: "Complete by",
-      color: "#d99b2b",
-    },
-    modifiers.completedDate && {
-      label: "Completed",
-      color: "#279773",
-    },
-  ].filter(
-    (marker): marker is { label: string; color: string } => Boolean(marker),
+    modifiers.scheduledInterview && MARKERS.scheduled,
+    modifiers.inviteDate && MARKERS.invited,
+    modifiers.deadline && MARKERS.deadline,
+    modifiers.completedDate && MARKERS.completed,
+  ].filter((marker): marker is { label: string; dot: string } =>
+    Boolean(marker),
   );
   const markerDescription = markers.map((marker) => marker.label).join(", ");
+
+  const tone = modifiers.selected
+    ? "bg-brand-700 font-semibold text-white hover:bg-brand-800"
+    : modifiers.today
+      ? "font-semibold text-brand-700 ring-2 ring-inset ring-brand-200 hover:bg-brand-50"
+      : modifiers.outside
+        ? "text-subtle hover:bg-surface-2"
+        : markers.length
+          ? "font-semibold text-ink hover:bg-surface-3"
+          : "text-body hover:bg-surface-3 hover:text-ink";
 
   return (
     <button
       {...buttonProps}
       title={markerDescription || undefined}
-      className={`${className ?? ""} relative mx-auto flex h-8 w-8 flex-col items-center justify-center rounded-full text-[9px] text-[#555762] transition-colors hover:bg-[#f3f2ff] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#6b5ce7] ${
-        modifiers.selected
-          ? "bg-[#eeecff] text-[#5f53ce] ring-1 ring-[#6b5ce7]"
-          : modifiers.today
-            ? "font-bold text-[#5f53ce] ring-1 ring-[#d8d3fb]"
-            : ""
-      }`}
+      className={`${className ?? ""} relative mx-auto flex h-9 w-9 items-center justify-center rounded-lg text-sm tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 sm:h-10 sm:w-10 ${tone}`}
     >
-      <span className={markers.length ? "-mt-1" : ""}>
+      <span className={markers.length ? "-mt-1.5" : ""}>
         {children ?? day.date.getDate()}
       </span>
       {markers.length > 0 && (
-        <span className="absolute bottom-1 flex max-w-[24px] items-center justify-center gap-[2px]">
+        <span
+          aria-hidden="true"
+          className="absolute bottom-1 flex items-center justify-center gap-0.5"
+        >
           {markers.slice(0, 4).map((marker) => (
             <span
               key={marker.label}
-              className="h-1 w-1 shrink-0 rounded-full"
-              style={{ backgroundColor: marker.color }}
+              className={`h-1.5 w-1.5 shrink-0 rounded-full ${
+                modifiers.selected ? "bg-white" : marker.dot
+              }`}
             />
           ))}
         </span>
@@ -301,27 +300,29 @@ function InterviewSchedule({
     completedDate: datesFor("completed"),
   };
 
+  const navButtonClass = iconButtonClass({ variant: "secondary", size: "sm" });
+
   return (
-    <div className="space-y-3">
-      <div className="grid min-w-0 items-start gap-3 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
-        <section className="border border-[#e9eaf0] bg-white p-3">
-          <div className="mb-2 flex items-center justify-between gap-2">
-            <div>
-              <h3 className="text-[10px] font-semibold text-[#454752]">
+    <div className="@container">
+      <div className="grid min-w-0 grid-cols-1 items-start gap-5 @2xl:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] @2xl:gap-6">
+        <section className="min-w-0 rounded-xl border border-line bg-surface p-3 sm:p-4">
+          <div className="mb-3 flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <h3 className="text-sm font-semibold text-ink">
                 Interview calendar
               </h3>
-              <p className="mt-0.5 text-[8px] text-[#999ba4]">
+              <p className="mt-0.5 text-xs text-muted">
                 Select a marked date to view its interviews.
               </p>
             </div>
             {selectedDate && (
-              <button
-                type="button"
+              <Button
+                variant="soft"
+                size="sm"
                 onClick={() => setSelectedDate(undefined)}
-                className="shrink-0 text-[8px] font-medium text-[#6658d9] hover:text-[#5143c3]"
               >
                 Show all
-              </button>
+              </Button>
             )}
           </div>
 
@@ -335,70 +336,66 @@ function InterviewSchedule({
             fixedWeeks
             weekStartsOn={1}
             modifiers={modifiers}
-            components={{ DayButton: InterviewCalendarDayButton }}
+            components={{
+              DayButton: InterviewCalendarDayButton,
+              Chevron: CalendarChevron,
+            }}
             classNames={{
               root: "w-full",
-              months: "w-full",
+              months: "relative w-full",
               month: "w-full",
-              month_caption:
-                "relative flex h-9 items-center justify-center px-16",
-              caption_label: "text-[11px] font-semibold text-[#454752]",
-              nav: "absolute inset-x-0 top-0 flex h-9 items-center justify-between",
-              button_previous:
-                "inline-flex h-7 w-7 items-center justify-center border border-[#e9eaf0] bg-white text-[#666974] hover:bg-[#f7f7fa]",
-              button_next:
-                "inline-flex h-7 w-7 items-center justify-center border border-[#e9eaf0] bg-white text-[#666974] hover:bg-[#f7f7fa]",
-              month_grid: "w-full table-fixed border-separate border-spacing-y-1",
+              month_caption: "flex h-10 items-center justify-center px-12",
+              caption_label: "font-display text-sm font-semibold text-ink",
+              nav: "absolute inset-x-0 top-0 z-10 flex h-10 items-center justify-between",
+              button_previous: navButtonClass,
+              button_next: navButtonClass,
+              chevron: "h-4 w-4",
+              month_grid: "mt-2 w-full table-fixed border-collapse",
               weekdays: "",
-              weekday:
-                "h-7 text-center text-[8px] font-medium text-[#92949d]",
+              weekday: "h-8 pb-1 text-center text-xs font-medium text-muted",
               weeks: "",
               week: "",
-              day: "h-9 p-0 text-center",
+              day: "h-10 p-0 text-center align-middle sm:h-11",
               day_button: "",
-              today: "font-bold text-[#5f53ce]",
-              outside: "text-[#c6c7ce]",
-              selected: "bg-[#eeecff] text-[#5f53ce]",
+              today: "",
+              outside: "",
+              selected: "",
             }}
           />
 
-          <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 border-t border-[#f0f0f3] pt-2">
-            {[
-              ["bg-[#6b5ce7]", "AI interview"],
-              ["bg-[#8b83d8]", "Organisation invite"],
-              ["bg-[#d99b2b]", "Complete by"],
-              ["bg-[#279773]", "Completed"],
-            ].map(([color, label]) => (
-              <span
-                key={label}
-                className="inline-flex items-center gap-1 text-[7px] text-[#858792]"
+          <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-2 border-t border-line-soft pt-3">
+            {Object.values(MARKERS).map((marker) => (
+              <li
+                key={marker.label}
+                className="inline-flex items-center gap-2 text-xs text-muted"
               >
-                <span className={`h-1.5 w-1.5 rounded-full ${color}`} />
-                {label}
-              </span>
+                <span
+                  aria-hidden="true"
+                  className={`h-2 w-2 rounded-full ${marker.dot}`}
+                />
+                {marker.label}
+              </li>
             ))}
-          </div>
+          </ul>
         </section>
 
         <section className="min-w-0">
-          <div className="mb-2 flex items-center justify-between gap-2">
-            <div>
-              <h3 className="text-[10px] font-semibold text-[#454752]">
-                {selectedDate
-                  ? `Interviews on ${formatDate(selectedDate.toISOString())}`
-                  : category === "organizational"
-                    ? "Organisational interviews"
-                    : "AI interviews"}
-              </h3>
-              <p className="mt-0.5 text-[8px] text-[#999ba4]">
-                {visibleItems.length} interview
-                {visibleItems.length === 1 ? "" : "s"}
-                {selectedDate ? " on this date" : ""}
-              </p>
-            </div>
+          <div className="mb-3">
+            <h3 className="text-sm font-semibold text-ink">
+              {selectedDate
+                ? `Interviews on ${formatDate(selectedDate.toISOString())}`
+                : category === "organizational"
+                  ? "Organisational interviews"
+                  : "AI interviews"}
+            </h3>
+            <p className="mt-0.5 text-xs tabular-nums text-muted">
+              {visibleItems.length} interview
+              {visibleItems.length === 1 ? "" : "s"}
+              {selectedDate ? " on this date" : ""}
+            </p>
           </div>
 
-          <div className="min-w-0 space-y-2">
+          <div className="min-w-0 space-y-3">
             {visibleItems.map((item) => {
               const { application } = item;
               const jobTitle =
@@ -410,171 +407,172 @@ function InterviewSchedule({
                   isInviteExpired(interview.expiresAt));
               const orgStatus =
                 interview?.status && expired ? "expired" : interview?.status;
+              const isAi = item.category === "ai";
 
               return (
                 <article
                   key={item.id}
-                  className="min-w-0 border border-[#e9eaf0] bg-white p-3"
+                  className="min-w-0 rounded-xl border border-line bg-surface p-4"
                 >
-                  <div className="flex min-w-0 flex-wrap items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <p className="text-[10px] font-semibold text-[#454752]">
-                        {item.category === "organizational"
-                          ? "Organisational interview"
-                          : "AI interview"}
-                      </p>
-                      <p className="mt-1 truncate text-[9px] text-[#686b77]">
-                        {jobTitle}
-                      </p>
+                  <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
+                    <div className="flex min-w-0 items-start gap-3">
+                      <span
+                        aria-hidden="true"
+                        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
+                          isAi
+                            ? "bg-brand-50 text-brand-700"
+                            : "bg-brand-50 text-brand-600"
+                        }`}
+                      >
+                        {isAi ? (
+                          <Bot className="h-4 w-4" />
+                        ) : (
+                          <Building2 className="h-4 w-4" />
+                        )}
+                      </span>
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-ink">
+                          {isAi ? "AI interview" : "Organisational interview"}
+                        </p>
+                        <p className="mt-0.5 break-words text-sm text-muted">
+                          {jobTitle}
+                        </p>
+                      </div>
                     </div>
                     <div className="flex max-w-full flex-wrap items-center gap-1.5">
-                      <ApplicationStatus status={application.status} />
+                      <ApplicationStatusBadge status={application.status} />
                       {orgStatus && (
-                        <span
-                          className={`rounded px-1.5 py-1 text-[8px] font-medium ${
-                            orgStatus === "completed"
-                              ? "bg-emerald-50 text-emerald-700"
-                              : orgStatus === "expired"
-                                ? "bg-[#f3f3f6] text-[#686b77]"
-                                : "bg-[#f0efff] text-[#5f53ce]"
-                          }`}
-                        >
+                        <span className={ORG_INTERVIEW_STATUS_BADGE[orgStatus]}>
                           {ORG_INTERVIEW_STATUS_LABELS[orgStatus]}
                         </span>
                       )}
-                      {item.category === "ai" && (
-                        <span className="rounded bg-[#f0efff] px-1.5 py-1 text-[8px] font-medium text-[#5f53ce]">
-                          Scheduled
-                        </span>
-                      )}
+                      {isAi && <Badge tone="info">Scheduled</Badge>}
                     </div>
                   </div>
 
-                  <dl className="mt-3 grid min-w-0 gap-x-4 gap-y-2 border-t border-[#f0f0f3] pt-2.5 sm:grid-cols-2">
+                  <dl className="mt-4 grid min-w-0 grid-cols-1 gap-x-6 gap-y-3 border-t border-line-soft pt-4 sm:grid-cols-2">
                     {item.dates.map((date) => (
-                      <div key={`${item.id}-${date.kind}`}>
-                        <dt className="text-[7px] font-semibold uppercase tracking-[0.06em] text-[#999ba4]">
+                      <div key={`${item.id}-${date.kind}`} className="min-w-0">
+                        <dt className="text-xs font-medium text-muted">
                           {date.label}
                         </dt>
-                        <dd className="mt-0.5 break-words text-[9px] text-[#555762]">
+                        <dd className="mt-0.5 break-words text-sm tabular-nums text-ink">
                           {formatDateTime(date.value)}
                           {date.kind === "deadline" &&
                             orgStatus === "invited" && (
-                              <span className="ml-1.5 text-[8px] font-medium text-[#6658d9]">
+                              <span className="ml-2 text-xs font-medium text-brand-600">
                                 {timeUntil(date.value)}
                               </span>
                             )}
                         </dd>
                       </div>
                     ))}
-                    <div>
-                      <dt className="text-[7px] font-semibold uppercase tracking-[0.06em] text-[#999ba4]">
-                        Role
-                      </dt>
-                      <dd className="mt-0.5 text-[9px] text-[#555762]">
+                    <div className="min-w-0">
+                      <dt className="text-xs font-medium text-muted">Role</dt>
+                      <dd className="mt-0.5 break-words text-sm text-ink">
                         {jobTitle}
                       </dd>
                     </div>
                   </dl>
 
                   {item.category === "organizational" && interview?.notes && (
-                    <div className="mt-2.5 border-t border-[#f0f0f3] pt-2">
-                      <p className="text-[7px] font-semibold uppercase tracking-[0.06em] text-[#999ba4]">
+                    <div className="mt-4 border-t border-line-soft pt-4">
+                      <p className="text-xs font-medium text-muted">
                         Organisation notes
                       </p>
-                      <p className="mt-1 whitespace-pre-line text-[9px] leading-4 text-[#686b77]">
+                      <p className="mt-1 whitespace-pre-line break-words text-sm text-body">
                         {interview.notes}
                       </p>
                     </div>
                   )}
 
-                  {item.category === "ai" && application.aiInterview.message && (
-                    <p className="mt-2.5 border-t border-[#f0f0f3] pt-2 text-[9px] leading-4 text-[#686b77]">
+                  {isAi && application.aiInterview.message && (
+                    <p className="mt-4 break-words border-t border-line-soft pt-4 text-sm text-body">
                       {application.aiInterview.message}
                     </p>
                   )}
 
                   {item.category === "organizational" &&
                     orgStatus === "invited" && (
-                      <p className="mt-2 text-[8px] leading-4 text-[#858792]">
-                        The invite link was sent to your email. Complete the
-                        interview before the deadline; this is a flexible
-                        invitation window, not a fixed appointment.
+                      <p className="mt-4 flex items-start gap-2 rounded-lg bg-brand-50 px-3 py-2.5 text-sm text-brand-800 ring-1 ring-inset ring-brand-600/15">
+                        <Info
+                          aria-hidden="true"
+                          className="mt-0.5 h-4 w-4 shrink-0 text-brand-600"
+                        />
+                        <span className="min-w-0">
+                          The invite link was sent to your email. Complete the
+                          interview before the deadline; this is a flexible
+                          invitation window, not a fixed appointment.
+                        </span>
                       </p>
                     )}
 
-                  <div className="mt-2.5 flex min-w-0 flex-wrap gap-2">
-                    {item.category === "organizational" &&
-                      orgStatus === "invited" &&
-                      interview?.calendarLink && (
-                        <a
-                          href={interview.calendarLink}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex min-w-0 h-7 items-center gap-1.5 border border-[#dedaf7] bg-white px-2.5 text-[8px] font-medium text-[#5f53ce] transition-colors hover:border-[#c9c3f1]"
-                        >
-                          <CalendarDays
-                            aria-hidden="true"
-                            className="h-3 w-3"
-                          />
-                          <span className="truncate">Add invite window to calendar</span>
-                          <ExternalLink
-                            aria-hidden="true"
-                            className="h-2.5 w-2.5"
-                          />
-                        </a>
-                      )}
-                    {item.category === "ai" &&
-                      application.interviewSessionId && (
-                        <Link
+                  {((item.category === "organizational" &&
+                    orgStatus === "invited" &&
+                    interview?.calendarLink) ||
+                    (isAi &&
+                      (application.interviewSessionId ||
+                        application.aiInterview.calendarLink))) && (
+                    <div className="mt-4 flex min-w-0 flex-wrap gap-2">
+                      {item.category === "organizational" &&
+                        orgStatus === "invited" &&
+                        interview?.calendarLink && (
+                          <a
+                            href={interview.calendarLink}
+                            target="_blank"
+                            rel="noreferrer"
+                            className={wrappingLinkClass}
+                          >
+                            <CalendarDays aria-hidden="true" />
+                            <span className="min-w-0">
+                              Add invite window to calendar
+                            </span>
+                            <ExternalLink aria-hidden="true" />
+                          </a>
+                        )}
+                      {isAi && application.interviewSessionId && (
+                        <Button
                           href={`/candidate/interview/session/${application.interviewSessionId}`}
-                          className="inline-flex h-7 items-center gap-1 rounded bg-[#6b5ce7] px-2.5 text-[8px] font-semibold text-white hover:bg-[#5849d1]"
+                          trailingIcon={<ArrowRight aria-hidden="true" />}
                         >
                           Open AI interview
-                          <ArrowRight
-                            aria-hidden="true"
-                            className="h-3 w-3"
-                          />
-                        </Link>
+                        </Button>
                       )}
-                    {item.category === "ai" &&
-                      application.aiInterview.calendarLink && (
+                      {isAi && application.aiInterview.calendarLink && (
                         <a
                           href={application.aiInterview.calendarLink}
                           target="_blank"
                           rel="noreferrer"
-                          className="inline-flex h-7 items-center gap-1 border border-[#e9eaf0] bg-white px-2.5 text-[8px] font-medium text-[#666974] hover:border-[#d8d5f7] hover:text-[#5f53ce]"
+                          className={wrappingLinkClass}
                         >
                           Add to calendar
-                          <ExternalLink
-                            aria-hidden="true"
-                            className="h-2.5 w-2.5"
-                          />
+                          <ExternalLink aria-hidden="true" />
                         </a>
                       )}
-                  </div>
+                    </div>
+                  )}
                 </article>
               );
             })}
 
             {visibleItems.length === 0 && (
-              <div className="flex min-h-[205px] flex-col items-center justify-center border border-[#e9eaf0] bg-white px-4 text-center">
-                <CalendarDays
-                  aria-hidden="true"
-                  className="mb-2 h-5 w-5 text-[#b2b4bd]"
+              <div className="rounded-xl border border-dashed border-line">
+                <EmptyState
+                  bare
+                  icon={<CalendarDays />}
+                  title={
+                    selectedDate
+                      ? "No interviews on this date"
+                      : category === "organizational"
+                        ? "No organisational interviews yet"
+                        : "No AI interviews scheduled"
+                  }
+                  description={
+                    selectedDate
+                      ? "Choose a marked date or show all interviews."
+                      : "Interview schedules and organisational invites will appear here when available."
+                  }
                 />
-                <p className="text-[10px] font-semibold text-[#555762]">
-                  {selectedDate
-                    ? "No interviews on this date"
-                    : category === "organizational"
-                      ? "No organisational interviews yet"
-                      : "No AI interviews scheduled"}
-                </p>
-                <p className="mt-1 max-w-xs text-[9px] leading-4 text-[#92949d]">
-                  {selectedDate
-                    ? "Choose a marked date or show all interviews."
-                    : "Interview schedules and organisational invites will appear here when available."}
-                </p>
               </div>
             )}
           </div>
@@ -655,87 +653,119 @@ export function MyApplications() {
     };
   }, [applicationList]);
 
+  const interviewStats = useMemo(() => {
+    const ai = applicationList.filter(
+      (item) => item.aiInterview.scheduled,
+    ).length;
+    const organizational = applicationList.filter((item) =>
+      Boolean(item.orgInterview?.status),
+    ).length;
+    return { ai, organizational, total: ai + organizational };
+  }, [applicationList]);
+
   return (
-    <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
-      <div className="mx-auto max-w-[1500px] space-y-3">
-        <header className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
-          <div className="flex min-w-0 items-center gap-2.5">
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#e9eaf0] bg-white text-[#767985]">
-              <BriefcaseBusiness aria-hidden="true" className="h-3 w-3" />
-            </span>
-            <div className="min-w-0">
-              <div className="flex items-center gap-1.5 text-[9px] text-[#999ba4]">
-                <Link
-                  href="/candidate/dashboard"
-                  className="hover:text-[#6658d9]"
-                >
-                  Candidate portal
-                </Link>
-                <span aria-hidden="true">/</span>
-                <span className="text-[#686b77]">Applications</span>
-              </div>
-              <h1 className="mt-0.5 truncate text-[13px] font-semibold text-[#30323b]">
-                My Applications
-              </h1>
-            </div>
-          </div>
-          <Link
+    <PortalPage>
+      <PageHeader
+        title="My applications"
+        description="Track match scores, HR decisions and scheduled interviews."
+        icon={<BriefcaseBusiness />}
+        action={
+          <Button
             href="/candidate/jobs"
-            className="inline-flex h-7 shrink-0 items-center gap-1.5 self-start rounded bg-[#6b5ce7] px-2.5 text-[9px] font-semibold text-white transition-colors hover:bg-[#5849d1] sm:self-auto"
+            trailingIcon={<ArrowRight aria-hidden="true" />}
           >
-            Browse jobs <ArrowRight aria-hidden="true" className="h-3 w-3" />
-          </Link>
-        </header>
+            Browse jobs
+          </Button>
+        }
+      />
 
-        {applications.error && (
-          <ErrorBlock
-            message={applications.error}
-            onRetry={applications.reload}
-          />
-        )}
+      {applications.error && (
+        <ErrorBlock
+          message={applications.error}
+          onRetry={applications.reload}
+        />
+      )}
 
-        {applications.isLoading ? (
-          <div
-            aria-label="Loading your applications"
-            className="grid animate-pulse gap-3 lg:grid-cols-[minmax(245px,0.78fr)_minmax(0,2fr)]"
-          >
-            <div className="h-[540px] border border-[#e9eaf0] bg-white" />
-            <div className="h-[540px] border border-[#e9eaf0] bg-white" />
+      {applications.isLoading ? (
+        <div
+          role="status"
+          aria-label="Loading your applications"
+          className="space-y-6"
+        >
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
+            {Array.from({ length: 4 }, (_, index) => (
+              <div
+                key={index}
+                className="rounded-xl border border-line bg-surface p-4 shadow-xs sm:p-5"
+              >
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="mt-3 h-7 w-16" />
+              </div>
+            ))}
           </div>
-        ) : applicationList.length === 0 ? (
-          <div className="border border-[#e9eaf0] bg-white px-4 py-14 text-center">
-            <span className="mx-auto flex h-9 w-9 items-center justify-center rounded-full bg-[#f4f3ff] text-[#7163df]">
-              <FileText aria-hidden="true" className="h-4 w-4" />
-            </span>
-            <h2 className="mt-3 text-[12px] font-semibold text-[#454752]">
-              No applications yet
-            </h2>
-            <p className="mx-auto mt-1 max-w-sm text-[10px] leading-4 text-[#92949d]">
-              Upload your resume and apply from the job board. Your match score
-              will be calculated when you apply.
-            </p>
-            <Link
+          <div className={layoutGridClass}>
+            <SkeletonCard lines={6} />
+            <SkeletonCard lines={8} />
+          </div>
+        </div>
+      ) : applicationList.length === 0 ? (
+        <EmptyState
+          icon={<FileText />}
+          title="No applications yet"
+          description="Upload your resume and apply from the job board. Your match score will be calculated when you apply."
+          action={
+            <Button
               href="/candidate/jobs"
-              className="mt-4 inline-flex h-7 items-center gap-1.5 rounded bg-[#6b5ce7] px-2.5 text-[9px] font-semibold text-white hover:bg-[#5849d1]"
+              trailingIcon={<ArrowRight aria-hidden="true" />}
             >
-              Browse open jobs <ArrowRight className="h-3 w-3" />
-            </Link>
+              Browse open jobs
+            </Button>
+          }
+        />
+      ) : (
+        <>
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
+            <StatCard
+              label="Applications"
+              value={counts.all}
+              sub={`${counts.pending} awaiting a decision`}
+              icon={<BriefcaseBusiness />}
+            />
+            <StatCard
+              label="Average match"
+              value={`${summary.averageMatch}%`}
+              sub={`${summary.matched} qualified match${summary.matched === 1 ? "" : "es"}`}
+              icon={<Target />}
+              tone="info"
+            />
+            <StatCard
+              label="Interviews"
+              value={interviewStats.total}
+              sub={`${interviewStats.ai} AI · ${interviewStats.organizational} organisational`}
+              icon={<CalendarDays />}
+              tone="warning"
+            />
+            <StatCard
+              label="Selected"
+              value={counts.selected}
+              sub={`${counts.rejected} rejected`}
+              icon={<CheckCircle2 />}
+              tone="success"
+            />
           </div>
-        ) : (
-          <div className="grid items-start gap-3 lg:grid-cols-[minmax(255px,0.78fr)_minmax(0,2fr)]">
-            <Panel
+
+          <div className={layoutGridClass}>
+            <Card
+              padding="none"
               title="Applications"
-              action={
-                <span className="rounded-full bg-[#f0efff] px-1.5 py-0.5 text-[8px] font-medium text-[#6658d9]">
-                  {counts.all}
-                </span>
-              }
+              action={<Badge tone="brand">{counts.all}</Badge>}
+              className="lg:sticky lg:top-6"
             >
-              <div className="border-b border-[#f0f0f3] p-2.5">
-                <label className="flex h-7 items-center gap-1.5 border border-[#e9eaf0] px-2">
+              <div className="space-y-3 border-b border-line-soft px-5 pb-4 sm:px-6">
+                <div className="relative">
                   <Search
                     aria-hidden="true"
-                    className="h-3 w-3 shrink-0 text-[#9a9ca5]"
+                    className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-subtle"
                   />
                   <input
                     type="search"
@@ -743,37 +773,46 @@ export function MyApplications() {
                     onChange={(event) => setSearch(event.target.value)}
                     placeholder="Search job title…"
                     aria-label="Search applications by job title"
-                    className="min-w-0 flex-1 bg-transparent text-[9px] text-[#42444e] outline-none placeholder:text-[#a3a5ad]"
+                    className={`${inputClass} pl-9`}
                   />
-                </label>
+                </div>
                 <div
                   role="tablist"
                   aria-label="Filter applications by status"
-                  className="mt-2 flex gap-1 overflow-x-auto"
+                  className="flex flex-wrap gap-2"
                 >
-                  {statusFilters.map((filter) => (
-                    <button
-                      key={filter.value}
-                      type="button"
-                      role="tab"
-                      aria-selected={statusFilter === filter.value}
-                      onClick={() => setStatusFilter(filter.value)}
-                      className={`inline-flex shrink-0 items-center gap-1 rounded px-1.5 py-1 text-[8px] transition-colors ${
-                        statusFilter === filter.value
-                          ? "bg-[#f0efff] font-semibold text-[#5f53ce]"
-                          : "text-[#858792] hover:bg-[#f7f7fa]"
-                      }`}
-                    >
-                      {filter.label}
-                      <span className="text-[7px] opacity-70">
-                        {counts[filter.value]}
-                      </span>
-                    </button>
-                  ))}
+                  {statusFilters.map((filter) => {
+                    const isActive = statusFilter === filter.value;
+                    return (
+                      <button
+                        key={filter.value}
+                        type="button"
+                        role="tab"
+                        aria-selected={isActive}
+                        onClick={() => setStatusFilter(filter.value)}
+                        className={`inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-sm font-medium ring-1 ring-inset transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 ${
+                          isActive
+                            ? "bg-brand-50 text-brand-700 ring-brand-200"
+                            : "bg-surface text-muted ring-line hover:bg-surface-2 hover:text-ink"
+                        }`}
+                      >
+                        {filter.label}
+                        <span
+                          className={`min-w-5 rounded-full px-1.5 text-center text-xs tabular-nums ${
+                            isActive
+                              ? "bg-brand-100 text-brand-700"
+                              : "bg-surface-3 text-muted"
+                          }`}
+                        >
+                          {counts[filter.value]}
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
-              <div className="max-h-[calc(100dvh-290px)] min-h-[220px] overflow-y-auto p-1.5">
+              <div className="space-y-1 p-2 sm:p-3 lg:max-h-[calc(100dvh-19rem)] lg:overflow-y-auto">
                 {filtered.map((application) => {
                   const job = populated(application.jobId);
                   const isSelected =
@@ -787,69 +826,76 @@ export function MyApplications() {
                         setActiveTab("overview");
                       }}
                       aria-pressed={isSelected}
-                      className={`mb-1.5 block w-full border p-2.5 text-left transition-colors last:mb-0 ${
+                      className={`block w-full rounded-lg border p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 ${
                         isSelected
-                          ? "border-[#dcd8fa] bg-[#f8f7ff]"
-                          : "border-transparent hover:border-[#ececf1] hover:bg-[#fbfbfc]"
+                          ? "border-brand-200 bg-brand-50/60"
+                          : "border-transparent hover:bg-surface-2"
                       }`}
                     >
-                      <div className="flex items-start gap-2">
+                      <span className="flex items-start gap-3">
                         <span
-                          className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded ${
+                          aria-hidden="true"
+                          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
                             isSelected
-                              ? "bg-[#eeecff] text-[#6658d9]"
-                              : "bg-[#f4f5f8] text-[#888a94]"
+                              ? "bg-brand-100 text-brand-700"
+                              : "bg-surface-3 text-muted"
                           }`}
                         >
-                          <BriefcaseBusiness
-                            aria-hidden="true"
-                            className="h-3.5 w-3.5"
-                          />
+                          <BriefcaseBusiness className="h-4 w-4" />
                         </span>
                         <span className="min-w-0 flex-1">
-                          <span className="block truncate text-[10px] font-semibold text-[#454752]">
-                            {job?.title ?? "Job no longer available"}
+                          <span className="flex items-start justify-between gap-2">
+                            <span className="min-w-0 break-words text-sm font-semibold text-ink">
+                              {job?.title ?? "Job no longer available"}
+                            </span>
+                            <span
+                              className={`shrink-0 text-sm font-semibold tabular-nums ${scoreColor(application.matchScore)}`}
+                            >
+                              {application.matchScore}%
+                            </span>
                           </span>
-                          <span className="mt-1 block text-[8px] text-[#999ba4]">
+                          <span className="mt-0.5 block text-xs text-muted">
                             Applied {formatDate(application.createdAt)}
                           </span>
-                        </span>
-                        <span
-                          className={`shrink-0 text-[9px] font-semibold tabular-nums ${scoreColor(application.matchScore)}`}
-                        >
-                          {application.matchScore}%
-                        </span>
-                      </div>
-                      <span className="mt-2 flex items-center justify-between pl-9">
-                        <ApplicationStatus status={application.status} />
-                        {application.matched && (
-                          <span className="text-[8px] text-[#279773]">
-                            Match qualified
+                          <span className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+                            <ApplicationStatusBadge
+                              status={application.status}
+                            />
+                            {application.matched && (
+                              <span className="inline-flex items-center gap-1 text-xs font-medium text-brand-700">
+                                <Target
+                                  aria-hidden="true"
+                                  className="h-3.5 w-3.5"
+                                />
+                                Match qualified
+                              </span>
+                            )}
                           </span>
-                        )}
+                        </span>
                       </span>
                     </button>
                   );
                 })}
                 {filtered.length === 0 && (
-                  <div className="px-3 py-9 text-center">
-                    <p className="text-[9px] font-medium text-[#626570]">
+                  <div className="px-3 py-10 text-center">
+                    <p className="text-sm font-medium text-ink">
                       No applications match these filters.
                     </p>
-                    <button
-                      type="button"
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="mt-3"
                       onClick={() => {
                         setSearch("");
                         setStatusFilter("all");
                       }}
-                      className="mt-2 text-[9px] font-semibold text-[#6658d9] hover:text-[#5143c3]"
                     >
                       Clear filters
-                    </button>
+                    </Button>
                   </div>
                 )}
               </div>
-            </Panel>
+            </Card>
 
             {selectedApplication ? (
               <ApplicationDetail
@@ -860,16 +906,19 @@ export function MyApplications() {
                 onTabChange={setActiveTab}
               />
             ) : (
-              <section className="flex min-h-[320px] items-center justify-center border border-[#e9eaf0] bg-white px-5 text-center">
-                <p className="text-[10px] text-[#858792]">
-                  Select an application to view its details.
-                </p>
-              </section>
+              <Card>
+                <EmptyState
+                  bare
+                  icon={<SearchX />}
+                  title="No application selected"
+                  description="Select an application to view its details."
+                />
+              </Card>
             )}
           </div>
-        )}
-      </div>
-    </div>
+        </>
+      )}
+    </PortalPage>
   );
 }
 
@@ -889,263 +938,220 @@ function ApplicationDetail({
   const job = populated(application.jobId);
   const { aiInterview, orgInterview } = application;
   const hasInterviews = aiInterview.scheduled || Boolean(orgInterview?.status);
-  const interviewCount = applications.reduce(
-    (count, item) =>
-      count +
-      Number(item.aiInterview.scheduled) +
-      Number(Boolean(item.orgInterview?.status)),
-    0,
-  );
   const aiInterviewCount = applications.filter(
     (item) => item.aiInterview.scheduled,
   ).length;
   const organizationalInterviewCount = applications.filter(
     (item) => Boolean(item.orgInterview?.status),
   ).length;
+  const skillCount = application.resumeSnapshotSkills.length;
+  const score = Math.min(100, Math.max(0, application.matchScore));
 
   return (
-    <div className="min-w-0 space-y-3">
-      <section className="border border-[#e9eaf0] bg-white p-3 sm:p-4">
-        <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
-          <div className="flex min-w-0 items-start gap-2.5">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-[#f0efff] text-[#6658d9]">
-              <BriefcaseBusiness aria-hidden="true" className="h-4 w-4" />
+    <div className="@container min-w-0 space-y-4 lg:space-y-6">
+      <Card>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex min-w-0 items-start gap-4">
+            <span
+              aria-hidden="true"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-700 ring-1 ring-inset ring-brand-600/10"
+            >
+              <BriefcaseBusiness className="h-5 w-5" />
             </span>
             <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <h2 className="text-[14px] font-semibold tracking-[-0.02em] text-[#30323b]">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                <h2 className="break-words font-display text-lg font-semibold tracking-tight text-ink sm:text-xl">
                   {job?.title ?? "Job no longer available"}
                 </h2>
-                <ApplicationStatus status={application.status} />
+                <ApplicationStatusBadge status={application.status} />
               </div>
-              <p className="mt-1 text-[9px] text-[#92949d]">
+              <p className="mt-1 text-sm text-muted">
                 Application · {application._id.slice(-8).toUpperCase()}
               </p>
             </div>
           </div>
-        </div>
-      </section>
-
-      <div className="grid items-start gap-3 xl:grid-cols-[minmax(0,1.55fr)_minmax(220px,0.95fr)]">
-        <Panel
-          title="Application details"
-          action={
-            <span className="text-[8px] text-[#999ba4]">
-              Updated {formatDate(application.updatedAt)}
-            </span>
-          }
-        >
-          <div
-            role="tablist"
-            aria-label="Application detail sections"
-            className="flex gap-1 overflow-x-auto border-b border-[#eeeeF2] bg-white px-2.5 py-2"
-          >
-            {detailTabs.map((tab) => (
-              <button
-                key={tab.value}
-                type="button"
-                role="tab"
-                aria-selected={activeTab === tab.value}
-                onClick={() => onTabChange(tab.value)}
-                className={`inline-flex shrink-0 items-center gap-1.5 rounded px-2.5 py-1.5 text-[9px] transition-colors ${
-                  activeTab === tab.value
-                    ? "bg-[#f0efff] font-semibold text-[#5f53ce]"
-                    : "text-[#858792] hover:bg-[#f7f7fa] hover:text-[#50525d]"
-                }`}
-              >
-                {tab.label}
-                {(tab.value === "ai" || tab.value === "organizational") && (
-                  <span className="ml-1 rounded-full bg-[#f0efff] px-1 py-0.5 text-[7px] text-[#6658d9]">
-                    {tab.value === "ai"
-                      ? aiInterviewCount
-                      : organizationalInterviewCount}
-                  </span>
-                )}
-              </button>
-            ))}
+          <div className="flex shrink-0 items-baseline gap-2 pl-14 sm:block sm:pl-0 sm:text-right">
+            <p className="text-xs font-medium text-muted sm:mb-0.5">
+              Match score
+            </p>
+            <p
+              className={`font-display text-2xl font-semibold tracking-tight tabular-nums sm:text-3xl ${scoreColor(application.matchScore)}`}
+            >
+              {application.matchScore}%
+            </p>
           </div>
+        </div>
 
-          <div className="min-h-[255px] space-y-3 bg-[#fcfcfd] p-3 sm:p-4">
-            {activeTab === "overview" && (
-              <div className="space-y-3">
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <h3 className="text-[11px] font-semibold text-[#454752]">
+        <dl className="mt-5 grid grid-cols-2 gap-x-6 gap-y-4 border-t border-line-soft pt-5 @2xl:grid-cols-4">
+          <DetailValue label="Shortlisting">
+            <span className="flex items-start gap-1.5">
+              {application.matched ? (
+                <CheckCircle2
+                  aria-hidden="true"
+                  className="mt-0.5 h-4 w-4 shrink-0 text-brand-600"
+                />
+              ) : (
+                <Clock3
+                  aria-hidden="true"
+                  className="mt-0.5 h-4 w-4 shrink-0 text-brand-500"
+                />
+              )}
+              {application.matched
+                ? "Met match threshold"
+                : "Below match threshold"}
+            </span>
+          </DetailValue>
+          <DetailValue label="Applied on">
+            <span className="tabular-nums">
+              {formatDateTime(application.createdAt)}
+            </span>
+          </DetailValue>
+          <DetailValue label="Last updated">
+            <span className="tabular-nums">
+              {formatDateTime(application.updatedAt)}
+            </span>
+          </DetailValue>
+          <DetailValue label="Interview steps">
+            {hasInterviews
+              ? `${Number(aiInterview.scheduled) + Number(Boolean(orgInterview?.status))} scheduled or invited`
+              : "No interviews yet"}
+          </DetailValue>
+        </dl>
+      </Card>
+
+      <Card padding="none">
+        <Tabs
+          ariaLabel="Application detail sections"
+          idPrefix="application-detail"
+          value={activeTab}
+          onChange={onTabChange}
+          className="px-5 pt-3 sm:px-6"
+          tabs={detailTabs.map((tab) => ({
+            id: tab.value,
+            label: tab.label,
+            count:
+              tab.value === "ai"
+                ? aiInterviewCount
+                : tab.value === "organizational"
+                  ? organizationalInterviewCount
+                  : undefined,
+          }))}
+        />
+
+        <div
+          id={`application-detail-panel-${activeTab}`}
+          role="tabpanel"
+          aria-labelledby={`application-detail-tab-${activeTab}`}
+          className="min-h-64 p-5 sm:p-6"
+        >
+          {activeTab === "overview" && (
+            <div className="space-y-6">
+              <section>
+                <div className="flex flex-wrap items-end justify-between gap-3">
+                  <div className="min-w-0">
+                    <h3 className="text-base font-semibold text-ink">
                       Match overview
                     </h3>
-                    <p className="mt-0.5 text-[9px] text-[#92949d]">
+                    <p className="mt-1 text-sm text-muted">
                       Based on the resume snapshot used when you applied.
                     </p>
                   </div>
                   <span
-                    className={`text-[18px] font-bold tabular-nums ${scoreColor(application.matchScore)}`}
+                    className={`font-display text-2xl font-semibold tracking-tight tabular-nums ${scoreColor(application.matchScore)}`}
                   >
                     {application.matchScore}%
                   </span>
                 </div>
-                <div className="h-1.5 overflow-hidden rounded-full bg-[#eeedf3]">
+                <div
+                  role="progressbar"
+                  aria-label="Match score"
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={score}
+                  className="mt-4 h-2 overflow-hidden rounded-full bg-surface-3"
+                >
                   <div
-                    className="h-full rounded-full bg-[#6b5ce7] transition-[width]"
-                    style={{
-                      width: `${Math.min(100, Math.max(0, application.matchScore))}%`,
-                    }}
+                    className="h-full rounded-full bg-brand-600 transition-[width]"
+                    style={{ width: `${score}%` }}
                   />
                 </div>
-                <section className="border border-[#ededf1] bg-white p-3">
-                  <div className="mb-2.5 flex items-center justify-between gap-2">
-                    <h3 className="text-[10px] font-semibold text-[#555762]">
-                      Skills found in your resume
-                    </h3>
-                    <span className="text-[8px] text-[#999ba4]">
-                      {application.resumeSnapshotSkills.length} skills
-                    </span>
-                  </div>
-                  {application.resumeSnapshotSkills.length ? (
-                    <div className="flex flex-wrap gap-1.5">
-                      {application.resumeSnapshotSkills.map((skill) => (
-                        <span
-                          key={skill}
-                          className="inline-flex items-center gap-1 rounded border border-[#e5f1ec] bg-[#f4faf7] px-2 py-1 text-[8px] text-[#507563]"
-                        >
-                          <Check
-                            aria-hidden="true"
-                            className="h-2.5 w-2.5 text-[#3e9a72]"
-                          />
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-[9px] text-[#92949d]">
-                      No required skills were found in the resume snapshot.
-                    </p>
-                  )}
-                </section>
-              </div>
-            )}
-
-            {(activeTab === "ai" || activeTab === "organizational") && (
-              <InterviewSchedule
-                applications={applications}
-                category={activeTab}
-              />
-            )}
-
-            {activeTab === "job" && (
-              <div className="border border-[#ededf1] bg-white p-3">
-                <div className="flex items-start gap-2">
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-[#f4f5f8] text-[#777984]">
-                    <FileText aria-hidden="true" className="h-3.5 w-3.5" />
+                <p className="mt-2 text-xs text-muted">
+                  Your average across all applications is{" "}
+                  <span className="font-medium tabular-nums text-body">
+                    {summary.averageMatch}%
                   </span>
-                  <div className="min-w-0">
-                    <h3 className="text-[11px] font-semibold text-[#454752]">
-                      {job?.title ?? "Job details unavailable"}
-                    </h3>
-                    <p className="mt-1 text-[8px] text-[#999ba4]">
-                      Applied {formatDate(application.createdAt)}
-                    </p>
-                  </div>
-                </div>
-                {job?.description ? (
-                  <p className="mt-3 whitespace-pre-line border-t border-[#f0f0f3] pt-3 text-[10px] leading-[1.7] text-[#686b77]">
-                    {job.description}
-                  </p>
-                ) : (
-                  <p className="mt-3 border-t border-[#f0f0f3] pt-3 text-[9px] text-[#92949d]">
-                    This job posting is no longer available.
-                  </p>
-                )}
-              </div>
-            )}
-          </div>
-        </Panel>
+                  .
+                </p>
+              </section>
 
-        <Panel
-          title="Application information"
-          className="xl:sticky xl:top-3"
-          action={
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#f4f3ff] text-[#6658d9]">
-              <BriefcaseBusiness aria-hidden="true" className="h-3 w-3" />
-            </span>
-          }
-        >
-          <div className="space-y-3.5 p-3">
-            <DetailValue label="Job title">
-              {job?.title ?? "Job no longer available"}
-            </DetailValue>
-            <DetailValue label="Application status">
-              <ApplicationStatus status={application.status} />
-            </DetailValue>
-            <DetailValue label="Match score">
-              <span
-                className={`inline-flex items-center gap-1 font-semibold ${scoreColor(application.matchScore)}`}
-              >
-                <Target aria-hidden="true" className="h-3 w-3" />
-                {application.matchScore}%
-              </span>
-            </DetailValue>
-            <DetailValue label="Shortlisting">
-              <span className="inline-flex items-center gap-1">
-                {application.matched ? (
-                  <CheckCircle2
-                    aria-hidden="true"
-                    className="h-3 w-3 text-emerald-600"
-                  />
+              <section className="rounded-xl border border-line p-4 sm:p-5">
+                <div className="mb-3 flex items-center justify-between gap-2">
+                  <h3 className="text-sm font-semibold text-ink">
+                    Skills found in your resume
+                  </h3>
+                  <span className="text-xs tabular-nums text-muted">
+                    {skillCount} skill{skillCount === 1 ? "" : "s"}
+                  </span>
+                </div>
+                {skillCount ? (
+                  <div className="flex flex-wrap gap-2">
+                    {application.resumeSnapshotSkills.map((skill) => (
+                      <Badge
+                        key={skill}
+                        tone="success"
+                        icon={<Check aria-hidden="true" />}
+                      >
+                        {skill}
+                      </Badge>
+                    ))}
+                  </div>
                 ) : (
-                  <Clock3
-                    aria-hidden="true"
-                    className="h-3 w-3 text-amber-600"
-                  />
+                  <p className="text-sm text-muted">
+                    No required skills were found in the resume snapshot.
+                  </p>
                 )}
-                {application.matched
-                  ? "Met match threshold"
-                  : "Below match threshold"}
-              </span>
-            </DetailValue>
-            <div className="border-t border-[#f0f0f3] pt-3">
-              <DetailValue label="Applied on">
-                {formatDateTime(application.createdAt)}
-              </DetailValue>
+              </section>
             </div>
-            <DetailValue label="Last updated">
-              {formatDateTime(application.updatedAt)}
-            </DetailValue>
-            <DetailValue label="Interview steps">
-              {hasInterviews
-                ? `${Number(aiInterview.scheduled) + Number(Boolean(orgInterview?.status))} scheduled or invited`
-                : "No interviews yet"}
-            </DetailValue>
-          </div>
-          <div className="border-t border-[#eeeeF2] px-3 py-2.5">
-            <p className="text-[8px] font-semibold uppercase tracking-[0.06em] text-[#999ba4]">
-              Interview activity
-            </p>
-            <div className="mt-2 flex items-center justify-between gap-2 text-[9px]">
-              <span className="text-[#686b77]">AI interviews</span>
-              <span className="font-semibold tabular-nums text-[#5f53ce]">
-                {aiInterviewCount}
-              </span>
+          )}
+
+          {(activeTab === "ai" || activeTab === "organizational") && (
+            <InterviewSchedule
+              applications={applications}
+              category={activeTab}
+            />
+          )}
+
+          {activeTab === "job" && (
+            <div>
+              <div className="flex items-start gap-3">
+                <span
+                  aria-hidden="true"
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-3 text-body"
+                >
+                  <FileText className="h-5 w-5" />
+                </span>
+                <div className="min-w-0">
+                  <h3 className="break-words text-base font-semibold text-ink">
+                    {job?.title ?? "Job details unavailable"}
+                  </h3>
+                  <p className="mt-0.5 text-sm text-muted">
+                    Applied {formatDate(application.createdAt)}
+                  </p>
+                </div>
+              </div>
+              {job?.description ? (
+                <p className="mt-5 whitespace-pre-line break-words border-t border-line-soft pt-5 text-sm leading-relaxed text-body">
+                  {job.description}
+                </p>
+              ) : (
+                <p className="mt-5 border-t border-line-soft pt-5 text-sm text-muted">
+                  This job posting is no longer available.
+                </p>
+              )}
             </div>
-            <div className="mt-1.5 flex items-center justify-between gap-2 text-[9px]">
-              <span className="text-[#686b77]">Organisational</span>
-              <span className="font-semibold tabular-nums text-[#5f53ce]">
-                {organizationalInterviewCount}
-              </span>
-            </div>
-            <p className="mt-2 border-t border-[#f0f0f3] pt-2 text-[8px] leading-4 text-[#92949d]">
-              {interviewCount} total interview
-              {interviewCount === 1 ? "" : "s"} across your applications
-            </p>
-          </div>
-          <div className="border-t border-[#eeeeF2] bg-[#fbfbfc] px-3 py-2.5">
-            <p className="text-[8px] leading-4 text-[#92949d]">
-              Across {summary.averageMatch}% average match on your applications
-              · {summary.matched} qualified match
-              {summary.matched === 1 ? "" : "es"}
-            </p>
-          </div>
-        </Panel>
-      </div>
+          )}
+        </div>
+      </Card>
     </div>
   );
 }

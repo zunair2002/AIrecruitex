@@ -1,17 +1,22 @@
 /**
- * Site wordmark. "Ai" is the mark — extra-bold purple, square tittle —
- * then Recruitex. No boxed icon.
+ * Site wordmark. "Ai" is the mark — extra-bold violet, square tittle —
+ * then Recruitex. No boxed icon. Size it with a text class, e.g. `text-xl`.
+ *
+ *   <BrandWordmark className="text-xl" />                 on light backgrounds
+ *   <BrandWordmark className="text-xl" tone="onDark" />   on dark (sidebar, footer)
  */
 export function BrandWordmark({
   className = "text-[1.35rem]",
   tone = "light",
 }: {
   className?: string;
-  tone?: "light" | "dark";
+  /** Background it sits on. `dark` and `onDark` are the same variant. */
+  tone?: "light" | "dark" | "onDark";
 }) {
+  const onDark = tone === "dark" || tone === "onDark";
   return (
     <span
-      className={`brand-wordmark ${tone === "dark" ? "is-on-dark" : ""} ${className}`}
+      className={`brand-wordmark ${onDark ? "is-on-dark" : ""} ${className}`}
       aria-label="AiRecruitex"
     >
       <span className="ai" aria-hidden="true">

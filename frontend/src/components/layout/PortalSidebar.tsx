@@ -1,13 +1,21 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type Ref } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ChevronDown, ChevronRight, LogOut, type LucideIcon } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronsUpDown,
+  LogOut,
+  X,
+  type LucideIcon,
+} from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useRealtimeConnected } from "@/context/RealtimeContext";
 import { useUnreadNotifications } from "@/components/shared/useUnreadNotifications";
-import { ROLE_LABELS, initials } from "@/lib/format";
+import { ROLE_LABELS } from "@/lib/format";
+import { Avatar } from "@/components/ui/Avatar";
+import { BrandWordmark } from "@/components/layout/Logo";
 
 /**
  * The portal sidebar — one component for all three portals.
@@ -15,6 +23,9 @@ import { ROLE_LABELS, initials } from "@/lib/format";
  * Candidate, HR and Admin differ only in their nav configuration, so they share
  * this file rather than each keeping a look of their own. That is what stops the
  * three portals drifting apart: a change to the chrome lands in all of them.
+ *
+ * `PortalShell` renders it twice — fixed on desktop and inside the mobile
+ * drawer — through `PortalSidebarPanel`, sharing one unread count.
  */
 
 export type NavItem = {
@@ -35,34 +46,7 @@ export type NavGroup = {
   items: NavItem[];
 };
 
-/** The user's photo, or their initials when they have none. */
-function Avatar({ user }: { user: { name: string; avatarUrl?: string } }) {
-  if (user.avatarUrl) {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={user.avatarUrl}
-        alt=""
-        referrerPolicy="no-referrer"
-        className="h-8 w-8 rounded-full object-cover ring-1 ring-white/20"
-      />
-    );
-  }
-  return (
-    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-[11px] font-semibold text-emerald-300 ring-1 ring-white/20">
-      {initials(user.name)}
-    </span>
-  );
-}
-
-export function PortalSidebar({
-  portalName,
-  portalTagline,
-  navGroups,
-  accountMenu = [],
-  loginPath,
-  homeHref,
-}: {
+export type PortalSidebarProps = {
   portalName: string;
   portalTagline: string;
   navGroups: NavGroup[];
@@ -75,11 +59,52 @@ export function PortalSidebar({
   loginPath: string;
   /** Where the portal name links to — this portal's own home, never "/". */
   homeHref: string;
+};
+
+const FOCUS_ON_DARK =
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400";
+
+function UnreadCount({ count }: { count: number }) {
+  return (
+    <span
+      aria-label={`${count} unread`}
+      className="inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-brand-500 px-1.5 text-xs font-semibold tabular-nums text-white"
+    >
+      {count > 99 ? "99+" : count}
+    </span>
+  );
+}
+
+/** Standalone sidebar that fetches its own unread count. */
+export function PortalSidebar(props: PortalSidebarProps) {
+  const unreadCount = useUnreadNotifications();
+  return <PortalSidebarPanel {...props} unreadCount={unreadCount} />;
+}
+
+export function PortalSidebarPanel({
+  portalName,
+  portalTagline,
+  navGroups,
+  accountMenu = [],
+  loginPath,
+  homeHref,
+  unreadCount,
+  onClose,
+  onNavigate,
+  closeButtonRef,
+  className = "",
+}: PortalSidebarProps & {
+  unreadCount: number;
+  /** When set (mobile drawer), shows a close button in the header. */
+  onClose?: () => void;
+  /** Called when any link in the sidebar is followed. */
+  onNavigate?: () => void;
+  closeButtonRef?: Ref<HTMLButtonElement>;
+  className?: string;
 }) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
-  const unreadCount = useUnreadNotifications();
   const isLive = useRealtimeConnected();
   const [collapsedGroups, setCollapsedGroups] = useState<string[]>([]);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -137,22 +162,39 @@ export function PortalSidebar({
   };
 
   return (
-    <aside className="sticky top-0 flex h-dvh max-h-dvh w-60 shrink-0 flex-col overflow-hidden border-r border-white/10 bg-[#1e1838] px-2.5 py-3.5">
-      <div className="mb-5 px-3">
+    <aside
+      className={`nav-glass flex h-full w-full flex-col text-white ${className}`}
+    >
+      {/* ---- brand ---- */}
+      <div className="flex shrink-0 items-start justify-between gap-3 px-5 pb-4 pt-6">
         <Link
           href={homeHref}
-          className="block transition-opacity hover:opacity-80"
+          onClick={onNavigate}
+          title={portalTagline}
+          className={`-mx-1 flex min-w-0 flex-col gap-1 rounded-md px-1 py-0.5 transition-opacity hover:opacity-90 ${FOCUS_ON_DARK}`}
         >
-          <h2 className="text-sm font-semibold tracking-tight text-white">
+          <BrandWordmark tone="onDark" className="text-xl" />
+          <span className="truncate text-xs font-medium text-white/50">
             {portalName}
-          </h2>
-          <p className="mt-1 text-xs text-purple-300/60">{portalTagline}</p>
+          </span>
         </Link>
+        {onClose && (
+          <button
+            ref={closeButtonRef}
+            type="button"
+            onClick={onClose}
+            aria-label="Close navigation"
+            className={`-mr-2 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-white/60 transition-colors hover:bg-white/10 hover:text-white ${FOCUS_ON_DARK}`}
+          >
+            <X aria-hidden="true" className="h-5 w-5" />
+          </button>
+        )}
       </div>
 
+      {/* ---- navigation ---- */}
       <nav
         aria-label={`${portalName} navigation`}
-        className="min-h-0 flex-1 space-y-3 overflow-y-auto"
+        className="no-scrollbar min-h-0 flex-1 space-y-5 overflow-y-auto px-3 pb-4 pt-2"
       >
         {navGroups.map((group, index) => {
           const title = group.title;
@@ -164,32 +206,35 @@ export function PortalSidebar({
             const showBadge = Boolean(item.showUnreadBadge) && unreadCount > 0;
 
             return (
-              <Link
-                key={item.href}
-                href={item.href}
-                aria-current={isActive ? "page" : undefined}
-                className={`flex items-center gap-2.5 rounded-md px-3 py-1.5 text-[11px] transition-colors duration-150 ${
-                  isActive
-                    ? "bg-white/10 font-medium text-emerald-300"
-                    : "font-normal text-purple-100/70 hover:bg-white/5 hover:text-white"
-                }`}
-              >
-                <Icon
-                  aria-hidden="true"
-                  className={`h-3.5 w-3.5 shrink-0 ${
-                    isActive ? "text-emerald-400" : "text-purple-300/60"
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  onClick={onNavigate}
+                  aria-current={isActive ? "page" : undefined}
+                  className={`group relative flex h-9 items-center gap-3 rounded-lg px-3 text-sm transition-colors ${FOCUS_ON_DARK} ${
+                    isActive
+                      ? "nav-glass-pill font-medium text-white"
+                      : "text-white/70 hover:bg-white/[0.06] hover:text-white"
                   }`}
-                />
-                <span className="flex-1 truncate">{item.label}</span>
-                {showBadge && (
-                  <span
-                    aria-label={`${unreadCount} unread`}
-                    className="min-w-[17px] rounded-full bg-emerald-400/90 px-1 py-px text-center text-[9px] font-bold text-[#1e1838]"
-                  >
-                    {unreadCount > 99 ? "99+" : unreadCount}
-                  </span>
-                )}
-              </Link>
+                >
+                  {isActive && (
+                    <span
+                      aria-hidden="true"
+                      className="absolute inset-y-2 left-0 w-[3px] rounded-r-full bg-brand-400"
+                    />
+                  )}
+                  <Icon
+                    aria-hidden="true"
+                    className={`h-4 w-4 shrink-0 transition-colors ${
+                      isActive
+                        ? "text-brand-300"
+                        : "text-white/50 group-hover:text-white/80"
+                    }`}
+                  />
+                  <span className="min-w-0 flex-1 truncate">{item.label}</span>
+                  {showBadge && <UnreadCount count={unreadCount} />}
+                </Link>
+              </li>
             );
           });
 
@@ -201,12 +246,12 @@ export function PortalSidebar({
                     type="button"
                     onClick={() => toggleGroup(title)}
                     aria-expanded={!isCollapsed}
-                    className="flex w-full items-center justify-between rounded-md px-3 py-1 text-left text-[9px] font-semibold uppercase tracking-[0.12em] text-purple-300/60 transition-colors hover:text-white"
+                    className={`flex w-full items-center justify-between rounded-md px-3 py-1 text-left text-xs font-medium uppercase tracking-wider text-white/40 transition-colors hover:text-white/70 ${FOCUS_ON_DARK}`}
                   >
                     <span>{title}</span>
                     <ChevronDown
                       aria-hidden="true"
-                      className={`h-3 w-3 transition-transform duration-200 ${
+                      className={`h-3.5 w-3.5 transition-transform duration-200 ${
                         isCollapsed ? "-rotate-90" : "rotate-0"
                       }`}
                     />
@@ -216,50 +261,49 @@ export function PortalSidebar({
                       isCollapsed ? "grid-rows-[0fr]" : "grid-rows-[1fr]"
                     }`}
                   >
-                    <div className="overflow-hidden">
-                      <div className="mt-0.5 space-y-0.5">{links}</div>
+                    <div className="overflow-hidden" inert={isCollapsed}>
+                      <ul className="mt-1 space-y-0.5">{links}</ul>
                     </div>
                   </div>
                 </>
               ) : (
-                <div className="space-y-0.5">{links}</div>
+                <ul className="space-y-0.5">{links}</ul>
               )}
             </section>
           );
         })}
       </nav>
 
+      {/* ---- account ---- */}
       {user && (
         <div
           ref={accountRef}
-          className="relative mt-auto border-t border-white/10 pt-3"
+          className="relative shrink-0 border-t border-white/10 p-3"
         >
-          {/* ---- the account card ---- */}
+          {/* the account card */}
           {isAccountOpen && (
             <div
               role="menu"
               aria-label="Account"
-              className="absolute bottom-full left-0 right-0 z-50 mb-2 overflow-hidden rounded-xl border border-white/10 bg-[#282046] py-1.5 shadow-[0_18px_40px_-12px_rgba(0,0,0,0.65)]"
+              className="absolute inset-x-3 bottom-full z-50 mb-2 overflow-hidden rounded-xl border border-line bg-white py-1.5 text-ink shadow-lg motion-safe:animate-pop-in"
             >
-              <div className="flex items-center gap-2.5 px-3 py-2">
-                <Avatar user={user} />
+              <div className="flex items-center gap-3 px-3.5 py-2.5">
+                <Avatar name={user.name} src={user.avatarUrl} size="md" />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-xs font-semibold text-white">
+                  <p className="truncate text-sm font-semibold text-ink">
                     {user.name}
                   </p>
-                  <p className="truncate text-[10px] text-purple-300/70">
-                    {user.email}
-                  </p>
+                  <p className="truncate text-xs text-muted">{user.email}</p>
                 </div>
               </div>
 
-              <p className="px-3 pb-1.5 text-[9px] font-semibold uppercase tracking-[0.12em] text-purple-300/50">
+              <p className="px-3.5 pb-2 text-xs text-muted">
                 {ROLE_LABELS[user.role]} ·{" "}
                 {user.authProvider === "google" ? "Google" : "Email"}
               </p>
 
               {accountMenu.length > 0 && (
-                <div className="my-1 border-t border-white/10" />
+                <div className="my-1 border-t border-line-soft" />
               )}
 
               {accountMenu.map((item) => {
@@ -271,50 +315,49 @@ export function PortalSidebar({
                     key={item.href}
                     href={item.href}
                     role="menuitem"
-                    onClick={() => setIsAccountOpen(false)}
-                    className="flex items-center gap-2.5 px-3 py-2 text-[11px] text-purple-100/80 transition-colors hover:bg-white/5 hover:text-white"
+                    onClick={() => {
+                      setIsAccountOpen(false);
+                      onNavigate?.();
+                    }}
+                    className="flex items-center gap-3 px-3.5 py-2 text-sm text-body transition-colors hover:bg-surface-2 hover:text-ink focus-visible:bg-surface-2 focus-visible:outline-none"
                   >
-                    <Icon aria-hidden="true" className="h-3.5 w-3.5 shrink-0" />
-                    <span className="flex-1 truncate">{item.label}</span>
-                    {showBadge && (
-                      <span
-                        aria-label={`${unreadCount} unread`}
-                        className="min-w-[17px] rounded-full bg-emerald-400/90 px-1 py-px text-center text-[9px] font-bold text-[#1e1838]"
-                      >
-                        {unreadCount > 99 ? "99+" : unreadCount}
-                      </span>
-                    )}
+                    <Icon
+                      aria-hidden="true"
+                      className="h-4 w-4 shrink-0 text-muted"
+                    />
+                    <span className="min-w-0 flex-1 truncate">{item.label}</span>
+                    {showBadge && <UnreadCount count={unreadCount} />}
                   </Link>
                 );
               })}
 
-              <div className="my-1 border-t border-white/10" />
+              <div className="my-1 border-t border-line-soft" />
 
               <button
                 type="button"
                 role="menuitem"
                 onClick={handleLogout}
                 disabled={isLoggingOut}
-                className="flex w-full items-center gap-2.5 px-3 py-2 text-[11px] text-purple-100/80 transition-colors hover:bg-white/5 hover:text-white disabled:opacity-60"
+                className="flex w-full items-center gap-3 px-3.5 py-2 text-sm text-body transition-colors hover:bg-rose-50 hover:text-rose-700 focus-visible:bg-rose-50 focus-visible:outline-none disabled:opacity-60"
               >
-                <LogOut aria-hidden="true" className="h-3.5 w-3.5 shrink-0" />
+                <LogOut aria-hidden="true" className="h-4 w-4 shrink-0" />
                 {isLoggingOut ? "Logging out…" : "Log out"}
               </button>
             </div>
           )}
 
-          {/* ---- the row that opens it ---- */}
+          {/* the row that opens it */}
           <button
             type="button"
             onClick={() => setIsAccountOpen((open) => !open)}
             aria-haspopup="menu"
             aria-expanded={isAccountOpen}
-            className={`flex w-full min-w-0 items-center gap-2.5 rounded-lg px-2 py-1.5 text-left transition-colors ${
-              isAccountOpen ? "bg-white/10" : "hover:bg-white/5"
+            className={`flex w-full min-w-0 items-center gap-3 rounded-lg px-2 py-2 text-left transition-colors ${FOCUS_ON_DARK} ${
+              isAccountOpen ? "nav-glass-pill" : "bg-white/[0.04] ring-1 ring-inset ring-white/10 hover:bg-white/[0.08]"
             }`}
           >
-            <span className="relative block h-8 w-8 shrink-0">
-              <Avatar user={user} />
+            <span className="relative block shrink-0">
+              <Avatar name={user.name} src={user.avatarUrl} size="sm" />
               <span
                 title={
                   isLive
@@ -326,24 +369,22 @@ export function PortalSidebar({
                     ? "Live updates connected"
                     : "Live updates disconnected"
                 }
-                className={`absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-[#1e1838] ${
-                  isLive ? "bg-emerald-500" : "bg-slate-500"
+                className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-sidebar ${
+                  isLive ? "bg-brand-500" : "bg-subtle"
                 }`}
               />
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-xs font-semibold text-white">
+              <span className="block truncate text-sm font-medium text-white">
                 {user.name}
               </span>
-              <span className="block truncate text-[10px] text-purple-300/60">
+              <span className="block truncate text-xs text-white/50">
                 {user.email}
               </span>
             </span>
-            <ChevronRight
+            <ChevronsUpDown
               aria-hidden="true"
-              className={`h-3.5 w-3.5 shrink-0 text-purple-300/60 transition-transform duration-200 ${
-                isAccountOpen ? "-rotate-90" : "rotate-0"
-              }`}
+              className="h-4 w-4 shrink-0 text-white/40"
             />
           </button>
         </div>

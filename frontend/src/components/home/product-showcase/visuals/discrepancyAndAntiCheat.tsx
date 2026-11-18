@@ -1,12 +1,12 @@
 export const DiscrepancyVisual = () => (
   <div className="w-full h-full bg-slate-50/60 flex items-center justify-center p-4 relative overflow-hidden group">
-    <div className="absolute w-40 h-40 bg-amber-500/5 rounded-full -top-10 -left-10 group-hover:bg-amber-500/10 transition-all duration-700" />
+    <div className="absolute w-40 h-40 bg-brand-300/5 rounded-full -top-10 -left-10 group-hover:bg-brand-300/10 transition-all duration-700" />
     <div className="w-11/12 h-5/6 bg-white border border-slate-200/80 rounded-xl overflow-hidden flex flex-col p-2.5 justify-between">
       <div className="flex items-center justify-between border-b border-slate-100 pb-1.5">
         <span className="text-[9px] font-bold text-slate-800">
           Fact-Check Engine
         </span>
-        <div className="flex items-center gap-1 bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded text-amber-700 text-[7px] font-bold animate-pulse">
+        <div className="flex items-center gap-1 bg-brand-50 border border-brand-100 px-1.5 py-0.5 rounded text-brand-600 text-[7px] font-bold animate-pulse">
           <span>⚠️ 1 Flag Detected</span>
         </div>
       </div>
@@ -24,21 +24,21 @@ export const DiscrepancyVisual = () => (
             </p>
           </div>
         </div>
-        <div className="w-1/2 bg-amber-50 border border-amber-100 p-1.5 rounded flex flex-col gap-1 h-full justify-center">
-          <span className="text-[5.5px] text-amber-700 font-bold uppercase tracking-wider">
+        <div className="w-1/2 bg-brand-50 border border-brand-100 p-1.5 rounded flex flex-col gap-1 h-full justify-center">
+          <span className="text-[5.5px] text-brand-600 font-bold uppercase tracking-wider">
             Interview Response
           </span>
-          <div className="bg-white p-1 rounded border border-amber-200 ">
-            <span className="text-[6.5px] text-amber-650 font-bold">
+          <div className="bg-white p-1 rounded border border-brand-200 ">
+            <span className="text-[6.5px] text-brand-650 font-bold">
               &quot;Never deployed K8s...&quot;
             </span>
-            <p className="text-[5px] text-amber-500 mt-0.5">
+            <p className="text-[5px] text-brand-300 mt-0.5">
               Admitted to only theoretical knowledge.
             </p>
           </div>
         </div>
       </div>
-      <div className="bg-amber-50 border border-amber-100 rounded p-1 text-center text-amber-700 text-[6.5px] font-bold uppercase tracking-wider">
+      <div className="bg-brand-50 border border-brand-100 rounded p-1 text-center text-brand-600 text-[6.5px] font-bold uppercase tracking-wider">
         AI Alert: Skills Mismatch Flagged
       </div>
     </div>
@@ -54,7 +54,7 @@ export const AntiCheatVisual = () => (
           Security Proctoring
         </span>
         <div className="flex items-center gap-1 bg-rose-50 border border-rose-100 px-1.5 py-0.5 rounded text-rose-600 text-[6px] font-bold">
-          <span className="w-1 h-1 rounded-full bg-rose-450 animate-pulse" />
+          <span className="w-1 h-1 rounded-full bg-brand-200 animate-pulse" />
           <span>ACTIVE MONITORING</span>
         </div>
       </div>
@@ -101,7 +101,7 @@ export const AntiCheatVisual = () => (
               key={label}
               className="flex items-center gap-1 text-[7.5px] text-slate-700 font-medium"
             >
-              <div className="w-3 h-3 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-[6px] text-emerald-600 font-bold">
+              <div className="w-3 h-3 rounded-full bg-brand-50 border border-brand-100 flex items-center justify-center text-[6px] text-brand-600 font-bold">
                 ✓
               </div>
               <span>{label}</span>
@@ -109,9 +109,9 @@ export const AntiCheatVisual = () => (
           ))}
         </div>
       </div>
-      <div className="bg-emerald-50 border border-emerald-100 rounded p-1 flex items-center justify-center gap-1">
+      <div className="bg-brand-50 border border-brand-100 rounded p-1 flex items-center justify-center gap-1">
         <svg
-          className="w-2.5 h-2.5 text-emerald-600"
+          className="w-2.5 h-2.5 text-brand-600"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -121,7 +121,7 @@ export const AntiCheatVisual = () => (
         >
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
         </svg>
-        <span className="text-[6.5px] text-emerald-700 font-bold uppercase tracking-wider">
+        <span className="text-[6.5px] text-brand-700 font-bold uppercase tracking-wider">
           Verified Authentic Response
         </span>
       </div>

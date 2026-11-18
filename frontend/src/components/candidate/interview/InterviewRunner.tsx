@@ -1,7 +1,16 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import {
+  ArrowRight,
+  BookOpen,
+  CircleCheck,
+  MessageSquareText,
+  RotateCcw,
+  Send,
+  TrendingUp,
+  Unlock,
+} from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { apiErrorStatus, toErrorMessage } from "@/lib/api";
 import { getInterviewReport, submitAnswer } from "@/lib/interviewApi";
@@ -19,13 +28,20 @@ import {
   type InterviewTurnView,
 } from "@/lib/types";
 import { VerdictBadge } from "@/components/shared/VerdictBadge";
-import { Card, InlineError, Spinner } from "@/components/ui/Feedback";
-import { primaryButtonClass, secondaryButtonClass } from "@/components/ui/controls";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { Card, InlineError } from "@/components/ui/Feedback";
 import { CertificatePanel } from "./CertificatePanel";
 import { FinalScoreRing, ScoreBar } from "./ScoreBreakdown";
 import { VoiceAnswerField, useVoiceAnswer } from "./VoiceAnswer";
 import { FailedInterviewNextSteps } from "./FailedInterviewNextSteps";
 import { InterviewTimer, timerKey } from "./InterviewTimer";
+import {
+  InterviewColumn,
+  InterviewProgressHeader,
+  QuestionCard,
+  TimeUpNotice,
+} from "./RunnerParts";
 
 /** Round 1 (5) + Round 2 (8) — used when the backend doesn't send a total. */
 const FALLBACK_TOTAL_QUESTIONS = 13;
@@ -150,66 +166,46 @@ export function InterviewRunner({
     .join(" · ");
 
   return (
-    <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
-      <div className="mb-6">
-        <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-sm text-[#898b96]">
-          <span>{title}</span>
-          <div className="flex items-center gap-3">
-            <span>{progressLabel}</span>
-            <InterviewTimer
-                key={timerKey(session)}
-                session={session}
-                onExpire={handleExpire}
-              />
-          </div>
-        </div>
-        <div className="h-2 overflow-hidden rounded-full bg-[#f3f3f6]">
-          <div
-            className="h-full bg-brand transition-all duration-300"
-            style={{ width: `${Math.min(100, (answered / totalQuestions) * 100)}%` }}
+    <InterviewColumn>
+      <InterviewProgressHeader
+        title={title}
+        description={subtitle}
+        progressLabel={progressLabel}
+        answered={answered}
+        total={totalQuestions}
+        timer={
+          <InterviewTimer
+            key={timerKey(session)}
+            session={session}
+            onExpire={handleExpire}
           />
-        </div>
-      </div>
+        }
+      />
 
       {hasTimedOut && (
-        <div
-          role="status"
-          className="mb-6 flex items-center gap-3 border border-amber-200 bg-amber-50 px-4 py-3"
-        >
-          <Spinner className="h-4 w-4" />
-          <div>
-            <p className="text-[12px] font-semibold text-amber-800">
-              Time&apos;s up — finishing your interview.
-            </p>
-            <p className="mt-0.5 text-[11px] text-amber-700">
-              Any questions you didn&apos;t reach are scored zero. Your report
-              appears here as soon as it&apos;s ready.
-            </p>
-          </div>
-        </div>
+        <TimeUpNotice
+          title="Time's up — finishing your interview."
+          detail="Any questions you didn't reach are scored zero. Your report appears here as soon as it's ready."
+        />
       )}
 
-      <Card className="mb-6">
-        <div className="flex items-start gap-4">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded bg-brand-light text-sm font-bold text-brand-dark">
-            AI
-          </div>
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-brand">
-              Interviewer · Question {questionNumber}
-              {answer.voice.speaking && " · speaking…"}
-            </p>
-            <h2 className="mt-1 text-xl font-bold text-[#292b35]">
-              {session.question ?? "Waiting for the next question…"}
-            </h2>
-          </div>
-        </div>
-      </Card>
+      <QuestionCard
+        eyebrow={
+          <>
+            Interviewer · Question {questionNumber}
+            {answer.voice.speaking && " · speaking…"}
+          </>
+        }
+        question={session.question ?? "Waiting for the next question…"}
+      />
 
-      <Card>
+      <section
+        aria-label="Your answer"
+        className="rounded-xl border border-line bg-surface p-5 shadow-xs sm:p-6"
+      >
         <VoiceAnswerField
           id="interview-answer"
-          label="Your Answer"
+          label="Your answer"
           answer={answer}
           disabled={isSubmitting || hasTimedOut}
         />
@@ -220,11 +216,14 @@ export function InterviewRunner({
           </div>
         )}
 
-        <button
-          type="button"
+        <Button
+          size="lg"
+          fullWidth
           onClick={handleSubmit}
           disabled={!answer.value.trim() || isSubmitting || hasTimedOut}
-          className={`${primaryButtonClass} mt-4 w-full`}
+          loading={isSubmitting}
+          leadingIcon={<Send aria-hidden="true" />}
+          className="mt-5 h-auto! min-h-11 whitespace-normal! py-2.5 text-center"
         >
           {hasTimedOut
             ? "Time expired"
@@ -232,21 +231,19 @@ export function InterviewRunner({
             ? isLastQuestion
               ? "Generating your report… (this can take up to a minute)"
               : "Submitting your answer…"
-            : "Submit Answer"}
-        </button>
-        <p className="mt-2 text-center text-xs text-[#9698a2]">
+            : "Submit answer"}
+        </Button>
+        <p className="mt-3 text-center text-xs text-muted">
           {isLastQuestion
             ? "This is the last question — your full report is generated after you submit."
             : "Answers are evaluated in the background; your report arrives after the last question."}
         </p>
-      </Card>
+      </section>
 
       {session.turns.length > 0 && (
-        <div className="mt-6">
-          <TurnHistory turns={session.turns} title="Answered so far" />
-        </div>
+        <TurnHistory turns={session.turns} title="Answered so far" />
       )}
-    </div>
+    </InterviewColumn>
   );
 }
 
@@ -266,52 +263,76 @@ function CompletedInterview({
   const decision = session.report?.decision;
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6 p-8">
-      <Card>
-        <div className="flex flex-col items-center gap-8 sm:flex-row">
+    <div className="mx-auto w-full max-w-4xl space-y-6 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+      <section className="rounded-xl border border-line bg-surface p-5 shadow-xs sm:p-6">
+        <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-center sm:gap-8">
           <FinalScoreRing score={session.score ?? 0} />
-          <div className="flex-1 text-center sm:text-left">
-            <h1 className="text-2xl font-bold text-[#292b35]">{title}</h1>
-            {subtitle && <p className="mt-1 text-sm text-[#898b96]">{subtitle}</p>}
-            {session.result && (
-              <span className={`${INTERVIEW_RESULT_BADGE[session.result]} mt-3`}>
-                {INTERVIEW_RESULT_LABELS[session.result]}
+          <div className="min-w-0 flex-1 text-center sm:text-left">
+            <p className="text-xs font-medium uppercase tracking-wider text-brand-700">
+              Interview report
+            </p>
+            <h1 className="mt-1 font-display text-xl font-semibold tracking-tight text-ink sm:text-2xl">
+              {title}
+            </h1>
+            {subtitle && <p className="mt-1 text-sm text-muted">{subtitle}</p>}
+            <div className="mt-3 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+              {session.result && (
+                <span className={INTERVIEW_RESULT_BADGE[session.result]}>
+                  {INTERVIEW_RESULT_LABELS[session.result]}
+                </span>
+              )}
+              <span className="text-sm font-medium tabular-nums text-body">
+                Overall score: {session.score ?? 0}%
               </span>
-            )}
-            <p className="mt-3 text-sm font-semibold text-[#44464f]">
-              Overall score: {session.score ?? 0}%
               {decision && (
                 <>
-                  <span className="mx-2 text-[#c9cbd4]">·</span>
-                  Decision: {INTERVIEW_DECISION_LABELS[decision]}
+                  <span aria-hidden="true" className="text-subtle">
+                    ·
+                  </span>
+                  <span className="text-sm font-medium text-body">
+                    Decision: {INTERVIEW_DECISION_LABELS[decision]}
+                  </span>
                 </>
               )}
-            </p>
-            <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-[#686b77]">
+            </div>
+            <p className="mt-4 whitespace-pre-line text-sm leading-6 text-body">
               {session.report?.summary ||
                 session.feedback ||
                 "No overall feedback was returned."}
             </p>
           </div>
         </div>
-      </Card>
-
-      {session.report && <ReportDetails report={session.report} />}
+      </section>
 
       {isRound1 && session.round2Unlocked && (
-        <div className="rounded border border-emerald-100 bg-gradient-to-br from-emerald-50 to-white p-6 ">
-          <h2 className="text-lg font-bold text-emerald-900">🔓 Round 2 unlocked</h2>
-          <p className="mt-1 text-sm text-emerald-800">
-            Nice work. The technical interview on your track is ready when you are.
-          </p>
-          <Link
+        <section className="flex flex-col gap-4 rounded-xl border border-brand-200 bg-brand-50 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+          <div className="flex items-start gap-4">
+            <span
+              aria-hidden="true"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white text-brand-600 ring-1 ring-inset ring-brand-600/20"
+            >
+              <Unlock className="h-5 w-5" />
+            </span>
+            <div className="min-w-0">
+              <h2 className="text-base font-semibold text-brand-900">
+                Round 2 unlocked
+              </h2>
+              <p className="mt-1 text-sm text-brand-800">
+                Nice work. The technical interview on your track is ready when you are.
+              </p>
+            </div>
+          </div>
+          <Button
             href="/candidate/interview/advanced"
-            className={`${primaryButtonClass} mt-4 inline-block text-sm`}
+            trailingIcon={<ArrowRight aria-hidden="true" />}
+            className="w-full sm:w-auto"
           >
-            Start Round 2 — Technical Interview
-          </Link>
-        </div>
+            Start Round 2 — Technical interview
+          </Button>
+        </section>
       )}
+
+      {session.report && <ReportDetails report={session.report} />}
 
       {session.result === "fail" && (
         <FailedInterviewNextSteps tips={tips} report={session.report} />
@@ -330,44 +351,111 @@ function CompletedInterview({
 
       {isRound1 && !session.round2Unlocked ? (
         onRestart ? (
-          <button
-            type="button"
+          <Button
+            size="lg"
+            fullWidth
             onClick={onRestart}
-            className={`${primaryButtonClass} w-full`}
+            leadingIcon={<RotateCcw aria-hidden="true" />}
           >
             Retake Round 1
-          </button>
+          </Button>
         ) : (
-          <Link
+          <Button
+            size="lg"
+            fullWidth
             href="/candidate/interview/basic"
-            className={`${primaryButtonClass} block w-full text-center`}
+            leadingIcon={<RotateCcw aria-hidden="true" />}
           >
             Retake Round 1
-          </Link>
+          </Button>
         )
       ) : (
         !isRound1 &&
         onRestart && (
-          <button
-            type="button"
+          <Button
+            variant="secondary"
+            size="lg"
+            fullWidth
             onClick={onRestart}
-            className={`${secondaryButtonClass} w-full`}
+            leadingIcon={<RotateCcw aria-hidden="true" />}
           >
             Start a new practice interview
-          </button>
+          </Button>
         )
       )}
     </div>
   );
 }
 
+const REPORT_LISTS = [
+  {
+    key: "strengths",
+    title: "Strengths",
+    icon: <CircleCheck aria-hidden="true" className="h-4 w-4" />,
+    tile: "bg-brand-50 text-brand-600",
+    dot: "bg-brand-500",
+  },
+  {
+    key: "areasToImprove",
+    title: "Areas to improve",
+    icon: <TrendingUp aria-hidden="true" className="h-4 w-4" />,
+    tile: "bg-brand-50 text-brand-500",
+    dot: "bg-brand-300",
+  },
+  {
+    key: "learningPlan",
+    title: "Learning plan",
+    icon: <BookOpen aria-hidden="true" className="h-4 w-4" />,
+    tile: "bg-brand-50 text-brand-700",
+    dot: "bg-brand-500",
+  },
+] as const;
+
+/** One titled list of report bullets (strengths, areas to improve, plan). */
+export function ReportList({
+  title,
+  items,
+  icon,
+  tile,
+  dot,
+}: {
+  title: string;
+  items: string[];
+  icon: React.ReactNode;
+  tile: string;
+  dot: string;
+}) {
+  return (
+    <section className="min-w-0 rounded-xl border border-line bg-surface p-5 shadow-xs sm:p-6">
+      <div className="mb-4 flex items-center gap-3">
+        <span
+          aria-hidden="true"
+          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${tile}`}
+        >
+          {icon}
+        </span>
+        <h2 className="text-base font-semibold text-ink">{title}</h2>
+      </div>
+      <ul className="divide-y divide-line-soft">
+        {items.map((item) => (
+          <li
+            key={item}
+            className="flex items-start gap-3 py-2.5 text-sm leading-6 text-body first:pt-0 last:pb-0"
+          >
+            <span
+              aria-hidden="true"
+              className={`mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full ${dot}`}
+            />
+            <span className="min-w-0">{item}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 /** The report's stage scores and narrative lists (the summary is shown by the caller). */
 export function ReportDetails({ report }: { report: InterviewReport }) {
-  const lists: { title: string; items?: string[] }[] = [
-    { title: "Strengths", items: report.strengths },
-    { title: "Areas to improve", items: report.areasToImprove },
-    { title: "Learning plan", items: report.learningPlan },
-  ];
   const hasScores =
     report.basicScore !== undefined || report.technicalScore !== undefined;
 
@@ -386,23 +474,25 @@ export function ReportDetails({ report }: { report: InterviewReport }) {
             <ScoreBar
               label="Round 2 — Technical"
               score={Math.round(report.technicalScore * 10)}
-              gradient="from-purple-500 to-pink-600"
+              gradient="bg-brand"
             />
           )}
         </div>
       )}
 
-      {lists.map(({ title, items }) =>
-        items && items.length > 0 ? (
-          <Card key={title} title={title}>
-            <ul className="list-inside list-disc space-y-2 text-sm text-[#44464f]">
-              {items.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </Card>
-        ) : null,
-      )}
+      {REPORT_LISTS.map(({ key, title, icon, tile, dot }) => {
+        const items = report[key];
+        return items && items.length > 0 ? (
+          <ReportList
+            key={key}
+            title={title}
+            items={items}
+            icon={icon}
+            tile={tile}
+            dot={dot}
+          />
+        ) : null;
+      })}
     </>
   );
 }
@@ -416,48 +506,68 @@ export function TurnHistory({
 }) {
   if (turns.length === 0) return null;
   return (
-    <Card title={title}>
-      <div className="space-y-4">
+    <Card
+      title={title}
+      padding="none"
+      action={
+        <span className="text-sm tabular-nums text-muted">
+          {turns.length} question{turns.length === 1 ? "" : "s"}
+        </span>
+      }
+    >
+      <ol className="divide-y divide-line-soft border-t border-line-soft">
         {turns.map((turn) => (
-          <div
-            key={turn.questionNumber}
-            className="rounded border border-[#f1f1f5] bg-[#f8f8fb] p-4"
+          <li
+            key={`${turn.round}-${turn.questionNumber}`}
+            className="flex gap-3 px-5 py-5 sm:gap-4 sm:px-6"
           >
-            <div className="flex items-start justify-between gap-3">
-              <p className="text-sm font-semibold text-[#292b35]">
-                <span className="mr-2 rounded bg-white px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#898b96]">
-                  Round {turn.round}
-                </span>
-                Q{turn.questionNumber}. {turn.question}
-              </p>
-              <div className="flex shrink-0 items-center gap-2">
-                <VerdictBadge verdict={turn.verdict} />
-                {turn.score !== undefined && (
-                  <span className="rounded-full bg-white px-2.5 py-1 text-xs font-bold text-brand">
-                    {turn.score}/10
-                  </span>
-                )}
+            <span
+              aria-hidden="true"
+              className="mt-0.5 hidden h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-700 sm:flex"
+            >
+              <MessageSquareText className="h-4 w-4" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+                <div className="min-w-0">
+                  <p className="text-xs font-medium uppercase tracking-wider text-muted">
+                    Round {turn.round} · Question {turn.questionNumber}
+                  </p>
+                  <h3 className="mt-1 text-sm font-semibold leading-6 text-ink">
+                    {turn.question}
+                  </h3>
+                </div>
+                <div className="flex shrink-0 flex-wrap items-center gap-1.5">
+                  <VerdictBadge verdict={turn.verdict} />
+                  {turn.score !== undefined && (
+                    <Badge tone="brand" className="tabular-nums">
+                      {turn.score}/10
+                    </Badge>
+                  )}
+                </div>
               </div>
+              <div className="mt-3 rounded-lg border-l-2 border-brand-200 bg-surface-2 px-3.5 py-3">
+                <p className="text-xs font-medium text-muted">Your answer</p>
+                <p className="mt-1 whitespace-pre-line break-words text-sm leading-6 text-body">
+                  {turn.answer || "No answer provided."}
+                </p>
+              </div>
+              {turn.feedback && (
+                <p className="mt-3 whitespace-pre-line text-sm leading-6 text-body">
+                  <span className="font-semibold text-ink">Feedback: </span>
+                  {turn.feedback}
+                </p>
+              )}
+              {turn.improvementTip && (
+                <p className="mt-2 whitespace-pre-line text-sm leading-6 text-brand-800">
+                  <span className="font-semibold text-brand-700">Tip: </span>
+                  {turn.improvementTip}
+                </p>
+              )}
             </div>
-            <p className="mt-3 whitespace-pre-line text-sm text-[#44464f]">
-              <span className="font-semibold text-[#898b96]">Your answer: </span>
-              {turn.answer}
-            </p>
-            {turn.feedback && (
-              <p className="mt-2 whitespace-pre-line text-sm text-[#292b35]">
-                <span className="font-semibold text-brand">Feedback: </span>
-                {turn.feedback}
-              </p>
-            )}
-            {turn.improvementTip && (
-              <p className="mt-2 whitespace-pre-line text-sm text-emerald-900">
-                <span className="font-semibold text-emerald-700">Tip: </span>
-                {turn.improvementTip}
-              </p>
-            )}
-          </div>
+          </li>
         ))}
-      </div>
+      </ol>
     </Card>
   );
 }

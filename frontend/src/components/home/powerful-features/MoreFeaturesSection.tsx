@@ -14,7 +14,7 @@ export const MoreFeaturesSection = () => {
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="more-features-toggle mx-auto flex items-center gap-2 px-6 py-3 bg-[#f6f3f9] hover:bg-[#f3e8ff] rounded-full transition-colors"
+        className="more-features-toggle mx-auto flex items-center gap-2 px-6 py-3 bg-canvas hover:bg-brand-50 rounded-full transition-colors"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <span className="font-semibold text-brand">
@@ -56,7 +56,7 @@ export const MoreFeaturesSection = () => {
             >
               <motion.button
                 whileHover={{ scale: 1.02, x: 5 }}
-                className="feature-pill w-full text-left px-4 py-3 bg-gray-50 hover:bg-[#f6f3f9] rounded-lg transition-colors flex items-center justify-between"
+                className="feature-pill w-full text-left px-4 py-3 bg-gray-50 hover:bg-canvas rounded-lg transition-colors flex items-center justify-between"
                 onClick={() =>
                   setActivePillDesc(activePillDesc === index ? null : index)
                 }

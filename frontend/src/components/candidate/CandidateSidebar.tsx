@@ -14,11 +14,13 @@ import {
   UserRound,
 } from "lucide-react";
 
+import type { ReactNode } from "react";
 import {
   PortalSidebar,
   type NavGroup,
   type NavItem,
 } from "@/components/layout/PortalSidebar";
+import { PortalShell, type PortalConfig } from "@/components/layout/PortalShell";
 
 const navGroups: NavGroup[] = [
   {
@@ -31,9 +33,9 @@ const navGroups: NavGroup[] = [
     ],
   },
   {
-    title: "Job Board",
+    title: "Job board",
     items: [
-      { href: "/candidate/jobs", label: "Job Board", icon: BriefcaseBusiness },
+      { href: "/candidate/jobs", label: "Job board", icon: BriefcaseBusiness },
       { href: "/candidate/resume", label: "Resume", icon: FileUser },
     ],
   },
@@ -42,23 +44,23 @@ const navGroups: NavGroup[] = [
     items: [
       {
         href: "/candidate/applications",
-        label: "My Applications",
+        label: "My applications",
         icon: ClipboardList,
       },
       {
         href: "/candidate/interview/result",
-        label: "Interview Results",
+        label: "Interview results",
         icon: ChartNoAxesColumnIncreasing,
       },
     ],
   },
   {
-    title: "Interview Preparation",
+    title: "Interview preparation",
     items: [
-      { href: "/candidate/interview/basic", label: "Basic Interview", icon: Mic },
+      { href: "/candidate/interview/basic", label: "Basic interview", icon: Mic },
       {
         href: "/candidate/interview/advanced",
-        label: "Technical Interview",
+        label: "Technical interview",
         icon: Code2,
       },
       { href: "/candidate/learning", label: "Learning", icon: GraduationCap },
@@ -67,7 +69,7 @@ const navGroups: NavGroup[] = [
   {
     title: "General",
     items: [
-      { href: "/candidate/profile", label: "My Profile", icon: UserRound },
+      { href: "/candidate/profile", label: "My profile", icon: UserRound },
       {
         href: "/candidate/notifications",
         label: "Notifications",
@@ -81,7 +83,7 @@ const navGroups: NavGroup[] = [
 
 /** Shortcuts in the account card. Only routes this portal actually has. */
 const accountMenu: NavItem[] = [
-  { href: "/candidate/profile", label: "My Profile", icon: UserRound },
+  { href: "/candidate/profile", label: "My profile", icon: UserRound },
   {
     href: "/candidate/notifications",
     label: "Notifications",
@@ -91,15 +93,21 @@ const accountMenu: NavItem[] = [
   { href: "/candidate/support", label: "Support", icon: MessageCircle },
 ];
 
+/** The candidate portal's chrome: nav, account shortcuts, home and login. */
+export const CANDIDATE_PORTAL: PortalConfig = {
+  portalName: "Candidate Portal",
+  portalTagline: "Career Dashboard",
+  navGroups,
+  accountMenu,
+  homeHref: "/candidate/dashboard",
+  loginPath: "/login/candidate",
+};
+
 export function CandidateSidebar() {
-  return (
-    <PortalSidebar
-      portalName="Candidate Portal"
-      portalTagline="Career Dashboard"
-      navGroups={navGroups}
-      accountMenu={accountMenu}
-      homeHref="/candidate/dashboard"
-      loginPath="/login/candidate"
-    />
-  );
+  return <PortalSidebar {...CANDIDATE_PORTAL} />;
+}
+
+/** Responsive portal frame (sidebar / top bar / drawer) for the candidate portal. */
+export function CandidatePortalShell({ children }: { children: ReactNode }) {
+  return <PortalShell portal={CANDIDATE_PORTAL}>{children}</PortalShell>;
 }

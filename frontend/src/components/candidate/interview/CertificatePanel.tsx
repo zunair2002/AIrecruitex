@@ -14,11 +14,9 @@ import type {
   InterviewResultVerdict,
   ObjectId,
 } from "@/lib/types";
+import { Award, CreditCard, Download, FileCheck2, RefreshCw } from "lucide-react";
+import { Button, buttonClass } from "@/components/ui/Button";
 import { Card, InlineError, InlineSuccess } from "@/components/ui/Feedback";
-import {
-  primaryButtonClass,
-  secondaryButtonClass,
-} from "@/components/ui/controls";
 
 /**
  * The certificate flow, exactly as the backend gates it:
@@ -92,7 +90,7 @@ export function CertificatePanel({
       setNotice(
         paid
           ? "Payment confirmed. You can generate your certificate now."
-          : "Stripe hasn&apos;t recorded this payment yet. Try again in a moment.",
+          : "Stripe hasn't recorded this payment yet. Try again in a moment.",
       );
     });
 
@@ -102,10 +100,22 @@ export function CertificatePanel({
       setNotice("Certificate issued.");
     });
 
+  const title = (
+    <span className="flex items-center gap-3">
+      <span
+        aria-hidden="true"
+        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-700"
+      >
+        <Award className="h-4 w-4" />
+      </span>
+      Certificate
+    </span>
+  );
+
   if (result === "fail") {
     return (
-      <Card title="Certificate">
-        <p className="text-sm text-[#686b77]">
+      <Card title={title}>
+        <p className="text-sm text-muted">
           Certificates are issued only for passing interviews. Practice again to
           raise your score, then come back here.
         </p>
@@ -114,47 +124,47 @@ export function CertificatePanel({
   }
 
   return (
-    <Card title="Certificate">
+    <Card title={title}>
       {certificate ? (
-        <div className="space-y-3">
+        <div className="space-y-4">
           <InlineSuccess message="Your certificate has been issued." />
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div className="rounded bg-[#f8f8fb] p-4">
-              <p className="text-xs uppercase tracking-wide text-[#898b96]">
-                Certificate ID
-              </p>
-              <p className="mt-1 font-mono text-sm font-semibold text-[#292b35]">
+          <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="min-w-0 rounded-lg border border-line-soft bg-surface-2 p-4">
+              <dt className="text-xs font-medium text-muted">Certificate ID</dt>
+              <dd className="mt-1 break-all font-mono text-sm font-semibold text-ink">
                 {certificate.certId}
-              </p>
+              </dd>
             </div>
-            <div className="rounded bg-[#f8f8fb] p-4">
-              <p className="text-xs uppercase tracking-wide text-[#898b96]">
+            <div className="min-w-0 rounded-lg border border-line-soft bg-surface-2 p-4">
+              <dt className="text-xs font-medium text-muted">
                 Score on certificate
-              </p>
-              <p className="mt-1 text-sm font-semibold text-[#292b35]">
+              </dt>
+              <dd className="mt-1 font-display text-lg font-semibold tabular-nums text-ink">
                 {certificate.score}%
-              </p>
+              </dd>
             </div>
-          </div>
+          </dl>
           <a
             href={certificate.certificateUrl}
             target="_blank"
             rel="noreferrer"
-            className={`${primaryButtonClass} inline-block text-sm`}
+            className={buttonClass({ className: "w-full sm:w-auto" })}
           >
+            <Download aria-hidden="true" />
             Download certificate PDF
           </a>
         </div>
       ) : (
         <div className="space-y-4">
-          <p className="text-sm text-[#686b77]">
+          <p className="text-sm text-body">
             {isPaid
               ? "Payment received — generate your certificate PDF."
               : "A certificate is available for this interview once payment is complete."}
             {typeof score === "number" && (
               <>
                 {" "}
-                Your score: <span className="font-semibold">{score}%</span>.
+                Your score:{" "}
+                <span className="font-semibold tabular-nums text-ink">{score}%</span>.
               </>
             )}
           </p>
@@ -162,42 +172,43 @@ export function CertificatePanel({
           {error && <InlineError message={error} />}
           {notice && <InlineSuccess message={notice} />}
 
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             {!isPaid && (
               <>
-                <button
-                  type="button"
+                <Button
                   onClick={handleCheckout}
                   disabled={busy !== null}
-                  className={`${primaryButtonClass} text-sm`}
+                  loading={busy === "checkout"}
+                  leadingIcon={<CreditCard aria-hidden="true" />}
                 >
                   {busy === "checkout"
                     ? "Opening checkout…"
                     : "Pay for certificate"}
-                </button>
-                <button
-                  type="button"
+                </Button>
+                <Button
+                  variant="secondary"
                   onClick={handleConfirm}
                   disabled={busy !== null}
-                  className={`${secondaryButtonClass} text-sm`}
+                  loading={busy === "confirm"}
+                  leadingIcon={<RefreshCw aria-hidden="true" />}
                 >
                   {busy === "confirm" ? "Checking…" : "I've already paid"}
-                </button>
+                </Button>
               </>
             )}
             {isPaid && (
-              <button
-                type="button"
+              <Button
                 onClick={handleGenerate}
                 disabled={busy !== null}
-                className={`${primaryButtonClass} text-sm`}
+                loading={busy === "generate"}
+                leadingIcon={<FileCheck2 aria-hidden="true" />}
               >
                 {busy === "generate" ? "Generating…" : "Generate certificate"}
-              </button>
+              </Button>
             )}
           </div>
 
-          <p className="text-xs text-[#9698a2]">
+          <p className="text-xs text-muted">
             The backend requires a score above its CERTIFICATE_PASS_SCORE
             threshold — it will say so if this interview doesn&apos;t qualify.
           </p>

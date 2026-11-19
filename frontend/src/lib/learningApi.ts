@@ -16,7 +16,7 @@ export function listActiveCourses(
   return apiRequest<Course[]>("/api/learning/courses", { token, signal });
 }
 
-/** GET /api/learning/courses/hr — HR only; every course including inactive. */
+/** GET /api/learning/courses/hr — HR only; the signed-in HR's own courses, including inactive. */
 export function listHrCourses(
   token: string | null,
   signal?: AbortSignal,

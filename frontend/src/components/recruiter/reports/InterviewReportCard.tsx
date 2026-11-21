@@ -336,9 +336,12 @@ type Turn = InterviewSession["turns"][number];
 function TurnItem({
   turn,
   feedbackLabel,
+  displayNumber = turn.questionNumber,
 }: {
   turn: Turn;
   feedbackLabel: string;
+  /** The number shown in the tile; defaults to `turn.questionNumber`. */
+  displayNumber?: number;
 }) {
   return (
     <li className="rounded-lg border border-line-soft bg-surface-2/60 p-4">
@@ -348,10 +351,10 @@ function TurnItem({
             aria-hidden="true"
             className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-100 text-xs font-semibold tabular-nums text-brand-700"
           >
-            {turn.questionNumber}
+            {displayNumber}
           </span>
           <p className="min-w-0 pt-0.5 text-sm font-semibold text-ink">
-            <span className="sr-only">Q{turn.questionNumber}. </span>
+            <span className="sr-only">Q{displayNumber}. </span>
             {turn.question}
           </p>
         </div>
@@ -452,6 +455,8 @@ function Transcript({
 function OrgInterviewResult({ session }: { session: InterviewSession }) {
   const earned = session.turns.reduce((sum, t) => sum + (t.marksEarned ?? 0), 0);
   const possible = session.turns.reduce((sum, t) => sum + (t.marksPossible ?? 0), 0);
+  // Unscored warm-ups; `[]` / absent on sessions from before warm-ups existed.
+  const introduction = session.introduction ?? [];
 
   return (
     <Card
@@ -497,12 +502,50 @@ function OrgInterviewResult({ session }: { session: InterviewSession }) {
         )
       )}
 
+      {introduction.length > 0 && (
+        <div className="mt-6">
+          <Eyebrow>Introduction (not scored)</Eyebrow>
+          <ol className="space-y-3">
+            {introduction.map((item, index) => (
+              <li
+                key={item.questionNumber}
+                className="rounded-lg border border-line-soft bg-surface-2/60 p-4"
+              >
+                <div className="flex min-w-0 items-start gap-3">
+                  <span
+                    aria-hidden="true"
+                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-surface-3 text-xs font-semibold tabular-nums text-body"
+                  >
+                    {index + 1}
+                  </span>
+                  <p className="min-w-0 pt-0.5 text-sm font-semibold text-ink">
+                    <span className="sr-only">Warm-up {index + 1}. </span>
+                    {item.question}
+                  </p>
+                </div>
+                <div className="mt-3 sm:pl-10">
+                  <p className="text-xs font-medium text-muted">Answer</p>
+                  <p className="mt-0.5 whitespace-pre-line text-sm text-body">
+                    {item.answer || "—"}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
+
       {session.turns.length > 0 ? (
         <div className="mt-6">
           <Eyebrow>Answers ({session.turns.length})</Eyebrow>
           <ol className="space-y-3">
             {session.turns.map((turn) => (
-              <TurnItem key={turn.questionNumber} turn={turn} feedbackLabel="Grading" />
+              <TurnItem
+                key={turn.questionNumber}
+                turn={turn}
+                feedbackLabel="Grading"
+                displayNumber={turn.poolQuestionNumber ?? turn.questionNumber}
+              />
             ))}
           </ol>
         </div>

@@ -456,6 +456,22 @@ export type InterviewTurn = {
   /** Structured org-interview turns only — HR's exact grading. */
   marksEarned?: number;
   marksPossible?: number;
+  /**
+   * Org interviews with warm-ups: this turn's number among the scored pool
+   * questions (1-based). `questionNumber` counts the whole interview, warm-ups
+   * included, so show this one. Absent on older sessions.
+   */
+  poolQuestionNumber?: number;
+};
+
+/** Org interviews: "warmup" questions are asked first and never scored. */
+export type OrgQuestionKind = "warmup" | "pool";
+
+/** One unscored warm-up answer on an org interview (HR report only). */
+export type InterviewIntroductionItem = {
+  questionNumber: number;
+  question: string;
+  answer: string;
 };
 
 export type InterviewMessage = {
@@ -473,6 +489,8 @@ export type SelectedQuestion = {
   question: string;
   referenceAnswer: string;
   marks: number;
+  /** Org interviews: warm-up (unscored) or pool question. Absent on older sessions. */
+  kind?: OrgQuestionKind;
 };
 
 /**
@@ -486,8 +504,21 @@ export type InterviewSessionInProgress = {
   track?: TrackId;
   questionNumber?: number;
   question?: string;
-  /** Length of this session's question list (5 for Round 1, 8 for Round 2). */
+  /**
+   * Length of this session's question list (5 for Round 1, 8 for Round 2).
+   * Org interviews: includes the warm-up questions.
+   */
   totalQuestions?: number;
+  /**
+   * Org interviews only (all absent on older sessions): whether the current
+   * question is an unscored warm-up or a scored pool question, and its
+   * position within that group.
+   */
+  kind?: OrgQuestionKind;
+  warmupNumber?: number;
+  totalWarmup?: number;
+  poolQuestionNumber?: number;
+  totalPoolQuestions?: number;
   round?: InterviewRound;
   turns: InterviewTurnView[];
   /**
@@ -530,6 +561,8 @@ export type InterviewSessionCompleted = {
   timedOut: boolean;
   /** Returned only when a visible interview was failed. */
   elearningTips?: string[];
+  /** Org interviews: the backend's closing message for the candidate. */
+  closingMessage?: string;
 };
 
 export type InterviewSessionView =
@@ -651,7 +684,10 @@ export type InterviewSession = {
   visibility: InterviewVisibility;
   status: InterviewStatus;
   messages: InterviewMessage[];
+  /** Org interviews with warm-ups: scored pool questions only. */
   turns: InterviewTurn[];
+  /** Org interviews: the unscored warm-up answers. `[]` or absent on older sessions. */
+  introduction?: InterviewIntroductionItem[];
   currentQuestionNumber?: number;
   currentQuestion?: string;
   startedAt?: string;

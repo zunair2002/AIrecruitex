@@ -21,7 +21,14 @@ import { Button } from "@/components/ui/Button";
 import { Dialog } from "@/components/ui/Dialog";
 import { Spinner } from "@/components/ui/Feedback";
 import { BrandWordmark } from "@/components/layout/Logo";
+import { useVoiceInterview } from "@/hooks/useVoiceInterview";
 import { VIOLATION_LABELS, type Camera } from "./orgProctoring";
+
+const cancelSpeech = () => {
+  if (typeof window !== "undefined" && "speechSynthesis" in window) {
+    window.speechSynthesis.cancel();
+  }
+};
 
 export const ORG_CARD = "rounded-xl border border-line bg-surface p-5 shadow-xs sm:p-7";
 
@@ -280,15 +287,29 @@ export function ViolationDialog({
 /**
  * The only thing a candidate sees once the interview is over: its status and
  * when it was invited / started / finished. No questions, answers or scores.
+ * A completed interview shows the backend's `closingMessage` (read aloud where
+ * text-to-speech exists); without one, the standard thank-you text.
  */
 export function OrgInterviewSummary({
   invite,
   status,
+  closingMessage,
 }: {
   invite: OrgInterviewInvite;
   status: "completed" | "cancelled";
+  closingMessage?: string;
 }) {
   const isCancelled = status === "cancelled";
+  const message = !isCancelled ? closingMessage?.trim() : undefined;
+  const { speak } = useVoiceInterview();
+
+  useEffect(() => {
+    if (!message) return;
+    // The last question may still be being read aloud — stop it first.
+    cancelSpeech();
+    void speak(message);
+    return cancelSpeech;
+  }, [message, speak]);
   const finishedAt = isCancelled ? invite.cancelledAt : invite.completedAt;
 
   const rows: { label: string; value?: string; fallback: string }[] = [
@@ -312,8 +333,10 @@ export function OrgInterviewSummary({
         <h1 className="mt-4 font-display text-xl font-semibold tracking-tight text-ink sm:text-2xl">
           {isCancelled ? "Interview cancelled" : "Interview submitted"}
         </h1>
-        <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-muted">
-          {isCancelled ? (
+        <p className="mx-auto mt-2 max-w-lg whitespace-pre-line text-sm leading-6 text-muted">
+          {message ? (
+            message
+          ) : isCancelled ? (
             <>
               Your interview for{" "}
               <span className="font-semibold text-ink">{invite.jobTitle ?? "this role"}</span> was

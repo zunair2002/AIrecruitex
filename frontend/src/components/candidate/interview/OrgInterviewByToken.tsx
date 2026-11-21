@@ -22,12 +22,17 @@ import {
   Camera as CameraIcon,
   CalendarClock,
   CameraOff,
+  Hourglass,
+  Layers,
   ListChecks,
   MessageSquareText,
+  Minimize2,
   Play,
   Send,
   ShieldAlert,
+  Sparkles,
 } from "lucide-react";
+import { checkboxClass } from "@/components/ui/controls";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { EmptyState, ErrorBlock, InlineError, LoadingBlock } from "@/components/ui/Feedback";
@@ -268,7 +273,11 @@ export function OrgInterviewByToken() {
     const status = cancelled || inviteStatus === "cancelled" || inProgress?.cancelled
       ? "cancelled"
       : "completed";
-    return <OrgInterviewSummary invite={data} status={status} />;
+    const closingMessage =
+      session && isFinishedSession(session) ? session.closingMessage : undefined;
+    return (
+      <OrgInterviewSummary invite={data} status={status} closingMessage={closingMessage} />
+    );
   }
 
   if (inProgress) {
@@ -313,19 +322,34 @@ export function OrgInterviewByToken() {
 
 const RULES: { icon: typeof CameraIcon; title: string; detail: string }[] = [
   {
-    icon: CameraIcon,
-    title: "Camera on throughout",
-    detail: "Keep your face visible. If the camera turns off, the interview pauses until it's back.",
+    icon: Layers,
+    title: "Don't switch tabs",
+    detail: "Opening another browser tab or minimising this one counts as a violation.",
   },
   {
     icon: AppWindow,
-    title: "Stay on this page",
-    detail: "Switching tabs, windows or apps, or leaving full screen, counts as a violation.",
+    title: "Don't change windows or apps",
+    detail: "Moving focus to another window or app counts as a violation.",
+  },
+  {
+    icon: Minimize2,
+    title: "Don't leave full screen",
+    detail: "The interview runs in full screen. Exiting it counts as a violation.",
+  },
+  {
+    icon: CameraIcon,
+    title: "Keep your camera on",
+    detail: "Keep your face visible. If the camera turns off, the interview pauses until it's back.",
   },
   {
     icon: ShieldAlert,
     title: "Two warnings, then cancelled",
-    detail: "The first two violations show a warning. The third cancels the interview automatically.",
+    detail: "The first two violations show a warning. The third violation cancels the interview automatically.",
+  },
+  {
+    icon: Sparkles,
+    title: "The first 3 questions are a warm-up",
+    detail: "They help you settle in and are not scored. Scored questions follow.",
   },
   {
     icon: MessageSquareText,
@@ -347,7 +371,17 @@ function IntroScreen({
   isBusy: boolean;
   onStart: () => void;
 }) {
+  const [agreed, setAgreed] = useState(false);
   const cameraReady = camera.state === "on";
+  const canStart = agreed && cameraReady;
+
+  const hint = !cameraReady && !agreed
+    ? "Turn on your camera and agree to the instructions to continue."
+    : !cameraReady
+      ? "Turn on your camera to continue."
+      : !agreed
+        ? "Tick the box above to agree to the instructions."
+        : "The interview opens in full screen. Your camera and activity are monitored.";
 
   return (
     <OrgShell wide>
@@ -398,6 +432,17 @@ function IntroScreen({
           </dl>
 
           <h2 className="mt-8 font-display text-base font-semibold text-ink">Before you begin</h2>
+          {invite.started && (
+            <div
+              role="status"
+              className="mt-3 flex items-start gap-3 rounded-lg border border-warning-200 bg-warning-50 p-4 text-sm"
+            >
+              <Hourglass className="mt-0.5 h-4 w-4 shrink-0 text-warning-700" aria-hidden="true" />
+              <p className="font-medium text-warning-700">
+                Your interview is already in progress; the timer is running.
+              </p>
+            </div>
+          )}
           <ul className="mt-3 space-y-3">
             {RULES.map(({ icon: Icon, title, detail }) => (
               <li key={title} className="flex items-start gap-3">
@@ -415,6 +460,22 @@ function IntroScreen({
             ))}
           </ul>
 
+          <label
+            htmlFor="org-interview-agree"
+            className="mt-6 flex cursor-pointer items-start gap-3 rounded-lg border border-line bg-surface-2 p-4 text-sm text-body has-[:checked]:border-brand-300 has-[:checked]:bg-brand-50 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand-500"
+          >
+            <input
+              id="org-interview-agree"
+              type="checkbox"
+              checked={agreed}
+              onChange={(event) => setAgreed(event.target.checked)}
+              className={`${checkboxClass} mt-0.5 size-5 sm:size-4`}
+            />
+            <span className="min-w-0 font-medium text-ink">
+              I have read and agree to these instructions
+            </span>
+          </label>
+
           {error && (
             <div className="mt-6">
               <InlineError message={error} />
@@ -425,21 +486,20 @@ function IntroScreen({
             <Button
               size="lg"
               onClick={onStart}
-              disabled={!cameraReady || isBusy}
+              disabled={!canStart || isBusy}
               loading={isBusy}
               leadingIcon={<Play aria-hidden="true" />}
               className="w-full sm:w-auto"
+              aria-describedby="org-interview-start-hint"
             >
               {isBusy
                 ? "Starting…"
                 : invite.started
-                  ? "I agree, resume interview"
-                  : "I agree, start interview"}
+                  ? "Resume interview"
+                  : "Start interview"}
             </Button>
-            <p className="text-xs leading-5 text-muted">
-              {cameraReady
-                ? "The interview opens in full screen. By starting, you agree to camera and activity monitoring."
-                : "Turn on your camera to continue."}
+            <p id="org-interview-start-hint" className="text-xs leading-5 text-muted">
+              {hint}
             </p>
           </div>
         </section>
@@ -453,6 +513,47 @@ function IntroScreen({
 }
 
 /* -------------------------------------------------------------- interview */
+
+type InProgressSession = Extract<InterviewSessionView, { status: "in_progress" }>;
+
+/**
+ * Progress label, tile and bar for the current question. Warm-ups read
+ * "Warm-up n of m" and leave the bar at 0; pool questions read "Question n of
+ * N" against the pool only. Sessions without the warm-up fields (started
+ * before they existed) fall back to counting the whole interview.
+ */
+function describeProgress(
+  session: InProgressSession,
+  questionNumber: number,
+  answered: number,
+): { label: string; tile: string; percent: number; isWarmup: boolean } {
+  if (session.kind === "warmup" && session.warmupNumber) {
+    const of = session.totalWarmup ? ` of ${session.totalWarmup}` : "";
+    return {
+      label: `Warm-up ${session.warmupNumber}${of}`,
+      tile: `W${session.warmupNumber}`,
+      percent: 0,
+      isWarmup: true,
+    };
+  }
+  if (session.kind === "pool" && session.poolQuestionNumber) {
+    const n = session.poolQuestionNumber;
+    const total = session.totalPoolQuestions;
+    return {
+      label: `Question ${n}${total ? ` of ${total}` : ""}`,
+      tile: `Q${n}`,
+      percent: total ? Math.min(100, Math.round(((n - 1) / total) * 100)) : 0,
+      isWarmup: false,
+    };
+  }
+  const total = session.totalQuestions;
+  return {
+    label: `Question ${questionNumber}${total ? ` of ${total}` : ""}`,
+    tile: `Q${questionNumber}`,
+    percent: total ? Math.min(100, Math.round((answered / total) * 100)) : 0,
+    isWarmup: false,
+  };
+}
 
 function InterviewScreen({
   invite,
@@ -469,7 +570,7 @@ function InterviewScreen({
   dialog,
 }: {
   invite: OrgInterviewInvite;
-  session: Extract<InterviewSessionView, { status: "in_progress" }>;
+  session: InProgressSession;
   camera: Camera;
   answer: ReturnType<typeof useVoiceAnswer>;
   error: string | null;
@@ -484,7 +585,7 @@ function InterviewScreen({
   const answered = session.turns.length;
   const questionNumber = session.questionNumber ?? answered + 1;
   const total = session.totalQuestions;
-  const percent = total ? Math.min(100, Math.round((answered / total) * 100)) : 0;
+  const progress = describeProgress(session, questionNumber, answered);
   const cameraOn = camera.state === "on";
   const warnings = maxViolations - 1;
   const locked = isBusy || hasTimedOut || !cameraOn;
@@ -498,8 +599,7 @@ function InterviewScreen({
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold text-ink">{invite.jobTitle ?? "Interview"}</p>
             <p className="text-xs tabular-nums text-muted">
-              Question {questionNumber}
-              {total ? ` of ${total}` : ""}
+              {progress.label}
               {answer.voice.speaking && " · reading aloud…"}
             </p>
           </div>
@@ -516,12 +616,13 @@ function InterviewScreen({
           aria-label="Interview progress"
           aria-valuemin={0}
           aria-valuemax={100}
-          aria-valuenow={percent}
+          aria-valuenow={progress.percent}
+          aria-valuetext={progress.label}
           className="h-1 bg-surface-3"
         >
           <div
             className="h-full bg-brand-600 transition-[width] duration-300 motion-reduce:transition-none"
-            style={{ width: `${percent}%` }}
+            style={{ width: `${progress.percent}%` }}
           />
         </div>
       </header>
@@ -558,8 +659,19 @@ function InterviewScreen({
         )}
 
         <QuestionCard
-          eyebrow={`Question ${questionNumber}${total ? ` of ${total}` : ""}`}
-          badge={`Q${questionNumber}`}
+          eyebrow={
+            progress.isWarmup ? (
+              <span className="inline-flex flex-wrap items-center gap-2">
+                {progress.label}
+                <Badge tone="info" className="normal-case tracking-normal">
+                  Warm-up · not scored
+                </Badge>
+              </span>
+            ) : (
+              progress.label
+            )
+          }
+          badge={progress.tile}
           question={session.question ?? "Preparing the next question…"}
         />
 

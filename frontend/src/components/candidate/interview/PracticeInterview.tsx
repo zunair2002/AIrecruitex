@@ -387,7 +387,7 @@ export function PracticeInterview({ stage }: { stage: InterviewStage }) {
             <>
               {limitReached ? (
                 usage.data?.plan === "free" ? (
-                  <HeroButton href="/pricing" icon={<Crown aria-hidden="true" />}>
+                  <HeroButton href="/candidate/billing" icon={<Crown aria-hidden="true" />}>
                     Upgrade to Premium
                   </HeroButton>
                 ) : null
@@ -654,7 +654,7 @@ function LimitReachedPanel({
       </div>
       {isFree && (
         <Link
-          href="/pricing"
+          href="/candidate/billing"
           className={buttonClass({ size: "lg", className: "w-full shrink-0 sm:w-auto" })}
         >
           <Crown aria-hidden="true" />
@@ -706,7 +706,7 @@ function UsageCard({ usage, canResume }: { usage: PracticeUsage; canResume: bool
             and unlocks every course.
           </p>
           <Link
-            href="/pricing"
+            href="/candidate/billing"
             className={buttonClass({ size: "sm", variant: "soft", className: "shrink-0" })}
           >
             Upgrade

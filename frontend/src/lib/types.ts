@@ -48,6 +48,14 @@ export type AuthProvider = "password" | "google";
 export type UserPlan = "free" | "premium";
 
 export const USER_ROLES: UserRole[] = ["candidate", "hr", "admin"];
+export const USER_PLANS: UserPlan[] = ["free", "premium"];
+
+/** The Stripe subscription fields stored on a user (admin user list). */
+export type UserSubscriptionSnapshot = {
+  status?: string | null;
+  currentPeriodEnd?: string | null;
+  cancelAtPeriodEnd?: boolean;
+};
 export const AUTH_PROVIDERS: AuthProvider[] = ["password", "google"];
 
 /** Full User document — returned by the admin user-management endpoints. */
@@ -65,6 +73,10 @@ export type User = {
   interests?: string[];
   /** Missing on older accounts — treat as "free". */
   plan?: UserPlan;
+  /** When a Premium plan ends; absent/null = no end date (or not Premium). */
+  planExpiresAt?: string | null;
+  /** Stripe subscription snapshot, when the candidate has ever subscribed. */
+  subscription?: UserSubscriptionSnapshot;
   isActive: boolean;
   /**
    * Password accounts start false and must confirm the emailed OTP before they
@@ -566,6 +578,64 @@ export type PracticeUsage = {
   resetsAt: string | null;
   /** Only while the limit is reached: the earliest time a new session can start. */
   nextAvailableAt: string | null;
+};
+
+/* --------------------------------------------------------------- billing */
+
+/** One entry of GET /api/billing/plans. Prices are in the smallest currency unit. */
+export type BillingPlan = {
+  id: UserPlan;
+  name: string;
+  priceCents: number;
+  currency: string;
+  interval: "month" | "year";
+  trialDays: number;
+  practiceInterviewsPerDay: number;
+  premiumCourses: boolean;
+};
+
+/** GET /api/billing/plans. `checkoutAvailable` is false when Stripe isn't configured. */
+export type BillingPlans = {
+  plans: BillingPlan[];
+  checkoutAvailable: boolean;
+};
+
+/**
+ * GET /api/billing/subscription (and the cancel / resume / confirm results).
+ * `plan` is the plan in effect right now. `status` is Stripe's subscription
+ * status (active, trialing, past_due, canceled, incomplete, unpaid, …) or null
+ * when the candidate never subscribed; `source` says where Premium came from.
+ */
+export type SubscriptionStatus = {
+  plan: UserPlan;
+  source: "stripe" | "admin" | null;
+  status: string | null;
+  currentPeriodEnd: string | null;
+  cancelAtPeriodEnd: boolean;
+  /** When Premium ends; null = no end date. */
+  planExpiresAt: string | null;
+  canUpgrade: boolean;
+  canCancel: boolean;
+  canResume: boolean;
+};
+
+export type PaymentKind = "subscription" | "certificate";
+export type PaymentStatus = "paid" | "failed";
+
+/** GET /api/billing/payments — newest first. */
+export type Payment = {
+  _id: ObjectId;
+  kind: PaymentKind;
+  status: PaymentStatus;
+  amountCents: number;
+  currency: string;
+  description: string;
+  invoiceNumber?: string;
+  periodStart?: string;
+  periodEnd?: string;
+  hostedInvoiceUrl?: string;
+  invoicePdfUrl?: string;
+  createdAt: string;
 };
 
 /** The full document, as embedded in the HR application report. */

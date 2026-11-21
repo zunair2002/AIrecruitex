@@ -6,6 +6,7 @@ import {
   ChartNoAxesColumnIncreasing,
   ClipboardList,
   Code2,
+  CreditCard,
   FileUser,
   GraduationCap,
   LayoutDashboard,
@@ -70,6 +71,7 @@ const navGroups: NavGroup[] = [
     title: "General",
     items: [
       { href: "/candidate/profile", label: "My profile", icon: UserRound },
+      { href: "/candidate/billing", label: "Plan & billing", icon: CreditCard },
       {
         href: "/candidate/notifications",
         label: "Notifications",

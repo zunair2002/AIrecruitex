@@ -191,7 +191,7 @@ export function CourseList() {
                           Included with Premium
                         </p>
                         <Link
-                          href="/pricing"
+                          href="/candidate/billing"
                           className={buttonClass({
                             variant: "primary",
                             size: "sm",

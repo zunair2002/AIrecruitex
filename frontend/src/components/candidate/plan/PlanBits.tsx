@@ -30,7 +30,7 @@ export function UpgradeLink({
   className?: string;
 }) {
   return (
-    <Link href="/pricing" className={buttonClass({ variant: "primary", size, className })}>
+    <Link href="/candidate/billing" className={buttonClass({ variant: "primary", size, className })}>
       <Crown aria-hidden="true" />
       {label}
     </Link>

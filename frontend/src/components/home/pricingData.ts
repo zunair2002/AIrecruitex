@@ -41,8 +41,10 @@ export const candidatePlans: PricingPlan[] = [
       "Detailed AI scoring & feedback",
       "Personalized learning recommendations",
     ],
-    cta: "Start Premium Trial",
-    href: "/login/candidate",
+    cta: "Get Premium",
+    // Signed-in candidates land on the upgrade page; signed-out visitors are
+    // sent to the candidate login by the portal's auth guard.
+    href: "/candidate/billing",
     highlighted: true,
   },
   {

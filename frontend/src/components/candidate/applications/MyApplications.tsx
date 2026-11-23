@@ -1,19 +1,20 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import {
   ArrowRight,
   MessageSquareText,
   BriefcaseBusiness,
   Building2,
   CalendarDays,
-  Check,
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
   ExternalLink,
   FileText,
+  Clock3,
   Info,
+  LayoutList,
   Mail,
   Search,
   SearchX,
@@ -87,11 +88,15 @@ const statusFilters: { value: StatusFilter; label: string }[] = [
   { value: "rejected", label: "Rejected" },
 ];
 
-const detailTabs: { value: DetailTab; label: string }[] = [
-  { value: "overview", label: "Overview" },
-  { value: "ai", label: "AI interviews" },
-  { value: "organizational", label: "Organisational" },
-  { value: "job", label: "Job description" },
+const detailTabs: {
+  value: DetailTab;
+  label: string;
+  icon: ReactNode;
+}[] = [
+  { value: "overview", label: "Overview", icon: <LayoutList /> },
+  { value: "ai", label: "AI interviews", icon: <MessageSquareText /> },
+  { value: "organizational", label: "Organisational", icon: <Building2 /> },
+  { value: "job", label: "Job description", icon: <FileText /> },
 ];
 
 /** Calendar marker per interview date kind (dots on days + legend). */
@@ -117,14 +122,27 @@ function ApplicationStatusBadge({ status }: { status: ApplicationStatus }) {
 
 function DetailValue({
   label,
+  icon,
   children,
 }: {
   label: string;
+  /** Leading glyph on the label, so the grid scans without reading. */
+  icon?: ReactNode;
   children: React.ReactNode;
 }) {
   return (
     <div className="min-w-0">
-      <dt className="text-xs font-medium text-muted">{label}</dt>
+      <dt className="flex items-center gap-1.5 text-xs font-medium text-muted">
+        {icon && (
+          <span
+            aria-hidden="true"
+            className="[&>svg]:h-3.5 [&>svg]:w-3.5 [&>svg]:shrink-0"
+          >
+            {icon}
+          </span>
+        )}
+        {label}
+      </dt>
       <dd className="mt-1 break-words text-sm font-medium text-ink">
         {children}
       </dd>
@@ -903,16 +921,12 @@ function ApplicationDetail({
   onTabChange: (tab: DetailTab) => void;
 }) {
   const job = populated(application.jobId);
-  const { aiInterview, orgInterview } = application;
-  const hasInterviews = aiInterview.scheduled || Boolean(orgInterview?.status);
   const aiInterviewCount = applications.filter(
     (item) => item.aiInterview.scheduled,
   ).length;
   const organizationalInterviewCount = applications.filter(
     (item) => Boolean(item.orgInterview?.status),
   ).length;
-  const skillCount = application.resumeSnapshotSkills.length;
-
   return (
     <div className="@container min-w-0 space-y-4 lg:space-y-6">
       <Card>
@@ -939,20 +953,15 @@ function ApplicationDetail({
         </div>
 
         <dl className="mt-5 grid grid-cols-2 gap-x-6 gap-y-4 border-t border-line-soft pt-5 @2xl:grid-cols-4">
-          <DetailValue label="Applied on">
+          <DetailValue label="Applied on" icon={<CalendarDays />}>
             <span className="tabular-nums">
               {formatDateTime(application.createdAt)}
             </span>
           </DetailValue>
-          <DetailValue label="Last updated">
+          <DetailValue label="Last updated" icon={<Clock3 />}>
             <span className="tabular-nums">
               {formatDateTime(application.updatedAt)}
             </span>
-          </DetailValue>
-          <DetailValue label="Interview steps">
-            {hasInterviews
-              ? `${Number(aiInterview.scheduled) + Number(Boolean(orgInterview?.status))} scheduled or invited`
-              : "No interviews yet"}
           </DetailValue>
         </dl>
       </Card>
@@ -967,6 +976,7 @@ function ApplicationDetail({
           tabs={detailTabs.map((tab) => ({
             id: tab.value,
             label: tab.label,
+            icon: tab.icon,
             count:
               tab.value === "ai"
                 ? aiInterviewCount
@@ -1002,33 +1012,6 @@ function ApplicationDetail({
                 </div>
               </section>
 
-              <section className="rounded-xl border border-line p-4 sm:p-5">
-                <div className="mb-3 flex items-center justify-between gap-2">
-                  <h3 className="text-sm font-semibold text-ink">
-                    Skills found in your resume
-                  </h3>
-                  <span className="text-xs tabular-nums text-muted">
-                    {skillCount} skill{skillCount === 1 ? "" : "s"}
-                  </span>
-                </div>
-                {skillCount ? (
-                  <div className="flex flex-wrap gap-2">
-                    {application.resumeSnapshotSkills.map((skill) => (
-                      <Badge
-                        key={skill}
-                        tone="success"
-                        icon={<Check aria-hidden="true" />}
-                      >
-                        {skill}
-                      </Badge>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-sm text-muted">
-                    No required skills were found in the resume snapshot.
-                  </p>
-                )}
-              </section>
             </div>
           )}
 

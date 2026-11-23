@@ -51,6 +51,8 @@ export function tabCountClass(active: boolean): string {
 export type TabItem<T extends string> = {
   id: T;
   label: ReactNode;
+  /** Leading icon. Sized by the tab, so pass a bare lucide element. */
+  icon?: ReactNode;
   count?: number;
   disabled?: boolean;
 };
@@ -131,6 +133,14 @@ export function Tabs<T extends string>({
               onClick={() => onChange(tab.id)}
               className={tabClass(isActive)}
             >
+              {tab.icon && (
+                <span
+                  aria-hidden="true"
+                  className="[&>svg]:h-4 [&>svg]:w-4 [&>svg]:shrink-0"
+                >
+                  {tab.icon}
+                </span>
+              )}
               {tab.label}
               {tab.count !== undefined && (
                 <span className={tabCountClass(isActive)}>{tab.count}</span>

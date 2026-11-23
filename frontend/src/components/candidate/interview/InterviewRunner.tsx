@@ -36,8 +36,9 @@ import { FinalScoreRing, ScoreBar } from "./ScoreBreakdown";
 import { VoiceAnswerField, useVoiceAnswer } from "./VoiceAnswer";
 import { FailedInterviewNextSteps } from "./FailedInterviewNextSteps";
 import { InterviewTimer, timerKey } from "./InterviewTimer";
+import { InterviewerAvatar } from "./InterviewerAvatar";
 import {
-  InterviewColumn,
+  InterviewStage,
   InterviewProgressHeader,
   QuestionCard,
   TimeUpNotice,
@@ -166,7 +167,19 @@ export function InterviewRunner({
     .join(" · ");
 
   return (
-    <InterviewColumn>
+    <InterviewStage
+      aside={
+        <InterviewerAvatar
+          speaking={answer.voice.speaking}
+          listening={answer.voice.listening}
+          caption={
+            hasTimedOut
+              ? "The time limit has run out — finishing up."
+              : "Answer in your own words. There's no penalty for thinking out loud."
+          }
+        />
+      }
+    >
       <InterviewProgressHeader
         title={title}
         description={subtitle}
@@ -243,7 +256,7 @@ export function InterviewRunner({
       {session.turns.length > 0 && (
         <TurnHistory turns={session.turns} title="Answered so far" />
       )}
-    </InterviewColumn>
+    </InterviewStage>
   );
 }
 

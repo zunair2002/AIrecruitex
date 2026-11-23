@@ -205,9 +205,9 @@ export function AuthSplitLayout({
   footer?: ReactNode;
 }) {
   return (
-    <main className="min-h-dvh bg-canvas">
-      <div className="grid min-h-dvh grid-cols-1 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
-        <aside className="relative hidden overflow-hidden bg-sidebar px-10 py-12 text-white lg:flex lg:flex-col lg:justify-between xl:px-16">
+    <main className="h-dvh overflow-hidden bg-canvas">
+      <div className="grid h-dvh grid-cols-1 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
+        <aside className="relative hidden h-dvh overflow-hidden bg-sidebar px-10 py-12 text-white lg:flex lg:flex-col lg:justify-between xl:px-16">
           <div
             aria-hidden="true"
             className="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full bg-brand-700/40 blur-3xl"
@@ -261,7 +261,7 @@ export function AuthSplitLayout({
           </p>
         </aside>
 
-        <section className="flex flex-col items-center justify-center px-4 py-10 sm:px-6 sm:py-16 lg:px-10">
+        <section className="flex h-dvh min-h-0 flex-col items-center justify-center overflow-y-auto px-4 py-10 sm:px-6 sm:py-16 lg:px-10">
           <div className="w-full max-w-md">
             <div className="mb-6 flex flex-col items-center text-center lg:hidden">
               <Link

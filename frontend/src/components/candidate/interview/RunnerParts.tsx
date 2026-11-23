@@ -27,6 +27,28 @@ export function InterviewColumn({
   );
 }
 
+/**
+ * The live-interview layout: the question and answer on the left, the
+ * interviewer on the right. Collapses to one column below `lg`, with the
+ * interviewer first so a phone still shows who is asking before the question.
+ */
+export function InterviewStage({
+  children,
+  aside,
+}: {
+  children: ReactNode;
+  aside: ReactNode;
+}) {
+  return (
+    <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
+        <div className="order-2 min-w-0 space-y-6 lg:order-1">{children}</div>
+        <div className="order-1 lg:order-2">{aside}</div>
+      </div>
+    </div>
+  );
+}
+
 /** Title row + "Question n of m" + timer pill + progress bar. */
 export function InterviewProgressHeader({
   eyebrow,

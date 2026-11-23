@@ -40,6 +40,7 @@ import { BrandWordmark } from "@/components/layout/Logo";
 import { VoiceAnswerField, useVoiceAnswer } from "./VoiceAnswer";
 import { InterviewTimer, timerKey } from "./InterviewTimer";
 import { QuestionCard, TimeUpNotice } from "./RunnerParts";
+import { InterviewerAvatar } from "./InterviewerAvatar";
 import {
   CameraCheckCard,
   ORG_CARD,
@@ -627,7 +628,18 @@ function InterviewScreen({
         </div>
       </header>
 
-      <main id="main-content" className="mx-auto w-full max-w-3xl flex-1 space-y-5 px-4 py-6 sm:py-10">
+        <main
+          id="main-content"
+          className="mx-auto grid w-full max-w-6xl flex-1 grid-cols-1 gap-6 px-4 py-6 sm:py-10 lg:grid-cols-[minmax(0,1fr)_300px] lg:items-start"
+        >
+          <div className="order-1 lg:order-2">
+            <InterviewerAvatar
+              speaking={answer.voice.speaking}
+              listening={answer.voice.listening}
+              caption="This interview is reviewed by the hiring team, so no score is shown here."
+            />
+          </div>
+          <div className="order-2 min-w-0 space-y-5 lg:order-1">
         {!cameraOn && (
           <div
             role="alert"
@@ -702,7 +714,8 @@ function InterviewScreen({
             </Button>
           </div>
         </section>
-      </main>
+          </div>
+        </main>
 
       {dialog}
     </div>

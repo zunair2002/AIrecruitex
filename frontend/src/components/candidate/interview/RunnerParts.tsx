@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Sparkles } from "lucide-react";
+import { ScanSearch } from "lucide-react";
 import { Spinner } from "@/components/ui/Feedback";
 
 /**
@@ -115,7 +115,7 @@ export function QuestionCard({
           aria-hidden="true"
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-sm font-semibold text-brand-700 ring-1 ring-inset ring-brand-600/10"
         >
-          {badge === "AI" ? <Sparkles className="h-5 w-5" /> : badge}
+          {badge === "AI" ? <ScanSearch className="h-5 w-5" /> : badge}
         </span>
         <div className="min-w-0 flex-1">
           <p className="text-xs font-medium uppercase tracking-wider text-muted">

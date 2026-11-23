@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Check, Crown, CreditCard, ExternalLink, FileText, Receipt } from "lucide-react";
+import { Check, BadgeCheck, CreditCard, ExternalLink, FileText, Receipt } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { toErrorMessage } from "@/lib/api";
 import {
@@ -16,6 +16,10 @@ import {
 } from "@/lib/billingApi";
 import { formatDate } from "@/lib/format";
 import { useApiResource } from "@/lib/useApiResource";
+import {
+  FeatureUnavailable,
+  isEndpointMissing,
+} from "@/components/shared/FeatureUnavailable";
 import type { BillingPlan, Payment, SubscriptionStatus } from "@/lib/types";
 import { PlanBadge } from "@/components/candidate/plan/PlanBits";
 import { PortalPage } from "@/components/dashboard/primitives";
@@ -174,6 +178,14 @@ export function BillingPage() {
     { enabled: Boolean(token) },
   );
 
+  /**
+   * The backend currently has no /api/billing router at all, so every call
+   * here comes back 404. Detect that once and say so plainly, rather than
+   * stacking three "Route not found" error blocks down the page.
+   */
+  const billingUnavailable =
+    isEndpointMissing(subscription.error) || isEndpointMissing(plans.error);
+
   // Drop ?checkout / ?session_id so a reload doesn't confirm or notify twice.
   useEffect(() => {
     if (returned.checkout) router.replace(BILLING_PATH, { scroll: false });
@@ -264,7 +276,12 @@ export function BillingPage() {
       )}
       <InlineError message={error} />
 
-      {subscription.isLoading ? (
+      {billingUnavailable ? (
+        <FeatureUnavailable
+          title="Billing isn't enabled on this server yet"
+          description="The plans, subscription and payment endpoints aren't part of this backend build, so there's nothing to show here. Premium is still honoured everywhere it's checked — this page is only the place to buy and manage it."
+        />
+      ) : subscription.isLoading ? (
         <LoadingBlock label="Loading your plan…" variant="skeleton" rows={3} />
       ) : subscription.error ? (
         <ErrorBlock message={subscription.error} onRetry={subscription.reload} />
@@ -283,6 +300,7 @@ export function BillingPage() {
         />
       ) : null}
 
+      {!billingUnavailable && (
       <Card
         title="Payment history"
         description="Premium invoices and certificate payments."
@@ -305,6 +323,7 @@ export function BillingPage() {
           <PaymentTable payments={payments.data} />
         )}
       </Card>
+      )}
 
       <ConfirmDialog
         open={confirmCancel}
@@ -379,7 +398,7 @@ function PlanCard({
               onClick={onUpgrade}
               loading={busy === "checkout"}
               disabled={!checkoutAvailable || busy !== null || plansLoading}
-              leadingIcon={<Crown />}
+              leadingIcon={<BadgeCheck />}
             >
               {price ? `Upgrade — ${price}` : "Upgrade to Premium"}
             </Button>

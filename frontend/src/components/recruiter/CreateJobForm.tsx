@@ -9,7 +9,7 @@ import {
   ListChecks,
   Plus,
   ScanSearch,
-  Sparkles,
+  FileSearch,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { toErrorMessage } from "@/lib/api";
@@ -404,7 +404,7 @@ export function CreateJobForm() {
                 text="The match score is the share of your required skills found."
               />
               <HowStep
-                icon={<Sparkles />}
+                icon={<FileSearch />}
                 title="No skills yet?"
                 text="Attach the job description and skills are suggested from its text."
               />

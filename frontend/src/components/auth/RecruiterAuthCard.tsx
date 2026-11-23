@@ -1,18 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { Bot, ListChecks, Sparkles } from "lucide-react";
+import { MessageSquareText, ListChecks, ScanSearch } from "lucide-react";
 import { AuthCardLayout, RegisterForm, type AuthTab } from "./AuthCardParts";
 import { GoogleSignInButton } from "./GoogleSignInButton";
 
 const RECRUITER_BENEFITS = [
   {
-    icon: <Sparkles />,
+    icon: <ScanSearch />,
     title: "AI-matched applicants",
     description: "Every resume parsed and ranked against the job description.",
   },
   {
-    icon: <Bot />,
+    icon: <MessageSquareText />,
     title: "Interviews that run overnight",
     description: "Candidates take AI interviews on their own time.",
   },

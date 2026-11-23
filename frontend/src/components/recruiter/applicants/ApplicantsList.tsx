@@ -4,12 +4,11 @@ import { useSearchParams } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import {
   ArrowRight,
-  Bot,
+  MessageSquareText,
   CalendarClock,
   CalendarPlus,
   Search,
   Send,
-  Sparkles,
   Star,
   Target,
   Users,
@@ -304,16 +303,9 @@ export function ApplicantsList() {
           <StatCard
             label="Above threshold"
             value={stats.matched}
-            sub="Eligible for an AI interview"
+            sub="Above the match threshold"
             icon={<Target />}
             tone="info"
-          />
-          <StatCard
-            label="AI interviews"
-            value={stats.interviewed}
-            sub="Scheduled or completed"
-            icon={<Bot />}
-            tone="warning"
           />
           <StatCard
             label="Selected"
@@ -414,16 +406,6 @@ export function ApplicantsList() {
                     Mark {APPLICATION_STATUS_LABELS[status].toLowerCase()}
                   </Button>
                 ))}
-                <Button
-                  size="sm"
-                  onClick={() =>
-                    setDialog({ application: filtered[0], kind: "ai" })
-                  }
-                  disabled={isBulkBusy}
-                  leadingIcon={<Bot aria-hidden="true" />}
-                >
-                  Trigger AI interviews
-                </Button>
                 <Button
                   variant="soft"
                   size="sm"
@@ -609,7 +591,7 @@ function ApplicantCard({
                 <div className="rounded-lg border border-brand-100 bg-brand-50/60 p-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <p className="inline-flex items-center gap-2 text-sm font-semibold text-ink">
-                      <Bot aria-hidden="true" className="h-4 w-4 text-brand-700" />
+                      <MessageSquareText aria-hidden="true" className="h-4 w-4 text-brand-700" />
                       AI interview
                     </p>
                     <Badge tone="brand">Scheduled</Badge>
@@ -672,23 +654,6 @@ function ApplicantCard({
             </div>
 
             <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:items-center">
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => onSchedule("ai")}
-                disabled={isBusy || !application.matched}
-                leadingIcon={<Sparkles aria-hidden="true" />}
-                className="max-sm:h-10"
-                title={
-                  application.matched
-                    ? undefined
-                    : "Only applicants above the match threshold can have an AI interview scheduled."
-                }
-              >
-                {aiInterview.scheduled
-                  ? "Reschedule AI interview"
-                  : "Schedule AI interview"}
-              </Button>
 
               <Button
                 variant="secondary"

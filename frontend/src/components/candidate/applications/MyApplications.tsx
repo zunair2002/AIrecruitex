@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import {
   ArrowRight,
-  Bot,
+  MessageSquareText,
   BriefcaseBusiness,
   Building2,
   CalendarDays,
@@ -11,14 +11,12 @@ import {
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
-  Clock3,
   ExternalLink,
   FileText,
   Info,
   Mail,
   Search,
   SearchX,
-  Target,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useApplicationEvents } from "@/context/RealtimeContext";
@@ -31,7 +29,6 @@ import {
   formatDate,
   formatDateTime,
   isInviteExpired,
-  scoreColor,
   timeUntil,
 } from "@/lib/format";
 import {
@@ -439,7 +436,7 @@ function InterviewSchedule({
                         }`}
                       >
                         {isAi ? (
-                          <Bot className="h-4 w-4" />
+                          <MessageSquareText className="h-4 w-4" />
                         ) : (
                           <Building2 className="h-4 w-4" />
                         )}
@@ -647,18 +644,6 @@ export function MyApplications() {
     filtered[0] ??
     null;
 
-  const summary = useMemo(() => {
-    return {
-      matched: applicationList.filter((application) => application.matched)
-        .length,
-      interviews: applicationList.filter(
-        (application) =>
-          application.aiInterview.scheduled ||
-          Boolean(application.orgInterview?.status),
-      ).length,
-    };
-  }, [applicationList]);
-
   const interviewStats = useMemo(() => {
     const ai = applicationList.filter(
       (item) => item.aiInterview.scheduled,
@@ -736,13 +721,6 @@ export function MyApplications() {
               value={counts.all}
               sub={`${counts.pending} awaiting a decision`}
               icon={<BriefcaseBusiness />}
-            />
-            <StatCard
-              label="Shortlisted"
-              value={summary.matched}
-              sub={`of ${counts.all} met the match threshold`}
-              icon={<Target />}
-              tone="info"
             />
             <StatCard
               label="Interviews"
@@ -854,11 +832,6 @@ export function MyApplications() {
                             <span className="min-w-0 break-words text-sm font-semibold text-ink">
                               {job?.title ?? "Job no longer available"}
                             </span>
-                            <span
-                              className={`shrink-0 text-sm font-semibold tabular-nums ${scoreColor(application.matchScore)}`}
-                            >
-                              {application.matchScore}%
-                            </span>
                           </span>
                           <span className="mt-0.5 block text-xs text-muted">
                             Applied {formatDate(application.createdAt)}
@@ -867,15 +840,6 @@ export function MyApplications() {
                             <ApplicationStatusBadge
                               status={application.status}
                             />
-                            {application.matched && (
-                              <span className="inline-flex items-center gap-1 text-xs font-medium text-brand-700">
-                                <Target
-                                  aria-hidden="true"
-                                  className="h-3.5 w-3.5"
-                                />
-                                Match qualified
-                              </span>
-                            )}
                           </span>
                         </span>
                       </span>
@@ -948,7 +912,6 @@ function ApplicationDetail({
     (item) => Boolean(item.orgInterview?.status),
   ).length;
   const skillCount = application.resumeSnapshotSkills.length;
-  const score = Math.min(100, Math.max(0, application.matchScore));
 
   return (
     <div className="@container min-w-0 space-y-4 lg:space-y-6">
@@ -973,37 +936,9 @@ function ApplicationDetail({
               </p>
             </div>
           </div>
-          <div className="flex shrink-0 items-baseline gap-2 pl-14 sm:block sm:pl-0 sm:text-right">
-            <p className="text-xs font-medium text-muted sm:mb-0.5">
-              Match score
-            </p>
-            <p
-              className={`font-display text-2xl font-semibold tracking-tight tabular-nums sm:text-3xl ${scoreColor(application.matchScore)}`}
-            >
-              {application.matchScore}%
-            </p>
-          </div>
         </div>
 
         <dl className="mt-5 grid grid-cols-2 gap-x-6 gap-y-4 border-t border-line-soft pt-5 @2xl:grid-cols-4">
-          <DetailValue label="Shortlisting">
-            <span className="flex items-start gap-1.5">
-              {application.matched ? (
-                <CheckCircle2
-                  aria-hidden="true"
-                  className="mt-0.5 h-4 w-4 shrink-0 text-brand-600"
-                />
-              ) : (
-                <Clock3
-                  aria-hidden="true"
-                  className="mt-0.5 h-4 w-4 shrink-0 text-brand-500"
-                />
-              )}
-              {application.matched
-                ? "Met match threshold"
-                : "Below match threshold"}
-            </span>
-          </DetailValue>
           <DetailValue label="Applied on">
             <span className="tabular-nums">
               {formatDateTime(application.createdAt)}
@@ -1050,39 +985,21 @@ function ApplicationDetail({
           {activeTab === "overview" && (
             <div className="space-y-6">
               <section>
-                <div className="flex flex-wrap items-end justify-between gap-3">
-                  <div className="min-w-0">
-                    <h3 className="text-base font-semibold text-ink">
-                      Match overview
-                    </h3>
-                    <p className="mt-1 text-sm text-muted">
-                      Based on the resume snapshot used when you applied.
-                    </p>
-                  </div>
-                  <span
-                    className={`font-display text-2xl font-semibold tracking-tight tabular-nums ${scoreColor(application.matchScore)}`}
-                  >
-                    {application.matchScore}%
+                <div className="min-w-0">
+                  <h3 className="text-base font-semibold text-ink">
+                    Application status
+                  </h3>
+                  <p className="mt-1 text-sm text-muted">
+                    Where this application has reached. The employer reviews
+                    your resume against the role and updates this as they go.
+                  </p>
+                </div>
+                <div className="mt-4 flex items-center gap-2.5">
+                  <ApplicationStatusBadge status={application.status} />
+                  <span className="text-xs text-muted">
+                    Updated {formatDateTime(application.updatedAt)}
                   </span>
                 </div>
-                <div
-                  role="progressbar"
-                  aria-label="Match score"
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                  aria-valuenow={score}
-                  className="mt-4 h-2 overflow-hidden rounded-full bg-surface-3"
-                >
-                  <div
-                    className="h-full rounded-full bg-brand-600 transition-[width]"
-                    style={{ width: `${score}%` }}
-                  />
-                </div>
-                <p className="mt-2 text-xs text-muted">
-                  {application.matched
-                    ? "This application met the employer's match threshold."
-                    : "This application is below the employer's match threshold."}
-                </p>
               </section>
 
               <section className="rounded-xl border border-line p-4 sm:p-5">

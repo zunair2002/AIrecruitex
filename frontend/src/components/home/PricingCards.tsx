@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { motion } from "framer-motion";
+import { PlanCta } from "./PlanCta";
 import { Building2, UserRound } from "lucide-react";
 import {
   pricingCategories,
@@ -104,16 +104,14 @@ export const PricingCards = ({
             </li>
           ))}
         </ul>
-        <Link
-          href={plan.href}
+        <PlanCta
+          plan={plan}
           className={`block px-6 py-3 text-center text-sm font-semibold transition ${
             plan.highlighted
               ? "bg-white text-ink hover:bg-canvas"
               : "bg-navy text-white hover:bg-brand"
           }`}
-        >
-          {plan.cta}
-        </Link>
+        />
       </motion.div>
     ))}
   </motion.div>

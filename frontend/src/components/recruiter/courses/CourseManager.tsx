@@ -3,7 +3,7 @@
 import { useState } from "react";
 import {
   CirclePlay,
-  Crown,
+  BadgeCheck,
   ExternalLink,
   GraduationCap,
   Pencil,
@@ -268,7 +268,7 @@ export function CourseManager() {
                 onChange={(tier) => update("tier", tier)}
                 options={[
                   { value: "free", label: "Free" },
-                  { value: "premium", label: "Premium", icon: <Crown aria-hidden="true" /> },
+                  { value: "premium", label: "Premium", icon: <BadgeCheck aria-hidden="true" /> },
                 ]}
               />
               <p className={helpTextClass}>
@@ -378,7 +378,7 @@ export function CourseManager() {
                         {course.tier === "premium" && (
                           <Badge
                             tone="brand"
-                            icon={<Crown aria-hidden="true" />}
+                            icon={<BadgeCheck aria-hidden="true" />}
                             title="Premium candidates only"
                           >
                             Premium

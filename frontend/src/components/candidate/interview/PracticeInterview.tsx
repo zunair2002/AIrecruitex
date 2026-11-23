@@ -5,13 +5,13 @@ import Link from "next/link";
 import {
   ArrowRight,
   BarChart3,
-  BrainCircuit,
+  Database,
   Briefcase,
   Check,
   CircleCheck,
   ClipboardCheck,
-  Cpu,
-  Crown,
+  Binary,
+  BadgeCheck,
   FileBarChart,
   History,
   Layers,
@@ -115,11 +115,11 @@ const TRACK_META: Record<string, { icon: React.ReactNode; blurb: string }> = {
     blurb: "End-to-end features across client, server and data.",
   },
   data_ai: {
-    icon: <BrainCircuit />,
+    icon: <Database />,
     blurb: "Machine learning, big data and data modelling.",
   },
   software_engineer: {
-    icon: <Cpu />,
+    icon: <Binary />,
     blurb: "Core CS: algorithms, OOP, operating systems and design.",
   },
 };
@@ -387,7 +387,7 @@ export function PracticeInterview({ stage }: { stage: InterviewStage }) {
             <>
               {limitReached ? (
                 usage.data?.plan === "free" ? (
-                  <HeroButton href="/candidate/billing" icon={<Crown aria-hidden="true" />}>
+                  <HeroButton href="/candidate/billing" icon={<BadgeCheck aria-hidden="true" />}>
                     Upgrade to Premium
                   </HeroButton>
                 ) : null
@@ -657,7 +657,7 @@ function LimitReachedPanel({
           href="/candidate/billing"
           className={buttonClass({ size: "lg", className: "w-full shrink-0 sm:w-auto" })}
         >
-          <Crown aria-hidden="true" />
+          <BadgeCheck aria-hidden="true" />
           Upgrade to Premium for 10/day
         </Link>
       )}

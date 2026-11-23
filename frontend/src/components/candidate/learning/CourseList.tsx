@@ -9,7 +9,7 @@ import { useApiResource } from "@/lib/useApiResource";
 import { formatDate } from "@/lib/format";
 import {
   CalendarDays,
-  Crown,
+  BadgeCheck,
   GraduationCap,
   Lock,
   PlayCircle,
@@ -168,7 +168,7 @@ export function CourseList() {
                       </p>
                     </div>
                     {course.tier === "premium" && (
-                      <Badge tone="brand" icon={<Crown aria-hidden="true" />}>
+                      <Badge tone="brand" icon={<BadgeCheck aria-hidden="true" />}>
                         Premium
                       </Badge>
                     )}
@@ -198,7 +198,7 @@ export function CourseList() {
                             className: "w-full sm:w-auto",
                           })}
                         >
-                          <Crown aria-hidden="true" />
+                          <BadgeCheck aria-hidden="true" />
                           Upgrade to watch
                         </Link>
                       </div>

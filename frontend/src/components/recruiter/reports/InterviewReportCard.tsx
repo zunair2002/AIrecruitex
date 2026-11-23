@@ -2,16 +2,16 @@
 
 import { useState, type ReactNode } from "react";
 import {
-  Bot,
+  MessageSquareText,
   Building2,
   Check,
   ChevronDown,
   CircleAlert,
   CircleCheck,
   Clock,
-  Lightbulb,
-  MessagesSquare,
   TrendingUp,
+  MessagesSquare,
+  ClipboardCheck,
   Undo2,
   X,
 } from "lucide-react";
@@ -276,12 +276,12 @@ export function InterviewReportDetail({
         </Card>
       ) : interviewSession.report ? (
         <Card
-          title={<SectionTitle icon={<Bot />}>AI interview report</SectionTitle>}
+          title={<SectionTitle icon={<MessageSquareText />}>AI interview report</SectionTitle>}
         >
           <ReportSummary report={interviewSession.report} />
         </Card>
       ) : (
-        <Card title={<SectionTitle icon={<Bot />}>AI feedback</SectionTitle>}>
+        <Card title={<SectionTitle icon={<MessageSquareText />}>AI feedback</SectionTitle>}>
           <p className="whitespace-pre-line text-sm leading-relaxed text-body">
             {interviewSession.feedback ?? "No overall feedback was returned."}
           </p>
@@ -649,7 +649,7 @@ function ReportSummary({ report }: { report: InterviewReport }) {
 
       {report.recommendation && (
         <div className="flex items-start gap-3 rounded-lg bg-brand-50 p-4 ring-1 ring-inset ring-brand-600/10">
-          <Lightbulb aria-hidden="true" className="mt-0.5 h-5 w-5 shrink-0 text-brand-700" />
+          <ClipboardCheck aria-hidden="true" className="mt-0.5 h-5 w-5 shrink-0 text-brand-700" />
           <div className="min-w-0">
             <p className="text-sm font-semibold text-ink">Recommendation</p>
             <p className="mt-0.5 whitespace-pre-line text-sm text-body">

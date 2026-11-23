@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { Crown, Search, Trash2, Users } from "lucide-react";
+import { BadgeCheck, Search, Trash2, Users } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { toErrorMessage } from "@/lib/api";
 import {
@@ -11,6 +11,7 @@ import {
   setUserRole,
 } from "@/lib/adminApi";
 import { setUserPlan } from "@/lib/billingApi";
+import { isEndpointMissing } from "@/components/shared/FeatureUnavailable";
 import { useApiResource } from "@/lib/useApiResource";
 import {
   USER_ROLES,
@@ -451,7 +452,7 @@ function PlanCell({
       <Button
         variant="ghost"
         size="sm"
-        leadingIcon={<Crown />}
+        leadingIcon={<BadgeCheck />}
         onClick={onChange}
         disabled={disabled}
         aria-label={`Change plan for ${user.name}`}
@@ -505,7 +506,14 @@ function PlanDialog({
       );
       onSaved();
     } catch (err) {
-      setError(toErrorMessage(err));
+      // No /api/admin/users/:id/plan on this backend build. Say that, rather
+      // than surfacing the raw "Route not found" to an admin who would read it
+      // as the save having failed for their input.
+      setError(
+        isEndpointMissing(err)
+          ? "Plan management isn't enabled on this server yet — the backend has no endpoint for changing a user's plan."
+          : toErrorMessage(err),
+      );
       setSaving(false);
     }
   };

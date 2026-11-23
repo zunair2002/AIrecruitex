@@ -7,6 +7,12 @@ export type PricingPlan = {
   cta: string;
   href: string;
   highlighted: boolean;
+  /**
+   * A paid plan. Its CTA goes to the buyer's billing page rather than a login
+   * screen — see PlanCta, which resolves the destination from the session so a
+   * signed-in user isn't bounced through sign-in to reach checkout.
+   */
+  paid?: boolean;
 };
 
 export type PricingCategory = "candidates" | "companies";
@@ -42,6 +48,7 @@ export const candidatePlans: PricingPlan[] = [
       "Personalized learning recommendations",
     ],
     cta: "Get Premium",
+    paid: true,
     // Signed-in candidates land on the upgrade page; signed-out visitors are
     // sent to the candidate login by the portal's auth guard.
     href: "/candidate/billing",
@@ -60,7 +67,8 @@ export const candidatePlans: PricingPlan[] = [
       "Priority feedback processing",
     ],
     cta: "Choose Career+",
-    href: "/login/candidate",
+    href: "/candidate/billing",
+    paid: true,
     highlighted: false,
   },
 ];

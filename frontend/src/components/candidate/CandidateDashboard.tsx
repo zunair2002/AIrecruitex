@@ -13,7 +13,6 @@ import {
   FileText,
   Mail,
   Search,
-  Target,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import {
@@ -29,7 +28,6 @@ import {
   APPLICATION_STATUS_LABELS,
   formatDate,
   formatDateTime,
-  scoreColor,
   timeUntil,
 } from "@/lib/format";
 import {
@@ -59,7 +57,7 @@ import {
 
 type ChartRange = "Monthly" | "Weekly" | "Quarterly";
 type StatusFilter = "all" | ApplicationStatus;
-type SeriesKey = "count" | "matched" | "selected";
+type SeriesKey = "count" | "selected";
 type ActivityBucket = Record<SeriesKey, number> & { label: string };
 type NextEvent = {
   application: Application;
@@ -109,12 +107,6 @@ const SERIES: {
     swatch: "bg-chart-1",
   },
   {
-    key: "matched",
-    label: "Profile matches",
-    color: "var(--color-chart-2)",
-    swatch: "bg-chart-2",
-  },
-  {
     key: "selected",
     label: "Selected",
     color: "var(--color-chart-3)",
@@ -123,11 +115,6 @@ const SERIES: {
   },
 ];
 
-function scoreBarClass(score: number): string {
-  if (score >= 80) return "bg-success-400";
-  if (score >= 50) return "bg-warning-400";
-  return "bg-danger-400";
-}
 
 function toDate(value?: string): Date | null {
   if (!value) return null;
@@ -218,15 +205,6 @@ function getActivityBuckets(
         appliedAt < end
       );
     }).length;
-    const matched = applications.filter((application) => {
-      const appliedAt = new Date(application.createdAt);
-      return (
-        application.matched &&
-        !Number.isNaN(appliedAt.getTime()) &&
-        appliedAt >= start &&
-        appliedAt < end
-      );
-    }).length;
     const selected = applications.filter((application) => {
       const appliedAt = new Date(application.createdAt);
       return (
@@ -236,7 +214,7 @@ function getActivityBuckets(
         appliedAt < end
       );
     }).length;
-    return { label, count: bucketApplications, matched, selected };
+    return { label, count: bucketApplications, selected };
   });
 
   return buckets;
@@ -255,7 +233,7 @@ function ActivityChart({
 }) {
   const peak = Math.max(
     1,
-    ...buckets.flatMap((bucket) => [bucket.count, bucket.matched, bucket.selected]),
+    ...buckets.flatMap((bucket) => [bucket.count, bucket.selected]),
   );
   const yMax = Math.max(4, Math.ceil(peak / 4) * 4);
   const ticks = [4, 3, 2, 1, 0].map((step) => (yMax / 4) * step);
@@ -355,8 +333,8 @@ function ActivityChart({
       <ul className="sr-only">
         {buckets.map((bucket, index) => (
           <li key={`${bucket.label}-${index}`}>
-            {bucket.label}: {bucket.count} applications, {bucket.matched} profile
-            matches, {bucket.selected} selected
+            {bucket.label}: {bucket.count} applications, {bucket.selected}
+            selected
           </li>
         ))}
       </ul>
@@ -510,8 +488,6 @@ export function CandidateDashboard() {
   const summary = useMemo(() => {
     return {
       total: applicationList.length,
-      matched: applicationList.filter((application) => application.matched)
-        .length,
       selected: applicationList.filter(
         (application) => application.status === "selected",
       ).length,
@@ -634,13 +610,6 @@ export function CandidateDashboard() {
             value: summary.total,
             detail: `${summary.pending} awaiting response`,
             icon: <FileCheck2 />,
-          },
-          {
-            label: "Matched",
-            value: summary.matched,
-            detail: `of ${summary.total} submitted`,
-            icon: <Target />,
-            trend: summary.matched > 0 ? "up" : "neutral",
           },
           {
             label: "Selected",
@@ -985,7 +954,6 @@ function LaterEventRow({ event }: { event: NextEvent }) {
 function ApplicationRow({ application }: { application: Application }) {
   const job = populated(application.jobId);
   const title = job?.title ?? "Job removed";
-  const score = application.matchScore;
   const status = (
     <StatusBadge
       status={application.status}
@@ -1003,21 +971,7 @@ function ApplicationRow({ application }: { application: Application }) {
         </p>
         <div className="mt-2 sm:hidden">{status}</div>
       </div>
-      <div className="hidden w-28 shrink-0 sm:block">{status}</div>
-      <div className="w-20 shrink-0 text-right sm:w-28">
-        <span className={`text-sm font-semibold tabular-nums ${scoreColor(score)}`}>
-          {score}%<span className="sr-only"> match</span>
-        </span>
-        <div
-          aria-hidden="true"
-          className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-surface-3"
-        >
-          <div
-            className={`h-full rounded-full ${scoreBarClass(score)}`}
-            style={{ width: `${Math.min(Math.max(score, 0), 100)}%` }}
-          />
-        </div>
-      </div>
+      <div className="w-28 shrink-0 text-right">{status}</div>
     </li>
   );
 }

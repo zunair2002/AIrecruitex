@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Check, Crown, Sparkles } from "lucide-react";
+import { Check, BadgeCheck, ScanSearch } from "lucide-react";
 import type { UserPlan } from "@/lib/types";
 import { Badge } from "@/components/ui/Badge";
 import { buttonClass } from "@/components/ui/Button";
@@ -12,7 +12,7 @@ export const planOf = (user: { plan?: UserPlan } | null | undefined): UserPlan =
 /** Small "Free plan" / "Premium" pill. */
 export function PlanBadge({ plan }: { plan: UserPlan }) {
   return plan === "premium" ? (
-    <Badge tone="brand" icon={<Crown aria-hidden="true" />}>
+    <Badge tone="brand" icon={<BadgeCheck aria-hidden="true" />}>
       Premium
     </Badge>
   ) : (
@@ -31,7 +31,7 @@ export function UpgradeLink({
 }) {
   return (
     <Link href="/candidate/billing" className={buttonClass({ variant: "primary", size, className })}>
-      <Crown aria-hidden="true" />
+      <BadgeCheck aria-hidden="true" />
       {label}
     </Link>
   );
@@ -52,7 +52,7 @@ export function PlanBanner({ plan }: { plan: UserPlan }) {
           aria-hidden="true"
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-600 text-white"
         >
-          <Crown className="h-5 w-5" />
+          <BadgeCheck className="h-5 w-5" />
         </span>
         <div className="min-w-0">
           <p className="text-sm font-semibold text-ink">You&apos;re on Premium</p>
@@ -81,7 +81,7 @@ export function PlanBanner({ plan }: { plan: UserPlan }) {
         </div>
         <div className="border-t border-line-soft bg-brand-50/60 p-4 sm:p-5 md:border-l md:border-t-0">
           <div className="flex items-center gap-2">
-            <Sparkles aria-hidden="true" className="h-4 w-4 text-brand-600" />
+            <ScanSearch aria-hidden="true" className="h-4 w-4 text-brand-600" />
             <p className="text-sm font-semibold text-ink">Premium</p>
             {premium && (
               <span className="text-xs text-muted">

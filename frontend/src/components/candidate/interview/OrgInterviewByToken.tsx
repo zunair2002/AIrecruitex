@@ -30,7 +30,7 @@ import {
   Play,
   Send,
   ShieldAlert,
-  Sparkles,
+  ScanSearch,
 } from "lucide-react";
 import { checkboxClass } from "@/components/ui/controls";
 import { Badge } from "@/components/ui/Badge";
@@ -347,7 +347,7 @@ const RULES: { icon: typeof CameraIcon; title: string; detail: string }[] = [
     detail: "The first two violations show a warning. The third violation cancels the interview automatically.",
   },
   {
-    icon: Sparkles,
+    icon: ScanSearch,
     title: "The first 3 questions are a warm-up",
     detail: "They help you settle in and are not scored. Scored questions follow.",
   },

@@ -2,9 +2,10 @@
 
 import { useId, useState, type ReactNode } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Bot, ListChecks, Sparkles } from "lucide-react";
-import { useAuth, homePathForRole } from "@/context/AuthContext";
+import { useRouter, useSearchParams } from "next/navigation";
+import { MessageSquareText, ListChecks, ScanSearch } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { resolveNextPath } from "@/lib/nextPath";
 import type { UserRole } from "@/lib/types";
 import { VerifyEmailForm } from "./VerifyEmailForm";
 import { BrandWordmark } from "@/components/layout/Logo";
@@ -165,12 +166,12 @@ export type AuthBenefit = {
 
 const DEFAULT_BENEFITS: AuthBenefit[] = [
   {
-    icon: <Sparkles />,
+    icon: <ScanSearch />,
     title: "AI-matched applicants",
     description: "Every resume parsed and scored against the job.",
   },
   {
-    icon: <Bot />,
+    icon: <MessageSquareText />,
     title: "AI interviews on demand",
     description: "Candidates interview on their schedule; you get scored answers.",
   },
@@ -426,6 +427,9 @@ export function RegisterForm({
 export function LoginForm() {
   const { login } = useAuth();
   const router = useRouter();
+  // Set when the visitor was sent here from somewhere specific (a pricing CTA,
+  // a deep link). Validated in resolveNextPath — it comes from the URL.
+  const nextPath = useSearchParams().get("next");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -438,7 +442,7 @@ export function LoginForm() {
     setIsSubmitting(true);
     try {
       const user = await login(email.trim(), password);
-      router.replace(homePathForRole(user.role));
+      router.replace(resolveNextPath(nextPath, user.role));
     } catch (err) {
       // The backend refuses a deactivated account at login too. Send them to
       // the dedicated page rather than squeezing the explanation into the auth

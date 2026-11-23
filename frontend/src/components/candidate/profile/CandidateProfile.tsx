@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Sparkles, UserRound } from "lucide-react";
+import { ScanSearch, UserRound } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { toErrorMessage } from "@/lib/api";
 import {
@@ -152,7 +152,7 @@ export function CandidateProfile() {
                 role="status"
                 className="flex items-start gap-3 rounded-xl border border-brand-200 bg-brand-50 p-4"
               >
-                <Sparkles
+                <ScanSearch
                   aria-hidden="true"
                   className="mt-0.5 h-5 w-5 shrink-0 text-brand-600"
                 />

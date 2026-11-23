@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState, type ReactNode } from "react";
+import { Suspense, useId, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { MessageSquareText, ListChecks, ScanSearch } from "lucide-react";
@@ -424,7 +424,19 @@ export function RegisterForm({
   );
 }
 
+/**
+ * `useSearchParams` needs a Suspense boundary so the login pages can still be
+ * prerendered; the form renders on the client once the URL is available.
+ */
 export function LoginForm() {
+  return (
+    <Suspense fallback={null}>
+      <LoginFormWithParams />
+    </Suspense>
+  );
+}
+
+function LoginFormWithParams() {
   const { login } = useAuth();
   const router = useRouter();
   // Set when the visitor was sent here from somewhere specific (a pricing CTA,

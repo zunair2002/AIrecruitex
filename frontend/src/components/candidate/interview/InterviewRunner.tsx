@@ -72,6 +72,13 @@ export function InterviewRunner({
   // Set once the countdown hits zero; flips the UI into "finishing up" and
   // starts polling for the server's verdict.
   const [hasTimedOut, setHasTimedOut] = useState(false);
+  // Resumed a session with under a minute left — offer a fresh start instead.
+  const [lowTimeOnResume] = useState(
+    () =>
+      session.status === "in_progress" &&
+      typeof session.remainingSeconds === "number" &&
+      session.remainingSeconds < 60,
+  );
   const answer = useVoiceAnswer(
     session.status === "in_progress" ? session.question : undefined,
   );
@@ -194,6 +201,25 @@ export function InterviewRunner({
           />
         }
       />
+
+      {lowTimeOnResume && !hasTimedOut && onRestart && (
+        <div
+          role="status"
+          className="flex flex-col gap-3 rounded-xl border border-warning-200 bg-warning-50 p-4 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <p className="text-sm font-medium text-warning-700">
+            Your previous attempt had little time left
+          </p>
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={onRestart}
+            leadingIcon={<RotateCcw aria-hidden="true" />}
+          >
+            Start a new interview
+          </Button>
+        </div>
+      )}
 
       {hasTimedOut && (
         <TimeUpNotice

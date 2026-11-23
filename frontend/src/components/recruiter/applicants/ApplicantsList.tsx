@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import {
   ArrowRight,
+  Check,
   MessageSquareText,
   CalendarClock,
   CalendarPlus,
@@ -29,7 +30,6 @@ import {
 } from "@/lib/applicationsApi";
 import { useApiResource } from "@/lib/useApiResource";
 import {
-  APPLICATION_STATUSES,
   populated,
   type Application,
   type ApplicationStatus,
@@ -59,7 +59,6 @@ import {
 } from "@/components/ui/Feedback";
 import {
   checkboxClass,
-  compactInputClass,
   inputClass,
 } from "@/components/ui/controls";
 import { JobPicker } from "../JobPicker";
@@ -253,7 +252,7 @@ export function ApplicantsList() {
     return {
       total: list.length,
       matched: list.filter((item) => item.matched).length,
-      selected: list.filter((item) => item.status === "selected").length,
+      shortlisted: list.filter((item) => item.status === "shortlisted").length,
       interviewed: list.filter((item) => item.aiInterview.scheduled).length,
       avg,
     };
@@ -308,8 +307,8 @@ export function ApplicantsList() {
             tone="info"
           />
           <StatCard
-            label="Selected"
-            value={stats.selected}
+            label="Shortlisted"
+            value={stats.shortlisted}
             sub="Ready for an org interview"
             icon={<Star />}
             tone="success"
@@ -395,17 +394,24 @@ export function ApplicantsList() {
                 </Button>
               </div>
               <div className="-mx-3 flex min-w-0 gap-2 overflow-x-auto px-3 no-scrollbar sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 xl:flex-1 xl:justify-end">
-                {APPLICATION_STATUSES.map((status) => (
-                  <Button
-                    key={status}
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => handleBulkStatus(status)}
-                    disabled={isBulkBusy}
-                  >
-                    Mark {APPLICATION_STATUS_LABELS[status].toLowerCase()}
-                  </Button>
-                ))}
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => handleBulkStatus("shortlisted")}
+                  disabled={isBulkBusy}
+                  leadingIcon={<Check aria-hidden="true" />}
+                >
+                  Shortlist
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => handleBulkStatus("rejected")}
+                  disabled={isBulkBusy}
+                  leadingIcon={<X aria-hidden="true" />}
+                >
+                  Reject
+                </Button>
                 <Button
                   variant="soft"
                   size="sm"
@@ -498,7 +504,9 @@ function ApplicantCard({
   const { aiInterview } = application;
   // Absent until HR invites — see the note on Application.orgInterview.
   const orgInterview = application.orgInterview;
-  const statusId = `status-${application._id}`;
+  // Org (HR) interview opens once the candidate is shortlisted (or later selected).
+  const canInviteOrg =
+    application.status === "shortlisted" || application.status === "selected";
   const jobId =
     typeof application.jobId === "string"
       ? application.jobId
@@ -633,24 +641,26 @@ function ApplicantCard({
           {/* Actions */}
           <div className="mt-4 flex flex-col gap-3 border-t border-line-soft pt-4 sm:flex-row sm:flex-wrap sm:items-center">
             <div className="flex items-center gap-2">
-              <label htmlFor={statusId} className="text-sm font-medium text-body">
-                Status
-              </label>
-              <select
-                id={statusId}
-                value={application.status}
-                onChange={(event) =>
-                  onStatusChange(event.target.value as ApplicationStatus)
-                }
-                disabled={isBusy}
-                className={`${compactInputClass} min-w-32 flex-1 max-sm:h-10 sm:flex-none`}
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => onStatusChange("shortlisted")}
+                disabled={isBusy || application.status === "shortlisted"}
+                leadingIcon={<Check aria-hidden="true" />}
+                className="max-sm:h-10 max-sm:flex-1"
               >
-                {APPLICATION_STATUSES.map((status) => (
-                  <option key={status} value={status}>
-                    {APPLICATION_STATUS_LABELS[status]}
-                  </option>
-                ))}
-              </select>
+                {application.status === "shortlisted" ? "Shortlisted" : "Shortlist"}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onStatusChange("rejected")}
+                disabled={isBusy || application.status === "rejected"}
+                leadingIcon={<X aria-hidden="true" />}
+                className="max-sm:h-10 max-sm:flex-1"
+              >
+                {application.status === "rejected" ? "Rejected" : "Reject"}
+              </Button>
             </div>
 
             <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:items-center">
@@ -659,13 +669,13 @@ function ApplicantCard({
                 variant="secondary"
                 size="sm"
                 onClick={() => onSchedule("org")}
-                disabled={isBusy || application.status !== "selected"}
+                disabled={isBusy || !canInviteOrg}
                 leadingIcon={<Send aria-hidden="true" />}
                 className="max-sm:h-10"
                 title={
-                  application.status === "selected"
+                  canInviteOrg
                     ? undefined
-                    : "Mark the candidate as Selected before scheduling an organisation interview."
+                    : "Shortlist the candidate before scheduling an organisation interview."
                 }
               >
                 {orgInterview?.status === "invited"
@@ -676,7 +686,8 @@ function ApplicantCard({
               </Button>
             </div>
 
-            {application.interviewSessionId && (
+            {(application.interviewSessionId ||
+              application.orgInterviewSessionId) && (
               <Button
                 variant="soft"
                 size="sm"

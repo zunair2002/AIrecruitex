@@ -97,6 +97,7 @@ export const ROLE_LABELS: Record<UserRole, string> = {
 
 export const APPLICATION_STATUS_LABELS: Record<ApplicationStatus, string> = {
   pending: "Pending",
+  shortlisted: "Shortlisted",
   selected: "Selected",
   rejected: "Rejected",
 };
@@ -230,11 +231,11 @@ const STATUS_TONES: Record<string, StatusTone> = {
   active: "success",
   parsed: "success",
   shortlist: "success",
-  shortlisted: "success",
   correct: "success",
   strong: "success",
   round2_unlocked: "success",
   paid: "success",
+  shortlisted: "info",
   // warning
   pending: "warning",
   in_progress: "warning",
@@ -335,6 +336,7 @@ export const ROLE_BADGE: Record<UserRole, string> = {
 
 export const APPLICATION_STATUS_BADGE: Record<ApplicationStatus, string> = {
   pending: statusBadge("pending"),
+  shortlisted: statusBadge("shortlisted"),
   selected: statusBadge("selected"),
   rejected: statusBadge("rejected"),
 };

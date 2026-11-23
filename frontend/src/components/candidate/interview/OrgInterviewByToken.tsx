@@ -30,7 +30,6 @@ import {
   Play,
   Send,
   ShieldAlert,
-  ScanSearch,
 } from "lucide-react";
 import { checkboxClass } from "@/components/ui/controls";
 import { Badge } from "@/components/ui/Badge";
@@ -348,11 +347,6 @@ const RULES: { icon: typeof CameraIcon; title: string; detail: string }[] = [
     detail: "The first two violations show a warning. The third violation cancels the interview automatically.",
   },
   {
-    icon: ScanSearch,
-    title: "The first 3 questions are a warm-up",
-    detail: "They help you settle in and are not scored. Scored questions follow.",
-  },
-  {
     icon: MessageSquareText,
     title: "One question at a time",
     detail: "Type or dictate each answer. You can't go back, and answers are reviewed by the hiring team.",
@@ -590,6 +584,8 @@ function InterviewScreen({
   const cameraOn = camera.state === "on";
   const warnings = maxViolations - 1;
   const locked = isBusy || hasTimedOut || !cameraOn;
+  // Submitting the last answer: freeze the clock so it can't expire mid-request.
+  const finalizing = isBusy && Boolean(total) && questionNumber >= (total ?? 0);
 
   return (
     <div className="flex min-h-dvh flex-col bg-canvas">
@@ -609,7 +605,13 @@ function InterviewScreen({
               Warnings {Math.min(violations, warnings)}/{warnings}
             </Badge>
           )}
-          <InterviewTimer key={timerKey(session)} session={session} onExpire={onExpire} />
+          <InterviewTimer
+            key={timerKey(session)}
+            session={session}
+            onExpire={onExpire}
+            paused={finalizing}
+            pausedLabel="Submitting…"
+          />
           <ProctoringThumb camera={camera} />
         </div>
         <div
@@ -672,17 +674,7 @@ function InterviewScreen({
 
         <QuestionCard
           eyebrow={
-            progress.isWarmup ? (
-              <span className="inline-flex flex-wrap items-center gap-2">
-                {progress.label}
-                <Badge tone="info" className="normal-case tracking-normal">
-                  Warm-up · not scored
-                </Badge>
-              </span>
-            ) : (
-              progress.label
-            )
-          }
+progress.label}
           badge={progress.tile}
           question={session.question ?? "Preparing the next question…"}
         />

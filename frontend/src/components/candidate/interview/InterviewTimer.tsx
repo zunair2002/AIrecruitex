@@ -22,9 +22,15 @@ import type { InterviewSessionInProgress } from "@/lib/types";
 export function InterviewTimer({
   session,
   onExpire,
+  paused = false,
+  pausedLabel,
 }: {
   session: InterviewSessionInProgress;
   onExpire?: () => void;
+  /** Freeze the countdown (e.g. while the final answer is submitting). */
+  paused?: boolean;
+  /** Shown in place of the countdown while paused. */
+  pausedLabel?: string;
 }) {
   const { remainingSeconds, timeLimitSeconds } = session;
   const hasTimer = typeof remainingSeconds === "number";
@@ -32,18 +38,18 @@ export function InterviewTimer({
   const [secondsLeft, setSecondsLeft] = useState(remainingSeconds ?? 0);
 
   useEffect(() => {
-    if (!hasTimer) return;
+    if (!hasTimer || paused) return;
     const id = window.setInterval(() => {
       setSecondsLeft((previous) => Math.max(0, previous - 1));
     }, 1000);
     return () => window.clearInterval(id);
-  }, [hasTimer]);
+  }, [hasTimer, paused]);
 
   // Once at zero the tick above is a no-op, so this fires exactly once.
   useEffect(() => {
-    if (!hasTimer || secondsLeft > 0) return;
+    if (!hasTimer || paused || secondsLeft > 0) return;
     onExpire?.();
-  }, [hasTimer, secondsLeft, onExpire]);
+  }, [hasTimer, paused, secondsLeft, onExpire]);
 
   if (!hasTimer) return null;
 
@@ -77,7 +83,11 @@ export function InterviewTimer({
             isOut ? "text-rose-700" : isLow ? "text-brand-600" : "text-ink"
           }`}
         >
-          {isOut ? "Time up" : formatCountdown(secondsLeft)}
+          {paused && pausedLabel
+            ? pausedLabel
+            : isOut
+              ? "Time up"
+              : formatCountdown(secondsLeft)}
         </p>
         {timeLimitSeconds ? (
           <div className="mt-1.5 h-1 w-14 overflow-hidden rounded-full bg-surface-3">

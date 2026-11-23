@@ -12,7 +12,6 @@ import {
   TrendingUp,
   MessagesSquare,
   ClipboardCheck,
-  Undo2,
   X,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -106,8 +105,13 @@ const DECISION_ACTIONS: {
 }[] = [
   { status: "selected", variant: "primary", icon: <Check aria-hidden="true" /> },
   { status: "rejected", variant: "danger-soft", icon: <X aria-hidden="true" /> },
-  { status: "pending", variant: "secondary", icon: <Undo2 aria-hidden="true" /> },
 ];
+
+/** Button text per decision ("Select" / "Reject"). */
+const DECISION_LABELS: Partial<Record<ApplicationStatus, string>> = {
+  selected: "Select",
+  rejected: "Reject",
+};
 
 /**
  * Renders GET /api/applications/:applicationId/report — the application plus
@@ -129,6 +133,10 @@ export function InterviewReportDetail({
   const [status, setStatus] = useState<ApplicationStatus>(application.status);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState<ApplicationStatus | null>(null);
+  // Final decision only once an interview (AI or org) has been completed.
+  const interviewCompleted =
+    interviewSession?.status === "completed" ||
+    orgInterviewSession?.status === "completed";
 
   const changeStatus = async (next: ApplicationStatus) => {
     setBusy(next);
@@ -217,9 +225,12 @@ export function InterviewReportDetail({
             <div>
               <p className="text-sm font-semibold text-ink">Hiring decision</p>
               <p className="text-xs text-muted">
-                The candidate is notified when the status changes.
+                {interviewCompleted
+                  ? "The candidate is notified when the status changes."
+                  : "Select or reject once the interview is complete."}
               </p>
             </div>
+            {interviewCompleted && (
             <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap">
               {DECISION_ACTIONS.map(({ status: option, variant, icon }) => (
                 <Button
@@ -234,10 +245,13 @@ export function InterviewReportDetail({
                 >
                   {busy === option
                     ? "Saving…"
-                    : `Mark ${APPLICATION_STATUS_LABELS[option].toLowerCase()}`}
+                    : status === option
+                      ? APPLICATION_STATUS_LABELS[option]
+                      : DECISION_LABELS[option]}
                 </Button>
               ))}
             </div>
+            )}
           </div>
         </div>
       </section>

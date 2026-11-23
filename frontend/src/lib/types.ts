@@ -163,9 +163,14 @@ export type JobRef = {
 
 /* ----------------------------------------------------------- application */
 
-export type ApplicationStatus = "pending" | "selected" | "rejected";
+export type ApplicationStatus =
+  | "pending"
+  | "shortlisted"
+  | "selected"
+  | "rejected";
 export const APPLICATION_STATUSES: ApplicationStatus[] = [
   "pending",
+  "shortlisted",
   "selected",
   "rejected",
 ];

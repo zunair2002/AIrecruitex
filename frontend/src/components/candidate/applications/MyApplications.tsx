@@ -84,6 +84,7 @@ const EMPTY_APPLICATIONS: Application[] = [];
 const statusFilters: { value: StatusFilter; label: string }[] = [
   { value: "all", label: "All" },
   { value: "pending", label: "Pending" },
+  { value: "shortlisted", label: "Shortlisted" },
   { value: "selected", label: "Selected" },
   { value: "rejected", label: "Rejected" },
 ];
@@ -636,6 +637,9 @@ export function MyApplications() {
       all: applicationList.length,
       pending: applicationList.filter((item) => item.status === "pending")
         .length,
+      shortlisted: applicationList.filter(
+        (item) => item.status === "shortlisted",
+      ).length,
       selected: applicationList.filter((item) => item.status === "selected")
         .length,
       rejected: applicationList.filter((item) => item.status === "rejected")

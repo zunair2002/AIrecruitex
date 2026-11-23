@@ -45,9 +45,12 @@ export function InterviewReportsList() {
     { enabled: Boolean(token && selectedJobId) },
   );
 
-  // Only applicants HR has actually scheduled an AI interview for have a report.
+  // Only applicants with an AI or org (HR) interview session have a report.
   const interviewed = useMemo(
-    () => (applications.data ?? []).filter((item) => item.interviewSessionId),
+    () =>
+      (applications.data ?? []).filter(
+        (item) => item.interviewSessionId || item.orgInterviewSessionId,
+      ),
     [applications.data],
   );
 
@@ -120,7 +123,7 @@ export function InterviewReportsList() {
       ) : interviewed.length === 0 ? (
         <EmptyState
           icon={<FileText />}
-          title="No AI interviews scheduled for this job yet."
+          title="No interviews yet"
           description="Schedule an AI interview from the Applicants screen — the report appears here as the candidate answers."
           action={
             <Button href={`/recruiter/applicants?jobId=${selectedJobId ?? ""}`}>

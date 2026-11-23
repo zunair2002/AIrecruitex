@@ -89,6 +89,7 @@ const statusFilters: StatusFilter[] = [
 const STATUS_CHART: Record<ApplicationStatus, { color: string; swatch: string }> =
   {
     pending: { color: "var(--color-chart-3)", swatch: "bg-chart-3" },
+    shortlisted: { color: "var(--color-chart-1)", swatch: "bg-chart-1" },
     selected: { color: "var(--color-chart-2)", swatch: "bg-chart-2" },
     rejected: { color: "var(--color-chart-4)", swatch: "bg-chart-4" },
   };

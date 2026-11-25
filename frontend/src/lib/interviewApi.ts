@@ -7,6 +7,7 @@ import type {
   InterviewStage,
   InterviewTrack,
   ObjectId,
+  PracticeUsage,
   TrackId,
 } from "./types";
 
@@ -19,7 +20,8 @@ export function listTracks(signal?: AbortSignal): Promise<InterviewTrack[]> {
  * POST /api/interview/start — begins (or resumes) a practice round.
  * The backend resumes an unfinished session of the same stage and track, so
  * this is safe to call again. "technical" (Round 2) is refused with 400/403
- * until the latest completed Round 1 scored at least 50.
+ * until the latest completed Round 1 scored at least 50, and with 429 once the
+ * plan's daily practice allowance is used up (see getPracticeUsage).
  */
 export function startInterview(
   input: { stage: InterviewStage; track: TrackId },
@@ -73,4 +75,15 @@ export function listMySessions(
     token,
     signal,
   });
+}
+
+/**
+ * GET /api/interview/usage — how many practice interviews the candidate's plan
+ * still allows right now, and when the next one frees up.
+ */
+export function getPracticeUsage(
+  token: string | null,
+  signal?: AbortSignal,
+): Promise<PracticeUsage> {
+  return apiRequest<PracticeUsage>("/api/interview/usage", { token, signal });
 }

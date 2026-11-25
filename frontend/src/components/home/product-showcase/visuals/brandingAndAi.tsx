@@ -3,9 +3,9 @@ export const BrandBrandingVisual = () => (
     <div className="absolute w-40 h-40 bg-brand/5 rounded-full -top-10 -left-10 group-hover:bg-brand/10 transition-all duration-700" />
     <div className="w-11/12 h-5/6 bg-white border border-slate-200/80 rounded-xl overflow-hidden flex flex-col ">
       <div className="h-8 bg-slate-50 border-b border-slate-150 flex items-center px-3 gap-1.5">
-        <div className="w-2 h-2 rounded-full bg-rose-400" />
-        <div className="w-2 h-2 rounded-full bg-amber-400" />
-        <div className="w-2 h-2 rounded-full bg-emerald-400" />
+        <div className="w-2 h-2 rounded-full bg-brand-200" />
+        <div className="w-2 h-2 rounded-full bg-brand-300" />
+        <div className="w-2 h-2 rounded-full bg-brand-400" />
         <div className="ml-2 text-[9px] text-slate-400 font-mono select-none">
           branding-control.io
         </div>
@@ -21,8 +21,8 @@ export const BrandBrandingVisual = () => (
             </span>
             <div className="flex gap-1.5 items-center">
               <div className="w-3.5 h-3.5 rounded-full bg-brand ring-2 ring-[#e0d6ea] ring-offset-2 ring-offset-white cursor-pointer animate-pulse" />
-              <div className="w-3.5 h-3.5 rounded-full bg-emerald-500 cursor-pointer hover:scale-110 transition-transform" />
-              <div className="w-3.5 h-3.5 rounded-full bg-amber-500 cursor-pointer hover:scale-110 transition-transform" />
+              <div className="w-3.5 h-3.5 rounded-full bg-brand-500 cursor-pointer hover:scale-110 transition-transform" />
+              <div className="w-3.5 h-3.5 rounded-full bg-brand-300 cursor-pointer hover:scale-110 transition-transform" />
             </div>
           </div>
           <div className="bg-slate-50 p-1.5 rounded-lg border border-slate-200/60 flex items-center justify-between">
@@ -69,13 +69,13 @@ export const AIHumanVisual = () => (
             <div className="w-6 h-6 rounded-full bg-brand flex items-center justify-center text-[10px] font-bold text-white ">
               AI
             </div>
-            <div className="absolute -bottom-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-emerald-500 border border-white" />
+            <div className="absolute -bottom-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-brand-500 border border-white" />
           </div>
           <div className="flex flex-col">
             <span className="text-[9px] font-bold text-slate-800 leading-none">
               AiRecruitex Voice AI
             </span>
-            <span className="text-[6px] text-emerald-605 mt-0.5 tracking-wider uppercase font-bold">
+            <span className="text-[6px] text-brand-605 mt-0.5 tracking-wider uppercase font-bold">
               Active Chat
             </span>
           </div>

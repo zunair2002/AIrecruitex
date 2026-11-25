@@ -1,41 +1,37 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import { LifeBuoy } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { toErrorMessage } from "@/lib/api";
-import { listSupportTickets, resolveSupportTicket } from "@/lib/adminApi";
-import { useApiResource } from "@/lib/useApiResource";
-import { populated, type ObjectId } from "@/lib/types";
-import {
-  SUPPORT_STATUS_BADGE,
-  SUPPORT_STATUS_LABELS,
-  formatDateTime,
-} from "@/lib/format";
+import { useServerEvent } from "@/context/RealtimeContext";
+import { listSupportTickets } from "@/lib/adminApi";
+import { resolveSelection, useApiResource } from "@/lib/useApiResource";
+import type { ObjectId, SupportTicket } from "@/lib/types";
+import { Tabs } from "@/components/ui/Tabs";
 import {
   EmptyState,
   ErrorBlock,
-  InlineError,
   LoadingBlock,
   PageHeader,
 } from "@/components/ui/Feedback";
+import { PortalPage } from "@/components/dashboard/primitives";
 import {
-  compactInputClass,
-  inputClass,
-  smallButtonClass,
-} from "@/components/ui/controls";
+  SupportThread,
+  SupportTicketList,
+} from "@/components/shared/SupportThread";
+
+type StatusFilter = "all" | "open" | "resolved";
 
 /**
- * GET /api/admin/support + PATCH /:ticketId/resolve. Resolving requires a reply,
- * which the backend also pushes to the ticket author as a notification.
+ * GET /api/admin/support for the queue; each ticket opens as a live chat with
+ * its author (SupportThread: shared message routes + admin resolve/reopen).
+ * New tickets, replies and status changes arrive over `support:ticket`.
  */
 export function SupportDesk() {
   const { token } = useAuth();
-  const [statusFilter, setStatusFilter] = useState<"all" | "open" | "resolved">(
-    "open",
-  );
-  const [replies, setReplies] = useState<Record<string, string>>({});
-  const [busyId, setBusyId] = useState<ObjectId | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("open");
+  const [selectedId, setSelectedId] = useState<ObjectId | null>(null);
+  const detailRef = useRef<HTMLDivElement>(null);
 
   const tickets = useApiResource(
     (signal) => listSupportTickets(token, signal),
@@ -43,138 +39,97 @@ export function SupportDesk() {
     { enabled: Boolean(token) },
   );
 
-  const filtered = useMemo(() => {
-    const list = tickets.data ?? [];
-    return statusFilter === "all"
-      ? list
-      : list.filter((ticket) => ticket.status === statusFilter);
-  }, [tickets.data, statusFilter]);
+  useServerEvent("support:ticket", () => tickets.reload());
 
-  const handleResolve = async (ticketId: ObjectId) => {
-    const reply = (replies[ticketId] ?? "").trim();
-    if (!reply) {
-      setError("A reply is required to resolve a ticket.");
-      return;
-    }
-    setBusyId(ticketId);
-    setError(null);
-    try {
-      const updated = await resolveSupportTicket(ticketId, reply, token);
-      tickets.setData((current) =>
-        (current ?? []).map((item) =>
-          item._id === updated._id ? { ...updated, userId: item.userId } : item,
-        ),
-      );
-      setReplies((current) => ({ ...current, [ticketId]: "" }));
-    } catch (err) {
-      setError(toErrorMessage(err));
-    } finally {
-      setBusyId(null);
+  const all = useMemo(() => tickets.data ?? [], [tickets.data]);
+  const filtered = useMemo(
+    () =>
+      statusFilter === "all"
+        ? all
+        : all.filter((ticket) => ticket.status === statusFilter),
+    [all, statusFilter],
+  );
+  const selected = resolveSelection(filtered, selectedId, (ticket) => ticket._id);
+  const openCount = all.filter((t) => t.status === "open").length;
+  const isFirstLoad = tickets.isLoading && !tickets.data;
+
+  const patchTicket = (updated: SupportTicket) =>
+    tickets.setData((current) =>
+      (current ?? []).map((item) => (item._id === updated._id ? updated : item)),
+    );
+
+  const select = (ticketId: ObjectId) => {
+    setSelectedId(ticketId);
+    const node = detailRef.current;
+    if (node && window.innerWidth < 1024) {
+      node.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
 
-  const openCount = (tickets.data ?? []).filter(
-    (t) => t.status === "open",
-  ).length;
-
   return (
-    <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
+    <PortalPage>
       <PageHeader
-        title="Support Desk"
-        description={`${openCount} open ticket${openCount === 1 ? "" : "s"}. Resolving a ticket notifies its author.`}
+        icon={<LifeBuoy />}
+        title="Support desk"
+        description={`${openCount} open ticket${openCount === 1 ? "" : "s"}. Chat with users live; they're notified of every reply.`}
       />
 
-      <select
+      <Tabs
+        ariaLabel="Ticket status"
+        idPrefix="support"
         value={statusFilter}
-        onChange={(event) =>
-          setStatusFilter(event.target.value as "all" | "open" | "resolved")
-        }
-        className={`${compactInputClass} mb-6`}
+        onChange={setStatusFilter}
+        tabs={[
+          { id: "open", label: "Open", count: openCount },
+          { id: "resolved", label: "Resolved", count: all.length - openCount },
+          { id: "all", label: "All tickets", count: all.length },
+        ]}
+      />
+
+      <div
+        id={`support-panel-${statusFilter}`}
+        role="tabpanel"
+        aria-labelledby={`support-tab-${statusFilter}`}
       >
-        <option value="open">Open only</option>
-        <option value="resolved">Resolved only</option>
-        <option value="all">All tickets</option>
-      </select>
-
-      {error && (
-        <div className="mb-6">
-          <InlineError message={error} />
-        </div>
-      )}
-
-      {tickets.isLoading ? (
-        <LoadingBlock label="Loading tickets…" />
-      ) : tickets.error ? (
-        <ErrorBlock message={tickets.error} onRetry={tickets.reload} />
-      ) : filtered.length === 0 ? (
-        <EmptyState title="No tickets in this view." />
-      ) : (
-        <div className="space-y-4">
-          {filtered.map((ticket) => {
-            const author = populated(ticket.userId);
-            return (
-              <div
-                key={ticket._id}
-                className="rounded border border-[#f1f1f5] bg-white p-6 "
-              >
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <h2 className="font-bold text-[#292b35]">
-                      {ticket.subject}
-                    </h2>
-                    <p className="mt-1 text-xs text-[#898b96]">
-                      {author?.name ?? "Unknown user"}
-                      {author?.email ? ` · ${author.email}` : ""} ·{" "}
-                      {formatDateTime(ticket.createdAt)}
-                    </p>
-                  </div>
-                  <span className={SUPPORT_STATUS_BADGE[ticket.status]}>
-                    {SUPPORT_STATUS_LABELS[ticket.status]}
-                  </span>
-                </div>
-
-                <p className="mt-4 whitespace-pre-line rounded bg-[#f8f8fb] p-4 text-sm text-[#44464f]">
-                  {ticket.message}
-                </p>
-
-                {ticket.adminReply ? (
-                  <div className="mt-4 rounded border border-emerald-100 bg-emerald-50 p-4">
-                    <p className="text-xs font-bold uppercase tracking-wide text-emerald-700">
-                      Admin reply
-                    </p>
-                    <p className="mt-1 whitespace-pre-line text-sm text-emerald-900">
-                      {ticket.adminReply}
-                    </p>
-                  </div>
-                ) : (
-                  <div className="mt-4">
-                    <textarea
-                      value={replies[ticket._id] ?? ""}
-                      onChange={(event) =>
-                        setReplies((current) => ({
-                          ...current,
-                          [ticket._id]: event.target.value,
-                        }))
-                      }
-                      rows={3}
-                      placeholder="Write the reply the user will receive…"
-                      className={`${inputClass} resize-none text-sm`}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handleResolve(ticket._id)}
-                      disabled={busyId === ticket._id}
-                      className={`${smallButtonClass} mt-3`}
-                    >
-                      {busyId === ticket._id ? "Resolving…" : "Reply & resolve"}
-                    </button>
-                  </div>
-                )}
+        {isFirstLoad ? (
+          <LoadingBlock label="Loading tickets…" />
+        ) : tickets.error && !tickets.data ? (
+          <ErrorBlock message={tickets.error} onRetry={tickets.reload} />
+        ) : filtered.length === 0 ? (
+          <EmptyState
+            icon={<LifeBuoy />}
+            title="No tickets in this view"
+            description={
+              statusFilter === "open"
+                ? "You're all caught up — new tickets from users appear here live."
+                : "Try another status tab."
+            }
+          />
+        ) : (
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-6">
+            <div className="min-w-0 self-start overflow-hidden rounded-xl border border-line bg-surface shadow-xs">
+              <div className="max-h-[70vh] overflow-y-auto">
+                <SupportTicketList
+                  tickets={filtered}
+                  selectedId={selected?._id ?? null}
+                  onSelect={select}
+                  showAuthor
+                />
               </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
+            </div>
+            <div ref={detailRef} className="min-w-0 scroll-mt-4 lg:col-span-2">
+              {selected && (
+                <SupportThread
+                  key={selected._id}
+                  ticketId={selected._id}
+                  isAdmin
+                  onTicketChange={patchTicket}
+                />
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </PortalPage>
   );
 }

@@ -15,13 +15,13 @@ const navLinks = [
 ] as const;
 
 const linkClass =
-  "text-[13px] font-medium tracking-wide text-zinc-600 transition-colors hover:text-brand";
+  "text-sm font-medium tracking-wide text-zinc-600 transition-colors hover:text-brand";
 
 export const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <nav className="fixed top-0 right-0 left-0 z-50 border-t-[3px] border-t-brand border-b border-[#e0d6ea] bg-white">
+    <nav className="fixed top-0 right-0 left-0 z-50 border-t-[3px] border-t-brand border-b border-line bg-white">
       <div className="mx-auto flex h-[4.75rem] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="z-50 transition-opacity hover:opacity-80">
           <BrandWordmark className="text-[1.65rem]" />
@@ -49,13 +49,13 @@ export const Navbar = () => {
         <div className="hidden items-center gap-6 lg:flex">
           <Link
             href="/login/candidate"
-            className="text-[13px] font-medium text-zinc-600 transition-colors hover:text-brand"
+            className="text-sm font-medium text-zinc-600 transition-colors hover:text-brand"
           >
             Candidate
           </Link>
           <Link
             href="/login/recruiter"
-            className="rounded-sm bg-brand px-4 py-2.5 text-[13px] font-semibold text-white transition-colors hover:bg-brand-dark"
+            className="rounded-sm bg-brand px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
           >
             Recruiter login
           </Link>
@@ -84,7 +84,7 @@ export const Navbar = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute top-full left-0 w-full border-b border-[#e0d6ea] bg-white lg:hidden"
+            className="absolute top-full left-0 w-full border-b border-line bg-white lg:hidden"
           >
             <div className="flex flex-col gap-1 px-4 py-5">
               {navLinks.map((link) =>
@@ -110,11 +110,11 @@ export const Navbar = () => {
                   </a>
                 ),
               )}
-              <div className="mt-3 flex flex-col gap-2 border-t border-[#e0d6ea] pt-4">
+              <div className="mt-3 flex flex-col gap-2 border-t border-line pt-4">
                 <Link
                   href="/login/candidate"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="border border-[#e0d6ea] py-3 text-center text-sm font-semibold text-ink"
+                  className="border border-line py-3 text-center text-sm font-semibold text-ink"
                 >
                   Candidate login
                 </Link>

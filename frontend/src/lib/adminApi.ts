@@ -206,7 +206,11 @@ export function updateSettings(
 
 /* ---------------------------------------------------------- support desk */
 
-/** GET /api/admin/support — every ticket, `userId` populated, newest first. */
+/**
+ * GET /api/admin/support — every ticket with its thread, `userId` populated,
+ * most recently active first. Reading one ticket and posting messages go
+ * through the shared `/api/support/tickets/:id` routes (see supportApi.ts).
+ */
 export function listSupportTickets(
   token: string | null,
   signal?: AbortSignal,
@@ -215,17 +219,28 @@ export function listSupportTickets(
 }
 
 /**
- * PATCH /api/admin/support/:ticketId/resolve — `adminReply` is required and
- * is pushed to the ticket author as a notification.
+ * PATCH /api/admin/support/:ticketId/resolve — `adminReply` is optional; when
+ * given it is appended to the chat as an admin message. The author is notified.
  */
 export function resolveSupportTicket(
   ticketId: ObjectId,
-  adminReply: string,
+  adminReply: string | undefined,
   token: string | null,
 ): Promise<SupportTicket> {
   return apiRequest<SupportTicket>(`/api/admin/support/${ticketId}/resolve`, {
     method: "PATCH",
-    body: { adminReply },
+    body: adminReply ? { adminReply } : {},
+    token,
+  });
+}
+
+/** PATCH /api/admin/support/:ticketId/reopen — the author is notified. */
+export function reopenSupportTicket(
+  ticketId: ObjectId,
+  token: string | null,
+): Promise<SupportTicket> {
+  return apiRequest<SupportTicket>(`/api/admin/support/${ticketId}/reopen`, {
+    method: "PATCH",
     token,
   });
 }

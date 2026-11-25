@@ -22,18 +22,18 @@ export default function RouteError({
   }, [error]);
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#f8f8fb] px-4">
-      <div className="w-full max-w-md rounded border border-[#f1f1f5] bg-white p-8 text-center ">
+    <main className="flex min-h-screen items-center justify-center bg-surface-2 px-4">
+      <div className="w-full max-w-md rounded border border-line-soft bg-white p-8 text-center ">
         <div className="mb-6 flex justify-center">
           <BrandWordmark className="text-[1.5rem]" />
         </div>
-        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 text-xl">
+        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-brand-100 text-xl">
           !
         </div>
-        <h1 className="text-xl font-bold text-[#292b35]">
+        <h1 className="text-xl font-bold text-ink">
           Something went wrong on this page
         </h1>
-        <p className="mt-2 text-sm text-[#898b96]">
+        <p className="mt-2 text-sm text-muted">
           This is usually temporary. Try again, and if it keeps happening go
           back to your dashboard.
         </p>
@@ -47,7 +47,7 @@ export default function RouteError({
           </button>
           <Link
             href="/"
-            className="rounded border border-[#e9eaf0] bg-white px-6 py-3 text-sm font-semibold text-[#44464f] transition-colors hover:bg-[#f8f8fb]"
+            className="rounded border border-line bg-white px-6 py-3 text-sm font-semibold text-body transition-colors hover:bg-surface-2"
           >
             Go to homepage
           </Link>

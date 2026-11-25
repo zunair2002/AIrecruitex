@@ -13,8 +13,8 @@ export const BrandedPhoneMockup = ({ id }: { id: number }) => {
         {id === 1 && (
           <>
             {/* FastTrack Deliveries (Mustard/Amber branding) */}
-            <div className="bg-amber-500 h-8 flex items-center justify-center px-2 relative text-white border-b border-amber-600">
-              <span className="text-[8px] font-extrabold tracking-wider font-mono">
+            <div className="bg-brand-300 h-8 flex items-center justify-center px-2 relative text-white border-b border-brand-500">
+              <span className="text-xs font-extrabold tracking-wider font-mono">
                 FastTrack
               </span>
             </div>
@@ -31,10 +31,10 @@ export const BrandedPhoneMockup = ({ id }: { id: number }) => {
                 </p>
               </div>
               <div className="flex flex-col gap-1 mb-2">
-                <div className="h-4.5 bg-amber-500 rounded flex items-center justify-center font-bold text-[6.5px] text-white cursor-pointer hover:bg-amber-600">
+                <div className="h-4.5 bg-brand-300 rounded flex items-center justify-center font-bold text-[6.5px] text-white cursor-pointer hover:bg-brand-500">
                   Yes, Clean Record
                 </div>
-                <div className="h-4.5 bg-white border border-amber-500 rounded flex items-center justify-center font-bold text-[6.5px] text-amber-600 cursor-pointer hover:bg-amber-50">
+                <div className="h-4.5 bg-white border border-brand-300 rounded flex items-center justify-center font-bold text-[6.5px] text-brand-500 cursor-pointer hover:bg-brand-50">
                   No, Minor Violations
                 </div>
               </div>
@@ -46,7 +46,7 @@ export const BrandedPhoneMockup = ({ id }: { id: number }) => {
           <>
             {/* Swift Recruitment (Teal branding) */}
             <div className="bg-brand-dark h-8 flex items-center justify-center px-2 relative text-white border-b border-brand-dark">
-              <span className="text-[8px] font-extrabold tracking-wider font-mono">
+              <span className="text-xs font-extrabold tracking-wider font-mono">
                 SWIFT RECRUIT
               </span>
             </div>
@@ -91,7 +91,7 @@ export const BrandedPhoneMockup = ({ id }: { id: number }) => {
           <>
             {/* The Local Kitchen (Coral Orange branding) */}
             <div className="bg-brand h-8 flex items-center justify-center px-2 relative text-white border-b border-brand-dark">
-              <span className="text-[8px] font-extrabold tracking-wider font-mono">
+              <span className="text-xs font-extrabold tracking-wider font-mono">
                 LOCAL KITCHEN
               </span>
             </div>
@@ -123,7 +123,7 @@ export const BrandedPhoneMockup = ({ id }: { id: number }) => {
           <>
             {/* TechStart Solutions (Indigo branding) */}
             <div className="bg-brand h-8 flex items-center justify-center px-2 relative text-white border-b border-brand-dark">
-              <span className="text-[8px] font-extrabold tracking-wider font-mono">
+              <span className="text-xs font-extrabold tracking-wider font-mono">
                 TECHSTART
               </span>
             </div>

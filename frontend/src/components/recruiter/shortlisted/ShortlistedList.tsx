@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
+import { CalendarDays, Search, Send, Star, Undo2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { toErrorMessage } from "@/lib/api";
 import {
@@ -12,10 +12,12 @@ import {
 } from "@/lib/applicationsApi";
 import { useApiResource } from "@/lib/useApiResource";
 import { populated, type Application } from "@/lib/types";
-import { formatDate, initials, scoreColor } from "@/lib/format";
+import { formatDate, scoreColor } from "@/lib/format";
 import { OrgInterviewPanel } from "@/components/shared/OrgInterviewPanel";
+import { PortalPage } from "@/components/dashboard/primitives";
+import { Avatar } from "@/components/ui/Avatar";
+import { Button } from "@/components/ui/Button";
 import {
-  Card,
   EmptyState,
   ErrorBlock,
   InlineError,
@@ -23,12 +25,7 @@ import {
   PageHeader,
   SkillChips,
 } from "@/components/ui/Feedback";
-import {
-  compactInputClass,
-  dangerButtonClass,
-  primaryButtonClass,
-  smallButtonClass,
-} from "@/components/ui/controls";
+import { inputClass } from "@/components/ui/controls";
 import { JobPicker } from "../JobPicker";
 import { useMyJobs } from "../useMyJobs";
 import {
@@ -128,59 +125,67 @@ export function ShortlistedList() {
   if (jobs.isLoading) return <LoadingBlock label="Loading your jobs…" />;
   if (jobs.error) {
     return (
-      <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
+      <PortalPage>
         <ErrorBlock message={jobs.error} onRetry={jobs.reload} />
-      </div>
+      </PortalPage>
     );
   }
 
   if ((jobs.data ?? []).length === 0) {
     return (
-      <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
-        <PageHeader title="Selected Candidates" />
+      <PortalPage>
+        <PageHeader title="Selected candidates" icon={<Star />} />
         <EmptyState
+          icon={<Star />}
           title="No jobs posted yet."
           description="Post a job, then mark strong applicants as Selected to see them here."
-          action={
-            <Link
-              href="/recruiter/jobs/create"
-              className={`${primaryButtonClass} text-sm`}
-            >
-              Create job
-            </Link>
-          }
+          action={<Button href="/recruiter/jobs/create">Create job</Button>}
         />
-      </div>
+      </PortalPage>
     );
   }
 
   return (
-    <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
+    <PortalPage>
       <PageHeader
-        title="Selected Candidates"
+        title="Selected candidates"
+        icon={<Star />}
         description="Applicants whose status is Selected — ready for an organisation interview."
       />
 
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center">
-        <JobPicker
-          jobs={jobs.data ?? []}
-          selectedJobId={selectedJobId}
-          onSelect={setSelectedJobId}
-        />
-        <input
-          type="text"
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          placeholder="Search by name or email…"
-          className={`${compactInputClass} flex-1`}
-        />
+      <div className="flex flex-col gap-3 rounded-xl border border-line bg-surface p-4 shadow-xs sm:flex-row sm:flex-wrap sm:items-center">
+        <div className="min-w-0 [&_select]:w-full sm:[&_select]:w-auto">
+          <JobPicker
+            jobs={jobs.data ?? []}
+            selectedJobId={selectedJobId}
+            onSelect={setSelectedJobId}
+          />
+        </div>
+        <div className="relative w-full sm:min-w-56 sm:flex-1">
+          <Search
+            aria-hidden="true"
+            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-subtle"
+          />
+          <input
+            type="search"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Search by name or email…"
+            aria-label="Search selected candidates by name or email"
+            className={`${inputClass} pl-9`}
+          />
+        </div>
+        {!applications.isLoading && !applications.error && (
+          <p className="text-sm text-muted sm:ml-auto">
+            <span className="font-semibold tabular-nums text-ink">
+              {selected.length}
+            </span>{" "}
+            selected
+          </p>
+        )}
       </div>
 
-      {error && (
-        <div className="mb-6">
-          <InlineError message={error} />
-        </div>
-      )}
+      {error && <InlineError message={error} />}
 
       {applications.isLoading ? (
         <LoadingBlock label="Loading candidates…" />
@@ -191,92 +196,109 @@ export function ShortlistedList() {
         />
       ) : selected.length === 0 ? (
         <EmptyState
+          icon={<Star />}
           title="No selected candidates for this job yet."
           description="Review applicants and their interview reports, then set an applicant's status to Selected."
           action={
-            <Link
-              href={`/recruiter/applicants?jobId=${selectedJobId ?? ""}`}
-              className={`${primaryButtonClass} text-sm`}
-            >
+            <Button href={`/recruiter/applicants?jobId=${selectedJobId ?? ""}`}>
               Review applicants
-            </Link>
+            </Button>
           }
         />
       ) : (
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 lg:gap-6 xl:grid-cols-2">
           {selected.map((application) => {
             const candidate = populated(application.candidateId);
+            const isBusy = busyId === application._id;
             return (
-              <Card key={application._id}>
-                <div className="flex items-start gap-4">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-light text-sm font-bold text-brand-dark">
-                    {initials(candidate?.name ?? "?")}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0">
-                        <h2 className="truncate font-bold text-[#292b35]">
-                          {candidate?.name ?? "Unknown candidate"}
-                        </h2>
-                        <p className="mt-0.5 truncate text-xs text-[#898b96]">
-                          {candidate?.email ?? "—"}
-                        </p>
+              <article
+                key={application._id}
+                className="flex min-w-0 flex-col rounded-xl border border-line bg-surface shadow-xs transition-colors hover:border-brand-200"
+              >
+                <div className="flex-1 p-5 sm:p-6">
+                  <div className="flex items-start gap-4">
+                    <Avatar name={candidate?.name ?? "?"} size="lg" />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <h2 className="truncate text-base font-semibold text-ink">
+                            {candidate?.name ?? "Unknown candidate"}
+                          </h2>
+                          <p className="mt-0.5 truncate text-sm text-muted">
+                            {candidate?.email ?? "—"}
+                          </p>
+                        </div>
+                        <div className="shrink-0 text-right">
+                          <p
+                            className={`font-display text-2xl font-semibold tabular-nums leading-none ${scoreColor(application.matchScore)}`}
+                          >
+                            {application.matchScore}%
+                          </p>
+                          <p className="mt-1 text-xs text-muted">Match</p>
+                        </div>
                       </div>
-                      <span
-                        className={`shrink-0 text-lg font-bold ${scoreColor(application.matchScore)}`}
-                      >
-                        {application.matchScore}%
-                      </span>
+                      <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
+                        <span className="font-medium text-body">
+                          {selectedJob?.title}
+                        </span>
+                        <span aria-hidden="true" className="text-subtle">
+                          ·
+                        </span>
+                        <span className="inline-flex items-center gap-1.5 text-xs text-muted">
+                          <CalendarDays aria-hidden="true" className="h-3.5 w-3.5" />
+                          Applied {formatDate(application.createdAt)}
+                        </span>
+                      </p>
                     </div>
+                  </div>
 
-                    <p className="mt-3 text-sm font-medium text-[#44464f]">
-                      {selectedJob?.title}
+                  <div className="mt-4">
+                    <p className="mb-2 text-xs font-medium text-muted">
+                      Matched skills
                     </p>
-                    <p className="mt-1 text-xs text-[#9698a2]">
-                      Applied {formatDate(application.createdAt)}
-                    </p>
+                    <SkillChips
+                      skills={application.resumeSnapshotSkills}
+                      emptyLabel="No matched skills recorded."
+                      limit={6}
+                    />
+                  </div>
 
-                    <div className="mt-3">
-                      <SkillChips
-                        skills={application.resumeSnapshotSkills}
-                        emptyLabel="No matched skills recorded."
+                  {application.orgInterview?.status && (
+                    <div className="mt-4">
+                      <OrgInterviewPanel
+                        orgInterview={application.orgInterview}
+                        audience="hr"
+                        applicationId={application._id}
+                        onCancelled={applyLocalUpdate}
                       />
                     </div>
-
-                    {application.orgInterview?.status && (
-                      <div className="mt-3">
-                        <OrgInterviewPanel
-                          orgInterview={application.orgInterview}
-                          audience="hr"
-                        />
-                      </div>
-                    )}
-
-                    <div className="mt-4 flex flex-wrap items-center gap-3">
-                      <button
-                        type="button"
-                        onClick={() => setDialogFor(application)}
-                        disabled={busyId === application._id}
-                        className={smallButtonClass}
-                      >
-                        {application.orgInterview?.status === "invited"
-                          ? "Re-send invite"
-                          : "Invite to org interview"}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleUnselect(application)}
-                        disabled={busyId === application._id}
-                        className={dangerButtonClass}
-                      >
-                        {busyId === application._id
-                          ? "Saving…"
-                          : "Move back to pending"}
-                      </button>
-                    </div>
-                  </div>
+                  )}
                 </div>
-              </Card>
+
+                <div className="flex flex-col-reverse gap-2 border-t border-line-soft bg-surface-2/60 px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                  <Button
+                    variant="danger-soft"
+                    size="sm"
+                    onClick={() => handleUnselect(application)}
+                    disabled={isBusy}
+                    leadingIcon={<Undo2 aria-hidden="true" />}
+                    className="max-sm:h-10"
+                  >
+                    {isBusy ? "Saving…" : "Move back to pending"}
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => setDialogFor(application)}
+                    disabled={isBusy}
+                    leadingIcon={<Send aria-hidden="true" />}
+                    className="max-sm:h-10"
+                  >
+                    {application.orgInterview?.status === "invited"
+                      ? "Re-send invite"
+                      : "Invite to org interview"}
+                  </Button>
+                </div>
+              </article>
             );
           })}
         </div>
@@ -287,10 +309,11 @@ export function ShortlistedList() {
           kind="org"
           candidateName={populated(dialogFor.candidateId)?.name ?? "Candidate"}
           jobTitle={selectedJob?.title ?? "This job"}
+          jobId={selectedJob?._id}
           onCancel={() => setDialogFor(null)}
           onSubmit={handleSchedule}
         />
       )}
-    </div>
+    </PortalPage>
   );
 }

@@ -1,6 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { BrandWordmark } from "@/components/layout/Logo";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 
 /**
  * Full-page takeover shown when the signed-in account has been deactivated by
@@ -19,52 +22,50 @@ export function AccountDeactivated({
   onSignOut?: () => void;
 }) {
   return (
-    <div className="flex min-h-dvh w-full items-center justify-center bg-[#f7f8fa] px-5 py-10">
-      <div className="w-full max-w-md text-center">
+    <main className="flex min-h-dvh w-full flex-col items-center justify-center bg-canvas px-4 py-10 sm:px-6">
+      <Link
+        href="/"
+        onClick={onSignOut}
+        className="mb-6 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+      >
+        <BrandWordmark className="text-2xl" />
+      </Link>
+
+      <div className="w-full max-w-md rounded-2xl border border-line bg-surface p-6 text-center shadow-xs sm:p-8">
         <DeactivatedIllustration />
 
-        <p className="mt-8 inline-flex items-center gap-1.5 rounded-full bg-[#f3e8ff] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#4a148c]">
-          <span
-            aria-hidden="true"
-            className="h-1.5 w-1.5 rounded-full bg-[#9b6fd4]"
-          />
-          Account deactivated
-        </p>
+        <div className="mt-6">
+          <Badge tone="danger" dot>
+            Account deactivated
+          </Badge>
+        </div>
 
-        <h1 className="mt-4 font-display text-2xl font-bold tracking-tight text-[#292b35] sm:text-[28px]">
+        <h1 className="mt-4 font-display text-xl font-semibold tracking-tight text-ink sm:text-2xl">
           Your account has been switched off
         </h1>
 
-        <p className="mx-auto mt-3 max-w-sm text-[13px] leading-relaxed text-[#686b77]">
+        <p className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-muted">
           An administrator deactivated this account, so it can&apos;t be used to
           sign in or load your data right now. Nothing has been deleted — your
           applications, resume and interview history are all still there, and
           they come back the moment the account is reactivated.
         </p>
 
-        <div className="mt-7 flex flex-col items-center justify-center gap-2.5 sm:flex-row">
-          <Link
-            href="/"
-            onClick={onSignOut}
-            className="inline-flex h-10 w-full items-center justify-center rounded bg-[#4a148c] px-5 text-[12px] font-semibold text-white transition-colors hover:bg-[#2e0a5c] sm:w-auto"
-          >
-            Back to homepage
-          </Link>
-          <Link
-            href="/contact"
-            onClick={onSignOut}
-            className="inline-flex h-10 w-full items-center justify-center rounded border border-[#e3e4ec] bg-white px-5 text-[12px] font-semibold text-[#44464f] transition-colors hover:bg-[#f3f3f6] sm:w-auto"
-          >
+        <div className="mt-7 flex flex-col-reverse justify-center gap-3 sm:flex-row">
+          <Button href="/contact" onClick={onSignOut} variant="secondary">
             Contact support
-          </Link>
+          </Button>
+          <Button href="/" onClick={onSignOut}>
+            Back to homepage
+          </Button>
         </div>
-
-        <p className="mt-6 text-[11px] text-[#9698a2]">
-          Think this is a mistake? Reach out and an administrator can turn it
-          back on.
-        </p>
       </div>
-    </div>
+
+      <p className="mt-6 max-w-sm text-center text-xs text-muted">
+        Think this is a mistake? Reach out and an administrator can turn it back
+        on.
+      </p>
+    </main>
   );
 }
 
@@ -83,21 +84,21 @@ function DeactivatedIllustration() {
       className="mx-auto h-auto w-56"
     >
       {/* soft halo */}
-      <ellipse cx="120" cy="150" rx="74" ry="11" fill="#ece3f7" />
-      <circle cx="120" cy="84" r="62" fill="#f6f1fc" />
+      <ellipse cx="120" cy="150" rx="74" ry="11" fill="var(--color-brand-100)" />
+      <circle cx="120" cy="84" r="62" fill="var(--color-brand-50)" />
 
       {/* lanyard */}
       <path
         d="M92 16 L112 44 M148 16 L128 44"
-        stroke="#c9b3e4"
+        stroke="var(--color-brand-300)"
         strokeWidth="5"
         strokeLinecap="round"
         fill="none"
       />
-      <rect x="110" y="40" width="20" height="9" rx="3" fill="#9b6fd4" />
+      <rect x="110" y="40" width="20" height="9" rx="3" fill="var(--color-brand-500)" />
 
       {/* badge body */}
-      <rect x="66" y="50" width="108" height="78" rx="12" fill="#ffffff" />
+      <rect x="66" y="50" width="108" height="78" rx="12" fill="var(--color-surface)" />
       <rect
         x="66"
         y="50"
@@ -105,52 +106,52 @@ function DeactivatedIllustration() {
         height="78"
         rx="12"
         fill="none"
-        stroke="#e0d6ea"
+        stroke="var(--color-brand-200)"
         strokeWidth="2.5"
       />
-      <rect x="66" y="50" width="108" height="16" rx="12" fill="#4a148c" />
-      <rect x="66" y="58" width="108" height="8" fill="#4a148c" />
+      <rect x="66" y="50" width="108" height="16" rx="12" fill="var(--color-brand-800)" />
+      <rect x="66" y="58" width="108" height="8" fill="var(--color-brand-800)" />
 
       {/* sleeping face */}
-      <circle cx="120" cy="88" r="21" fill="#f3e8ff" />
+      <circle cx="120" cy="88" r="21" fill="var(--color-brand-100)" />
       <path
         d="M110 85 q4.5 -4.5 9 0 M121 85 q4.5 -4.5 9 0"
-        stroke="#4a148c"
+        stroke="var(--color-brand-800)"
         strokeWidth="2.6"
         strokeLinecap="round"
         fill="none"
       />
       <path
         d="M114 98 q6 -4.5 12 0"
-        stroke="#9b6fd4"
+        stroke="var(--color-brand-500)"
         strokeWidth="2.6"
         strokeLinecap="round"
         fill="none"
       />
 
       {/* greyed-out detail lines */}
-      <rect x="92" y="114" width="56" height="5" rx="2.5" fill="#e6e7ee" />
+      <rect x="92" y="114" width="56" height="5" rx="2.5" fill="var(--color-line)" />
 
       {/* power symbol, unlit */}
-      <circle cx="170" cy="118" r="17" fill="#ffffff" stroke="#e0d6ea" strokeWidth="2.5" />
+      <circle cx="170" cy="118" r="17" fill="var(--color-surface)" stroke="var(--color-brand-200)" strokeWidth="2.5" />
       <path
         d="M170 110 v9"
-        stroke="#9698a2"
+        stroke="var(--color-subtle)"
         strokeWidth="3"
         strokeLinecap="round"
       />
       <path
         d="M163.5 112.5 a9 9 0 1 0 13 0"
-        stroke="#9698a2"
+        stroke="var(--color-subtle)"
         strokeWidth="3"
         strokeLinecap="round"
         fill="none"
       />
 
       {/* drifting z's */}
-      <text x="186" y="52" fill="#c9b3e4" fontSize="17" fontWeight="700">z</text>
-      <text x="198" y="36" fill="#dccdee" fontSize="13" fontWeight="700">z</text>
-      <text x="207" y="24" fill="#e8dff4" fontSize="10" fontWeight="700">z</text>
+      <text x="186" y="52" fill="var(--color-brand-300)" fontSize="17" fontWeight="700">z</text>
+      <text x="198" y="36" fill="var(--color-brand-200)" fontSize="13" fontWeight="700">z</text>
+      <text x="207" y="24" fill="var(--color-brand-100)" fontSize="10" fontWeight="700">z</text>
     </svg>
   );
 }

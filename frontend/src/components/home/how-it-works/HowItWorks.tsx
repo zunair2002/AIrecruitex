@@ -6,7 +6,7 @@ import { HowItWorksHeader, StepCard } from "./HowItWorksParts";
 import { fadeUp, stagger } from "@/lib/motion";
 
 export const HowItWorks = () => (
-  <section className="bg-[#f6f3f9] py-24" id="how-it-works">
+  <section className="bg-canvas py-24" id="how-it-works">
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <motion.div
         initial="hidden"

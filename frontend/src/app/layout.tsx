@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Raleway } from "next/font/google";
+import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { NavbarWrapper } from "@/components/layout/NavbarWrapper";
 import { AuthProvider } from "@/context/AuthContext";
@@ -7,10 +7,20 @@ import { RealtimeProvider } from "@/context/RealtimeContext";
 import { ToastProvider } from "@/context/ToastContext";
 import { RealtimeToasts } from "@/components/shared/RealtimeToasts";
 
-const raleway = Raleway({
+/** UI and body copy. Variable font, so every weight is available. */
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-  variable: "--font-raleway",
+  variable: "--font-inter",
+  display: "swap",
+});
+
+/**
+ * Display face: page titles, headings, KPI numbers and the wordmark
+ * (`font-display`). Variable font covering 500–800.
+ */
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-jakarta",
   display: "swap",
 });
 
@@ -25,8 +35,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={raleway.variable}>
-      <body className={`${raleway.className} antialiased`}>
+    // data-scroll-behavior lets Next turn smooth scrolling off during route
+    // changes, so a new page starts at the top instead of animating there.
+    <html
+      lang="en"
+      data-scroll-behavior="smooth"
+      className={`${inter.variable} ${jakarta.variable}`}
+    >
+      <body className="bg-canvas font-sans text-body antialiased">
         <AuthProvider>
           <RealtimeProvider>
             <ToastProvider>

@@ -16,6 +16,7 @@ import type {
   ApplicationStatus,
   ObjectId,
   OrgInterview,
+  SupportTicketStatus,
 } from "./types";
 
 /** admin/notification-broadcast + admin/support-desk */
@@ -46,12 +47,26 @@ export type OrgInterviewEvent = {
   orgInterview: OrgInterview;
 };
 
+/**
+ * shared/support — sent to the ticket author and every admin when a ticket is
+ * created, gets a message, or changes status. Ids only: refetch the ticket
+ * over REST (author-or-admin RBAC) for its content.
+ */
+export type SupportTicketEvent = {
+  ticketId: ObjectId;
+  kind: "created" | "message" | "status";
+  status: SupportTicketStatus;
+  actorId: ObjectId;
+  messageId?: string;
+};
+
 /** Every server->client event, keyed by the exact string the backend emits. */
 export type ServerEvents = {
   "admin:notification": AdminNotificationEvent;
   "application:status": ApplicationStatusEvent;
   "application:ai-interview-scheduled": AiInterviewScheduledEvent;
   "application:org-interview": OrgInterviewEvent;
+  "support:ticket": SupportTicketEvent;
 };
 
 export type ServerEventName = keyof ServerEvents;
@@ -61,6 +76,7 @@ export const SERVER_EVENTS: ServerEventName[] = [
   "application:status",
   "application:ai-interview-scheduled",
   "application:org-interview",
+  "support:ticket",
 ];
 
 /**

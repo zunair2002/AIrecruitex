@@ -6,9 +6,9 @@ export const AutopilotVisual = () => (
         <span className="text-[9px] font-bold text-slate-800">
           Interview Pipeline
         </span>
-        <div className="flex items-center gap-1 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded-full">
-          <span className="w-1 h-1 rounded-full bg-emerald-500 animate-ping" />
-          <span className="text-[6px] text-emerald-700 font-bold uppercase tracking-wider">
+        <div className="flex items-center gap-1 bg-brand-50 border border-brand-100 px-1.5 py-0.5 rounded-full">
+          <span className="w-1 h-1 rounded-full bg-brand-500 animate-ping" />
+          <span className="text-[6px] text-brand-700 font-bold uppercase tracking-wider">
             Autopilot ON
           </span>
         </div>
@@ -28,7 +28,7 @@ export const AutopilotVisual = () => (
               </span>
             </div>
           </div>
-          <span className="text-[6.5px] text-emerald-700 bg-emerald-50 border border-emerald-100 px-1 rounded font-bold">
+          <span className="text-[6.5px] text-brand-700 bg-brand-50 border border-brand-100 px-1 rounded font-bold">
             Done 09:30
           </span>
         </div>
@@ -146,8 +146,8 @@ export const SmartScoringVisual = () => (
           </div>
         </div>
       </div>
-      <div className="bg-emerald-50 border border-emerald-100 rounded p-1 flex items-center justify-between">
-        <span className="text-[6.5px] text-emerald-700 font-bold uppercase tracking-wider">
+      <div className="bg-brand-50 border border-brand-100 rounded p-1 flex items-center justify-between">
+        <span className="text-[6.5px] text-brand-700 font-bold uppercase tracking-wider">
           Consensus Reached ✓
         </span>
         <span className="text-[6.5px] text-slate-500">Diff: &lt; 2%</span>

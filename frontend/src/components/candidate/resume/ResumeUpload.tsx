@@ -1,22 +1,20 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import {
   ArrowRight,
   Camera,
   Check,
+  CircleAlert,
   Clock3,
+  Download,
   ExternalLink,
   FileText,
   Pencil,
-  RefreshCw,
   Search,
-  Shield,
   ShieldCheck,
   Trash2,
   Upload,
-  UserRound,
   X,
 } from "lucide-react";
 import { ResumeDropzone } from "./ResumeDropzone";
@@ -31,23 +29,105 @@ import {
   uploadResume,
 } from "@/lib/resumeApi";
 import { useApiResource } from "@/lib/useApiResource";
+import type { MyResume } from "@/lib/types";
 import {
   RESUME_STATUS_LABELS,
+  badgeClass,
   formatDateTime,
   formatFileSize,
+  statusTone,
 } from "@/lib/format";
-import type { ResumeStatus } from "@/lib/types";
-import { ErrorBlock } from "@/components/ui/Feedback";
+import {
+  Card,
+  EmptyState,
+  ErrorBlock,
+  InlineError,
+  InlineSuccess,
+  PageHeader,
+} from "@/components/ui/Feedback";
+import { Avatar } from "@/components/ui/Avatar";
+import { Badge } from "@/components/ui/Badge";
+import { Button, buttonClass } from "@/components/ui/Button";
+import { ConfirmDialog } from "@/components/ui/Dialog";
+import { Skeleton, SkeletonCard } from "@/components/ui/Skeleton";
+import {
+  compactInputClass,
+  inputClass,
+  textareaClass,
+} from "@/components/ui/controls";
+import {
+  tableClass,
+  tableWrapClass,
+  tdClass,
+  thClass,
+  trClass,
+} from "@/components/ui/table";
+import { PortalPage } from "@/components/dashboard/primitives";
 import { useToast } from "@/context/ToastContext";
 
 const MAX_SIZE_MB = RESUME_MAX_BYTES / (1024 * 1024);
 const MAX_AVATAR_BYTES = 5 * 1024 * 1024;
 const AVATAR_MIME_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
-const parseStatusStyle: Record<ResumeStatus, string> = {
-  parsed: "bg-emerald-50 text-emerald-700",
-  failed: "bg-rose-50 text-rose-700",
+function FieldLabel({
+  htmlFor,
+  children,
+  hint,
+}: {
+  htmlFor: string;
+  children: string;
+  hint: string;
+}) {
+  return (
+    <div className="mb-1.5 flex items-center justify-between gap-3">
+      <label htmlFor={htmlFor} className="text-sm font-medium text-body">
+        {children}
+      </label>
+      <span className="text-xs tabular-nums text-muted">{hint}</span>
+    </div>
+  );
+}
+
+const RESUME_EXTENSIONS: Record<string, string> = {
+  "application/pdf": ".pdf",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+    ".docx",
 };
+
+/** The original filename, guaranteed to end in the right extension. */
+function resumeDownloadName(resume: NonNullable<MyResume>): string {
+  const fromUrl = /\.(pdf|docx)(?:$|\?)/i.exec(resume.fileUrl)?.[0];
+  const extension =
+    RESUME_EXTENSIONS[resume.mimeType ?? ""] ??
+    (fromUrl ? fromUrl.replace("?", "").toLowerCase() : ".pdf");
+  const base = (resume.originalName || "resume").trim();
+  return /\.(pdf|docx)$/i.test(base) ? base : `${base}${extension}`;
+}
+
+/**
+ * Saves the resume under its original name. The `download` attribute is ignored
+ * for cross-origin (Cloudinary) links, so fetch the bytes and save a blob; if
+ * that fails (CORS/network) fall back to opening the file in a new tab.
+ */
+async function downloadResume(resume: NonNullable<MyResume>) {
+  try {
+    const response = await fetch(resume.fileUrl);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const blob = await response.blob();
+    const url = URL.createObjectURL(
+      resume.mimeType ? new Blob([blob], { type: resume.mimeType }) : blob,
+    );
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = resumeDownloadName(resume);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch {
+    window.open(resume.fileUrl, "_blank", "noopener,noreferrer");
+  }
+}
 
 export function ResumeUpload() {
   const { token, user, refresh } = useAuth();
@@ -92,10 +172,6 @@ export function ResumeUpload() {
     if (!RESUME_ACCEPTED_MIME_TYPES.includes(file.type)) {
       setError("Only PDF or DOCX files are allowed.");
       setSelectedFile(null);
-      toast({
-        title: "Resume uploaded",
-        detail: "It will be matched against jobs you apply to.",
-      });
       return;
     }
     if (file.size > RESUME_MAX_BYTES) {
@@ -115,6 +191,10 @@ export function ResumeUpload() {
       await uploadResume(selectedFile, token);
       setSelectedFile(null);
       existing.reload();
+      toast({
+        title: "Resume uploaded",
+        detail: "It will be matched against jobs you apply to.",
+      });
     } catch (uploadError) {
       setError(toErrorMessage(uploadError));
     } finally {
@@ -220,13 +300,18 @@ export function ResumeUpload() {
 
   if (existing.isLoading) {
     return (
-      <div className="min-h-full animate-pulse bg-[#f7f8fa] p-5">
-        <div className="mx-auto max-w-[1500px] space-y-4">
-          <div className="h-8 bg-white" />
-          <div className="h-36 border border-[#e9eaf0] bg-white" />
-          <div className="h-56 border border-[#e9eaf0] bg-white" />
+      <PortalPage>
+        <div role="status" aria-label="Loading resume" className="space-y-6">
+          <div className="space-y-2">
+            <Skeleton className="h-7 w-48" />
+            <Skeleton className="h-4 w-72 max-w-full" />
+          </div>
+          <div className="grid grid-cols-1 gap-4 lg:gap-6 xl:grid-cols-3">
+            <SkeletonCard lines={5} className="xl:col-span-2" />
+            <SkeletonCard lines={4} />
+          </div>
         </div>
-      </div>
+      </PortalPage>
     );
   }
 
@@ -245,115 +330,354 @@ export function ResumeUpload() {
     ? null
     : avatarPreview ?? user?.avatarUrl ?? null;
 
+  const openDeleteConfirmation = () => {
+    setDeleteError(null);
+    setShowDeleteConfirmation(true);
+  };
+
+  const parseBadge = resume ? (
+    <Badge
+      tone={statusTone(resume.status)}
+      icon={resume.status === "parsed" ? <Check /> : <CircleAlert />}
+    >
+      {RESUME_STATUS_LABELS[resume.status]}
+    </Badge>
+  ) : null;
+
+  const fileSubtitle = resume?.fileSize
+    ? formatFileSize(resume.fileSize)
+    : "PDF or DOCX document";
+
   return (
-    <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
-      <div className="mx-auto max-w-[1500px] space-y-3">
-        <header className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
-          <div className="flex min-w-0 items-center gap-2.5">
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#e9eaf0] bg-white text-[#767985]">
-              <FileText aria-hidden="true" className="h-3 w-3" />
-            </span>
-            <div className="min-w-0">
-              <h1 className="truncate text-[13px] font-semibold text-[#30323b]">
-                Resume Upload
-              </h1>
-              <p className="hidden text-[10px] text-[#999ba4] sm:block">
-                Keep your resume up to date for more relevant job matches.
-              </p>
-            </div>
-          </div>
-          <Link
-            href="/candidate/jobs"
-            className="inline-flex h-7 shrink-0 items-center gap-1.5 self-start rounded bg-[#6b5ce7] px-2.5 text-[9px] font-semibold text-white transition-colors hover:bg-[#5849d1] sm:self-auto"
+    <PortalPage>
+      <PageHeader
+        title="Resume"
+        description="Keep your resume up to date for more relevant job matches."
+        icon={<FileText />}
+        action={
+          <>
+            {resume && (
+              <Button variant="secondary" href="/candidate/applications">
+                My applications
+              </Button>
+            )}
+            <Button
+              href="/candidate/jobs"
+              trailingIcon={<ArrowRight aria-hidden="true" />}
+            >
+              Browse jobs
+            </Button>
+          </>
+        }
+      />
+
+      {existing.error && (
+        <ErrorBlock message={existing.error} onRetry={existing.reload} />
+      )}
+
+      <div className="grid grid-cols-1 gap-4 lg:gap-6 xl:grid-cols-3">
+        <div className="min-w-0 space-y-4 lg:space-y-6 xl:col-span-2">
+          <Card
+            title={resume ? "Replace your resume" : "Upload your resume"}
+            description="We read your skills and experience to match you with the right jobs."
           >
-            Browse jobs <ArrowRight aria-hidden="true" className="h-3 w-3" />
-          </Link>
-        </header>
+            <ResumeDropzone
+              onFileSelect={handleFileSelect}
+              error={error}
+              maxSizeMB={MAX_SIZE_MB}
+            />
+            {resume && (
+              <p className="mt-3 flex items-start gap-2 text-sm text-muted">
+                <ShieldCheck
+                  aria-hidden="true"
+                  className="mt-0.5 h-4 w-4 shrink-0 text-brand-700"
+                />
+                Uploading a new file replaces your current resume. Only the
+                latest version is stored.
+              </p>
+            )}
 
-        {existing.error && (
-          <ErrorBlock message={existing.error} onRetry={existing.reload} />
-        )}
+            {selectedFile && (
+              <div className="mt-4 flex flex-col gap-4 rounded-xl border border-brand-200 bg-brand-50/50 p-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex min-w-0 items-center gap-3">
+                  <span
+                    aria-hidden="true"
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white text-brand-700 ring-1 ring-inset ring-brand-200"
+                  >
+                    <FileText className="h-5 w-5" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-ink">
+                      {selectedFile.name}
+                    </p>
+                    <p className="mt-0.5 text-xs text-muted">
+                      {formatFileSize(selectedFile.size)} · Ready to upload
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-col-reverse gap-2 sm:shrink-0 sm:flex-row">
+                  <Button
+                    variant="secondary"
+                    onClick={() => {
+                      setSelectedFile(null);
+                      setError(null);
+                    }}
+                    disabled={isUploading}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleUpload}
+                    loading={isUploading}
+                    leadingIcon={<Upload aria-hidden="true" />}
+                  >
+                    {isUploading
+                      ? "Uploading…"
+                      : resume
+                        ? "Replace resume"
+                        : "Upload resume"}
+                  </Button>
+                </div>
+              </div>
+            )}
+          </Card>
 
-        <section className="border border-[#e9eaf0] bg-white">
-          <div className="flex items-center justify-between gap-3 border-b border-[#eeeeF2] px-3 py-2.5 sm:px-4">
-            <div className="flex items-center gap-2">
-              <UserRound
-                aria-hidden="true"
-                className="h-3.5 w-3.5 text-[#6b5ce7]"
+          <Card
+            title={
+              <span className="flex items-center gap-2">
+                Resume file
+                <Badge tone="brand">{resume ? "1 file" : "0 files"}</Badge>
+              </span>
+            }
+            description="Your current resume and its last updated time."
+            action={
+              <div className="relative w-56 max-w-full">
+                <Search
+                  aria-hidden="true"
+                  className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-subtle"
+                />
+                <input
+                  type="search"
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                  placeholder="Search resume…"
+                  aria-label="Search resume history"
+                  className={`${compactInputClass} w-full pl-9`}
+                />
+              </div>
+            }
+          >
+            {resume && matchesSearch ? (
+              <>
+                <div className={`hidden md:block ${tableWrapClass}`}>
+                  <table className={tableClass}>
+                    <thead>
+                      <tr>
+                        <th className={thClass}>File</th>
+                        <th className={thClass}>Parse status</th>
+                        <th className={thClass}>Last modified</th>
+                        <th className={`${thClass} text-right`}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className={trClass}>
+                        <td className={tdClass}>
+                          <div className="flex min-w-0 items-center gap-3">
+                            <span
+                              aria-hidden="true"
+                              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-700"
+                            >
+                              <FileText className="h-5 w-5" />
+                            </span>
+                            <div className="min-w-0">
+                              <p className="max-w-xs truncate font-medium text-ink">
+                                {resume.originalName || "Current resume"}
+                              </p>
+                              <p className="mt-0.5 text-xs text-muted">
+                                {fileSubtitle}
+                              </p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className={tdClass}>{parseBadge}</td>
+                        <td className={`${tdClass} whitespace-nowrap text-muted`}>
+                          <span className="inline-flex items-center gap-1.5">
+                            <Clock3
+                              aria-hidden="true"
+                              className="h-4 w-4 text-subtle"
+                            />
+                            {formatDateTime(resume.updatedAt)}
+                          </span>
+                        </td>
+                        <td className={tdClass}>
+                          <div className="flex items-center justify-end gap-2">
+                            <a
+                              href={resume.fileUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className={buttonClass({
+                                variant: "secondary",
+                                size: "sm",
+                              })}
+                            >
+                              View
+                              <ExternalLink aria-hidden="true" />
+                            </a>
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              leadingIcon={<Download aria-hidden="true" />}
+                              onClick={() => void downloadResume(resume)}
+                            >
+                              Download
+                            </Button>
+                            <Button
+                              variant="danger-soft"
+                              size="sm"
+                              leadingIcon={<Trash2 aria-hidden="true" />}
+                              onClick={openDeleteConfirmation}
+                            >
+                              Delete
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="md:hidden">
+                  <div className="flex items-start gap-3">
+                    <span
+                      aria-hidden="true"
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-700"
+                    >
+                      <FileText className="h-5 w-5" />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="break-words text-sm font-medium text-ink">
+                        {resume.originalName || "Current resume"}
+                      </p>
+                      <p className="mt-0.5 text-xs text-muted">{fileSubtitle}</p>
+                    </div>
+                    {parseBadge}
+                  </div>
+                  <p className="mt-3 flex items-center gap-1.5 text-sm text-muted">
+                    <Clock3 aria-hidden="true" className="h-4 w-4 text-subtle" />
+                    Updated {formatDateTime(resume.updatedAt)}
+                  </p>
+                  <div className="mt-4 grid grid-cols-3 gap-3">
+                    <a
+                      href={resume.fileUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={buttonClass({ variant: "secondary" })}
+                    >
+                      View
+                      <ExternalLink aria-hidden="true" />
+                    </a>
+                    <Button
+                      variant="secondary"
+                      leadingIcon={<Download aria-hidden="true" />}
+                      onClick={() => void downloadResume(resume)}
+                    >
+                      Download
+                    </Button>
+                    <Button
+                      variant="danger-soft"
+                      leadingIcon={<Trash2 aria-hidden="true" />}
+                      onClick={openDeleteConfirmation}
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <EmptyState
+                bare
+                icon={resume ? <Search /> : <FileText />}
+                title={
+                  resume
+                    ? "No resume matches your search."
+                    : "No resume uploaded yet."
+                }
+                description={
+                  resume
+                    ? undefined
+                    : "Upload a PDF or DOCX file to see it listed here."
+                }
               />
-              <h2 className="text-[11px] font-semibold text-[#454752]">
-                Candidate profile
-              </h2>
-            </div>
-            {!isEditingProfile && (
-              <button
-                type="button"
+            )}
+            {resume && (
+              <p className="mt-5 border-t border-line-soft pt-4 text-xs text-muted">
+                Only the latest resume is retained. Uploading another file
+                replaces this one.
+              </p>
+            )}
+          </Card>
+
+          {deleteError && !showDeleteConfirmation && (
+            <InlineError message={deleteError} />
+          )}
+        </div>
+
+        <Card
+          title="Candidate profile"
+          className="xl:self-start"
+          action={
+            !isEditingProfile ? (
+              <Button
+                variant="secondary"
+                size="sm"
+                leadingIcon={<Pencil aria-hidden="true" />}
                 onClick={() => {
                   setProfileError(null);
                   setProfileSuccess(null);
                   setIsEditingProfile(true);
                 }}
-                className="inline-flex h-7 items-center gap-1 rounded border border-[#e9eaf0] px-2.5 text-[9px] font-medium text-[#666974] transition-colors hover:border-[#d8d5f7] hover:text-[#5f53ce]"
               >
-                <Pencil aria-hidden="true" className="h-3 w-3" />
                 Edit profile
-              </button>
-            )}
-          </div>
-
-          {profileError && (
-            <p
-              role="alert"
-              className="mx-3 mt-3 border border-rose-100 bg-rose-50 px-3 py-2 text-[10px] text-rose-700 sm:mx-4"
-            >
-              {profileError}
-            </p>
-          )}
-          {profileSuccess && !isEditingProfile && (
-            <p
-              role="status"
-              className="mx-3 mt-3 border border-emerald-100 bg-emerald-50 px-3 py-2 text-[10px] text-emerald-700 sm:mx-4"
-            >
-              {profileSuccess}
-            </p>
+              </Button>
+            ) : undefined
+          }
+        >
+          {(profileError || (profileSuccess && !isEditingProfile)) && (
+            <div className="mb-4 space-y-3">
+              <InlineError message={profileError} />
+              {!isEditingProfile && <InlineSuccess message={profileSuccess} />}
+            </div>
           )}
 
           {isEditingProfile ? (
-            <div className="space-y-3 p-3 sm:p-4">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="space-y-5">
+              <div className="space-y-4">
                 <div className="flex min-w-0 items-center gap-3">
-                  <span className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#f0efff] text-sm font-semibold text-[#6658d9] ring-1 ring-[#e9eaf0]">
-                    {displayedAvatar ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={displayedAvatar}
-                        alt=""
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      user?.name
-                        .split(/\s+/)
-                        .map((part) => part[0])
-                        .join("")
-                        .slice(0, 2)
-                        .toUpperCase() ?? "?"
-                    )}
-                  </span>
+                  <Avatar
+                    name={user?.name ?? "?"}
+                    src={displayedAvatar}
+                    size="lg"
+                  />
                   <div className="min-w-0">
-                    <p className="truncate text-[10px] font-semibold text-[#454752]">
+                    <p className="truncate text-sm font-semibold text-ink">
                       {user?.name}
                     </p>
-                    <p className="truncate text-[9px] text-[#92949d]">
-                      {user?.email}
-                    </p>
-                    <p className="mt-0.5 text-[8px] text-[#a0a2aa]">
+                    <p className="truncate text-sm text-muted">{user?.email}</p>
+                    <p className="mt-0.5 text-xs text-muted">
                       JPG, PNG or WEBP · max 5MB
                     </p>
                   </div>
                 </div>
-                <div className="flex flex-wrap items-center gap-2 sm:ml-auto">
-                  <label className="inline-flex h-7 cursor-pointer items-center gap-1.5 rounded border border-[#e9eaf0] bg-white px-2.5 text-[9px] font-medium text-[#666974] transition-colors hover:border-[#d8d5f7] hover:text-[#5f53ce]">
-                    <Camera aria-hidden="true" className="h-3 w-3" />
+                <div className="flex flex-wrap items-center gap-2">
+                  <label
+                    className={buttonClass({
+                      variant: "secondary",
+                      size: "sm",
+                      className:
+                        "cursor-pointer focus-within:ring-2 focus-within:ring-brand-500 focus-within:ring-offset-2",
+                    })}
+                  >
+                    <Camera aria-hidden="true" />
                     {displayedAvatar ? "Change photo" : "Upload photo"}
                     <input
                       type="file"
@@ -366,439 +690,155 @@ export function ResumeUpload() {
                     />
                   </label>
                   {displayedAvatar && (
-                    <button
-                      type="button"
+                    <Button
+                      variant="danger-soft"
+                      size="sm"
+                      leadingIcon={<Trash2 aria-hidden="true" />}
                       onClick={() => {
                         clearAvatarSelection();
                         setRemoveAvatar(true);
                       }}
-                      className="inline-flex h-7 items-center gap-1 rounded border border-rose-100 px-2.5 text-[9px] font-medium text-rose-600 hover:bg-rose-50"
                     >
-                      <Trash2 aria-hidden="true" className="h-3 w-3" />
                       Remove photo
-                    </button>
+                    </Button>
                   )}
                   {removeAvatar && (
-                    <button
-                      type="button"
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      leadingIcon={<X aria-hidden="true" />}
                       onClick={() => setRemoveAvatar(false)}
-                      className="inline-flex h-7 items-center gap-1 rounded border border-[#e9eaf0] px-2.5 text-[9px] font-medium text-[#666974]"
                     >
-                      <X aria-hidden="true" className="h-3 w-3" />
                       Keep current photo
-                    </button>
+                    </Button>
                   )}
                 </div>
               </div>
 
-              <label className="block">
-                <span className="mb-1 flex items-center justify-between text-[9px] font-medium text-[#666974]">
+              <div>
+                <FieldLabel
+                  htmlFor="resume-profile-headline"
+                  hint={`${headline.length}/120`}
+                >
                   Professional headline
-                  <span className="text-[#a0a2aa]">{headline.length}/120</span>
-                </span>
+                </FieldLabel>
                 <input
+                  id="resume-profile-headline"
                   type="text"
                   value={headline}
                   onChange={(event) => setHeadline(event.target.value)}
                   maxLength={120}
                   placeholder="e.g. Frontend Developer | React & TypeScript"
-                  className="h-8 w-full border border-[#e9eaf0] px-2.5 text-[10px] text-[#42444e] outline-none placeholder:text-[#a3a5ad] focus:border-[#bdb6f0]"
+                  className={inputClass}
                 />
-              </label>
+              </div>
 
-              <label className="block">
-                <span className="mb-1 flex items-center justify-between text-[9px] font-medium text-[#666974]">
+              <div>
+                <FieldLabel
+                  htmlFor="resume-profile-about"
+                  hint={`${about.length}/1000`}
+                >
                   About
-                  <span className="text-[#a0a2aa]">{about.length}/1000</span>
-                </span>
+                </FieldLabel>
                 <textarea
+                  id="resume-profile-about"
                   value={about}
                   onChange={(event) => setAbout(event.target.value)}
                   maxLength={1000}
-                  rows={3}
+                  rows={4}
                   placeholder="Share a short professional introduction…"
-                  className="w-full resize-y border border-[#e9eaf0] px-2.5 py-2 text-[10px] leading-5 text-[#42444e] outline-none placeholder:text-[#a3a5ad] focus:border-[#bdb6f0]"
+                  className={`${textareaClass} resize-y`}
                 />
-              </label>
+              </div>
 
-              <label className="block">
-                <span className="mb-1 flex items-center justify-between text-[9px] font-medium text-[#666974]">
+              <div>
+                <FieldLabel
+                  htmlFor="resume-profile-interests"
+                  hint="Separate with commas"
+                >
                   Interests and skills
-                  <span className="text-[#a0a2aa]">Separate with commas</span>
-                </span>
+                </FieldLabel>
                 <textarea
+                  id="resume-profile-interests"
                   value={interestsText}
                   onChange={(event) => setInterestsText(event.target.value)}
                   rows={2}
                   placeholder="React, UI design, accessibility"
-                  className="w-full resize-y border border-[#e9eaf0] px-2.5 py-2 text-[10px] leading-5 text-[#42444e] outline-none placeholder:text-[#a3a5ad] focus:border-[#bdb6f0]"
+                  className={`${inputClass} resize-y`}
                 />
-              </label>
+              </div>
 
-              <div className="flex flex-wrap justify-end gap-2 border-t border-[#f0f0f3] pt-3">
-                <button
-                  type="button"
+              <div className="flex flex-col-reverse gap-3 border-t border-line-soft pt-5 sm:flex-row sm:justify-end">
+                <Button
+                  variant="secondary"
                   onClick={handleCancelProfileEdit}
                   disabled={isSavingProfile}
-                  className="h-7 px-2.5 text-[9px] font-medium text-[#777984] hover:text-[#454752] disabled:opacity-50"
                 >
                   Cancel
-                </button>
-                <button
-                  type="button"
+                </Button>
+                <Button
                   onClick={handleSaveProfile}
-                  disabled={isSavingProfile}
-                  className="inline-flex h-7 items-center gap-1.5 rounded bg-[#6b5ce7] px-3 text-[9px] font-semibold text-white transition-colors hover:bg-[#5849d1] disabled:cursor-wait disabled:opacity-60"
+                  loading={isSavingProfile}
+                  leadingIcon={<Check aria-hidden="true" />}
                 >
-                  {isSavingProfile ? (
-                    <RefreshCw
-                      aria-hidden="true"
-                      className="h-3 w-3 animate-spin"
-                    />
-                  ) : (
-                    <Check aria-hidden="true" className="h-3 w-3" />
-                  )}
                   {isSavingProfile ? "Saving…" : "Save profile"}
-                </button>
+                </Button>
               </div>
             </div>
           ) : (
-            <div className="flex flex-col gap-3 p-3 sm:flex-row sm:p-4">
-              <span className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#f0efff] text-sm font-semibold text-[#6658d9] ring-1 ring-[#e9eaf0]">
-                {user?.avatarUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={user.avatarUrl}
-                    alt=""
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  user?.name
-                    .split(/\s+/)
-                    .map((part) => part[0])
-                    .join("")
-                    .slice(0, 2)
-                    .toUpperCase() ?? "?"
-                )}
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="text-[11px] font-semibold text-[#454752]">
-                  {user?.name}
-                </p>
-                <p className="mt-0.5 text-[9px] text-[#92949d]">
-                  {user?.headline || "Add a professional headline"}
-                </p>
-                {user?.about && (
-                  <p className="mt-2 whitespace-pre-line text-[9px] leading-4 text-[#777a85]">
-                    {user.about}
-                  </p>
-                )}
-                {user?.interests?.length ? (
-                  <div className="mt-2 flex flex-wrap gap-1">
-                    {user.interests.map((interest) => (
-                      <span
-                        key={interest}
-                        className="rounded-sm border border-[#ececf1] bg-[#fbfbfc] px-1.5 py-0.5 text-[8px] text-[#6f717b]"
-                      >
-                        {interest}
-                      </span>
-                    ))}
-                  </div>
-                ) : (
-                  !user?.about && (
-                    <p className="mt-1 text-[9px] text-[#a0a2aa]">
-                      Add an about section and interests to complete your profile.
-                    </p>
-                  )
-                )}
-              </div>
-            </div>
-          )}
-        </section>
-
-        <section className="border border-[#e9eaf0] bg-white p-2 sm:p-3">
-          <ResumeDropzone
-            onFileSelect={handleFileSelect}
-            error={error}
-            maxSizeMB={MAX_SIZE_MB}
-          />
-          {resume && (
-            <p className="mt-2 flex items-center gap-1.5 px-1 text-[9px] text-[#92949d]">
-              <ShieldCheck
-                aria-hidden="true"
-                className="h-3 w-3 shrink-0 text-[#6b5ce7]"
-              />
-              Uploading a new file replaces your current resume. Only the latest
-              version is stored.
-            </p>
-          )}
-        </section>
-
-        {selectedFile && (
-          <section className="flex flex-col gap-3 border border-[#e9eaf0] bg-white p-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex min-w-0 items-center gap-2.5">
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-[#f0efff] text-[#6658d9]">
-                <FileText aria-hidden="true" className="h-4 w-4" />
-              </span>
-              <div className="min-w-0">
-                <p className="truncate text-[10px] font-semibold text-[#454752]">
-                  {selectedFile.name}
-                </p>
-                <p className="mt-0.5 text-[9px] text-[#92949d]">
-                  {formatFileSize(selectedFile.size)} · Ready to upload
-                </p>
-              </div>
-            </div>
-            <div className="flex shrink-0 items-center justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedFile(null);
-                  setError(null);
-                }}
-                disabled={isUploading}
-                className="h-7 px-2.5 text-[9px] font-medium text-[#777984] hover:text-[#454752] disabled:opacity-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleUpload}
-                disabled={isUploading}
-                className="inline-flex h-7 items-center gap-1.5 rounded bg-[#6b5ce7] px-3 text-[9px] font-semibold text-white transition-colors hover:bg-[#5849d1] disabled:cursor-wait disabled:opacity-60"
-              >
-                {isUploading ? (
-                  <>
-                    <RefreshCw
-                      aria-hidden="true"
-                      className="h-3 w-3 animate-spin"
-                    />
-                    Uploading…
-                  </>
-                ) : (
-                  <>
-                    <Upload aria-hidden="true" className="h-3 w-3" />
-                    {resume ? "Replace resume" : "Upload resume"}
-                  </>
-                )}
-              </button>
-            </div>
-          </section>
-        )}
-
-        <section className="border border-[#e9eaf0] bg-white">
-          <div className="flex flex-col justify-between gap-3 border-b border-[#eeeeF2] p-3 sm:flex-row sm:items-center">
             <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-[11px] font-semibold text-[#454752]">
-                    Resume file
-                </h2>
-                <span className="rounded-full bg-[#f0efff] px-1.5 py-0.5 text-[8px] font-medium text-[#6658d9]">
-                  {resume ? "1 file" : "0 files"}
-                </span>
+              <div className="flex items-center gap-4">
+                <Avatar
+                  name={user?.name ?? "?"}
+                  src={user?.avatarUrl}
+                  size="xl"
+                />
+                <div className="min-w-0">
+                  <p className="truncate text-base font-semibold text-ink">
+                    {user?.name}
+                  </p>
+                  <p className="mt-0.5 text-sm text-muted">
+                    {user?.headline || "Add a professional headline"}
+                  </p>
+                </div>
               </div>
-              <p className="mt-1 text-[9px] text-[#92949d]">
-                Your current resume and its last updated time.
-              </p>
-            </div>
-            <label className="flex h-7 w-full items-center gap-1.5 border border-[#e9eaf0] px-2 sm:max-w-[190px]">
-              <Search
-                aria-hidden="true"
-                className="h-3 w-3 shrink-0 text-[#9a9ca5]"
-              />
-              <input
-                type="search"
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search resume…"
-                aria-label="Search resume history"
-                className="min-w-0 flex-1 bg-transparent text-[9px] text-[#42444e] outline-none placeholder:text-[#a3a5ad]"
-              />
-            </label>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[560px] table-fixed border-collapse text-left">
-              <thead>
-                <tr className="border-b border-[#f0f0f3] text-[8px] font-semibold uppercase tracking-[0.05em] text-[#999ba4]">
-                  <th className="w-[36%] px-3 py-2.5">File</th>
-                  <th className="w-[20%] px-3 py-2.5">Parse status</th>
-                  <th className="w-[25%] px-3 py-2.5">Last modified</th>
-                  <th className="w-[19%] px-3 py-2.5 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {resume && matchesSearch ? (
-                  <tr className="border-b border-[#f3f3f6] last:border-0">
-                    <td className="px-3 py-3">
-                      <div className="flex min-w-0 items-center gap-2.5">
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-[#f4f3ff] text-[#6b5ce7]">
-                          <FileText
-                            aria-hidden="true"
-                            className="h-4 w-4"
-                          />
-                        </span>
-                        <div className="min-w-0">
-                          <p className="truncate text-[10px] font-semibold text-[#454752]">
-                            {resume.originalName || "Current resume"}
-                          </p>
-                          <p className="mt-0.5 text-[8px] text-[#999ba4]">
-                            {resume.fileSize
-                              ? formatFileSize(resume.fileSize)
-                              : "PDF or DOCX document"}
-                          </p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-3 py-3">
-                      <span
-                        className={`inline-flex items-center gap-1 rounded px-1.5 py-1 text-[8px] font-medium ${parseStatusStyle[resume.status]}`}
-                      >
-                        <Check aria-hidden="true" className="h-2.5 w-2.5" />
-                        {RESUME_STATUS_LABELS[resume.status]}
-                      </span>
-                    </td>
-                    <td className="px-3 py-3">
-                      <span className="inline-flex items-center gap-1.5 text-[9px] text-[#666974]">
-                        <Clock3
-                          aria-hidden="true"
-                          className="h-3 w-3 text-[#999ba4]"
-                        />
-                        {formatDateTime(resume.updatedAt)}
-                      </span>
-                    </td>
-                    <td className="px-3 py-3">
-                      <div className="flex items-center justify-end gap-2">
-                        <a
-                          href={resume.fileUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex h-6 items-center gap-1 rounded border border-[#e9eaf0] px-2 text-[8px] font-medium text-[#666974] transition-colors hover:border-[#d8d5f7] hover:text-[#5f53ce]"
-                        >
-                          View
-                          <ExternalLink
-                            aria-hidden="true"
-                            className="h-2.5 w-2.5"
-                          />
-                        </a>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setDeleteError(null);
-                            setShowDeleteConfirmation(true);
-                          }}
-                          className="inline-flex h-6 items-center gap-1 rounded border border-rose-100 px-2 text-[8px] font-medium text-rose-600 transition-colors hover:bg-rose-50"
-                        >
-                          <Trash2 aria-hidden="true" className="h-2.5 w-2.5" />
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ) : (
-                  <tr>
-                    <td colSpan={4} className="px-3 py-9 text-center">
-                      <p className="text-[10px] font-medium text-[#626570]">
-                        {resume
-                          ? "No resume matches your search."
-                          : "No resume uploaded yet."}
-                      </p>
-                      {!resume && (
-                        <p className="mt-1 text-[9px] text-[#92949d]">
-                          Upload a PDF or DOCX file to see it listed here.
-                        </p>
-                      )}
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-          {resume && (
-            <div className="border-t border-[#f0f0f3] px-3 py-2">
-              <p className="text-[8px] text-[#999ba4]">
-                Only the latest resume is retained. Uploading another file replaces
-                this one.
-              </p>
+              {user?.about && (
+                <p className="mt-4 whitespace-pre-line text-sm leading-6 text-body">
+                  {user.about}
+                </p>
+              )}
+              {user?.interests?.length ? (
+                <div className="mt-4 flex flex-wrap gap-1.5">
+                  {user.interests.map((interest) => (
+                    <span key={interest} className={badgeClass("neutral")}>
+                      {interest}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                !user?.about && (
+                  <p className="mt-4 text-sm text-muted">
+                    Add an about section and interests to complete your profile.
+                  </p>
+                )
+              )}
             </div>
           )}
-        </section>
-
-        {deleteError && (
-          <p
-            role="alert"
-            className="border border-rose-100 bg-rose-50 px-3 py-2 text-[10px] text-rose-700"
-          >
-            {deleteError}
-          </p>
-        )}
-
-        {showDeleteConfirmation && resume && (
-          <section
-            role="alertdialog"
-            aria-labelledby="delete-resume-title"
-            aria-describedby="delete-resume-description"
-            className="flex flex-col gap-3 border border-rose-100 bg-white p-3 sm:flex-row sm:items-center sm:justify-between"
-          >
-            <div className="flex items-start gap-2.5">
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-rose-50 text-rose-600">
-                <Shield aria-hidden="true" className="h-3.5 w-3.5" />
-              </span>
-              <div>
-                <p
-                  id="delete-resume-title"
-                  className="text-[10px] font-semibold text-[#454752]"
-                >
-                  Delete your current resume?
-                </p>
-                <p
-                  id="delete-resume-description"
-                  className="mt-0.5 text-[9px] text-[#858792]"
-                >
-                  This permanently removes the file from your candidate profile.
-                </p>
-              </div>
-            </div>
-            <div className="flex shrink-0 justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setShowDeleteConfirmation(false)}
-                disabled={isDeletingResume}
-                className="h-7 px-2.5 text-[9px] font-medium text-[#777984] hover:text-[#454752] disabled:opacity-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleDeleteResume}
-                disabled={isDeletingResume}
-                className="inline-flex h-7 items-center gap-1.5 rounded bg-rose-600 px-2.5 text-[9px] font-semibold text-white transition-colors hover:bg-rose-700 disabled:cursor-wait disabled:opacity-60"
-              >
-                {isDeletingResume ? (
-                  <RefreshCw
-                    aria-hidden="true"
-                    className="h-3 w-3 animate-spin"
-                  />
-                ) : (
-                  <Trash2 aria-hidden="true" className="h-3 w-3" />
-                )}
-                {isDeletingResume ? "Deleting…" : "Delete resume"}
-              </button>
-            </div>
-          </section>
-        )}
-
-        {resume && (
-          <div className="flex flex-wrap gap-2">
-            <Link
-              href="/candidate/applications"
-              className="inline-flex h-7 items-center gap-1.5 border border-[#e9eaf0] bg-white px-2.5 text-[9px] font-medium text-[#666974] transition-colors hover:border-[#d8d5f7] hover:text-[#5f53ce]"
-            >
-              My applications <ArrowRight className="h-3 w-3" />
-            </Link>
-          </div>
-        )}
+        </Card>
       </div>
-    </div>
+
+      <ConfirmDialog
+        open={showDeleteConfirmation && Boolean(resume)}
+        onClose={() => setShowDeleteConfirmation(false)}
+        onConfirm={handleDeleteResume}
+        tone="danger"
+        title="Delete your current resume?"
+        description="This permanently removes the file from your candidate profile."
+        confirmLabel={isDeletingResume ? "Deleting…" : "Delete resume"}
+        loading={isDeletingResume}
+      >
+        {deleteError ? <InlineError message={deleteError} /> : null}
+      </ConfirmDialog>
+    </PortalPage>
   );
 }

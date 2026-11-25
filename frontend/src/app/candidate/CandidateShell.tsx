@@ -1,8 +1,14 @@
 "use client";
 
-import { usePathname } from "next/navigation";
-import { CandidateSidebar } from "@/components/candidate/CandidateSidebar";
+import { useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { CandidatePortalShell } from "@/components/candidate/CandidateSidebar";
 import { RequireAuth } from "@/components/auth/RequireAuth";
+import { useAuth } from "@/context/AuthContext";
+import {
+  CANDIDATE_PROFILE_PATH,
+  isCandidateProfileComplete,
+} from "@/lib/candidateProfile";
 
 /**
  * Routes under /candidate that must stay reachable without a session.
@@ -23,12 +29,51 @@ export function CandidateShell({ children }: { children: React.ReactNode }) {
 
   return (
     <RequireAuth roles={["candidate"]} loginPath="/login/candidate">
-      <div className="flex h-dvh overflow-hidden">
-        <CandidateSidebar />
-        <main className="h-dvh min-h-0 min-w-0 flex-1 overflow-y-auto bg-[#f7f8fa]">
-          {children}
-        </main>
-      </div>
+      <ProfileGate pathname={pathname}>
+        <CandidatePortalShell>{children}</CandidatePortalShell>
+      </ProfileGate>
     </RequireAuth>
   );
+}
+
+/**
+ * Creating a profile is mandatory: until it's complete (see
+ * isCandidateProfileComplete) every candidate page except the profile page
+ * redirects there. Runs inside RequireAuth, so `user` is a signed-in candidate.
+ * The page is never rendered while the redirect is pending, so nothing flashes,
+ * and the profile page itself is exempt, so it can't loop.
+ */
+function ProfileGate({
+  pathname,
+  children,
+}: {
+  pathname: string;
+  children: React.ReactNode;
+}) {
+  const { user } = useAuth();
+  const router = useRouter();
+
+  const onProfilePage = pathname.startsWith(CANDIDATE_PROFILE_PATH);
+  const mustRedirect = !onProfilePage && !isCandidateProfileComplete(user);
+
+  useEffect(() => {
+    if (mustRedirect) router.replace(CANDIDATE_PROFILE_PATH);
+  }, [mustRedirect, router]);
+
+  if (mustRedirect) {
+    return (
+      <div className="flex min-h-dvh flex-1 flex-col items-center justify-center gap-4 bg-canvas px-4">
+        <div
+          className="h-9 w-9 animate-spin rounded-full border-[3px] border-brand-100 border-t-brand-600"
+          role="status"
+          aria-label="Loading"
+        />
+        <p aria-hidden="true" className="text-sm text-muted">
+          Loading your workspace…
+        </p>
+      </div>
+    );
+  }
+
+  return <>{children}</>;
 }

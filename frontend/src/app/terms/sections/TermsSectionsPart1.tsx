@@ -48,7 +48,7 @@
       <li>Review and manage candidate applications</li>
     </ul>
 
-    <div className="bg-yellow-50 border-l-4 border-yellow-500 p-6 rounded-lg mb-8">
+    <div className="bg-brand-50 border-l-4 border-brand-300 p-6 rounded-lg mb-8">
       <strong className="text-gray-900">Important:</strong> AiRecruitex is a
       screening and prioritisation tool. All hiring decisions must be made by
       human recruiters. AiRecruitex does not make employment decisions and

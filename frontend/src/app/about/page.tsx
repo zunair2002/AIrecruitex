@@ -10,13 +10,13 @@ export const metadata = {
 export default function AboutPage() {
   return (
     <main>
-      <section className="bg-[#f6f3f9] pt-32 pb-20">
+      <section className="bg-canvas pt-32 pb-20">
         <div className="mx-auto max-w-3xl px-4 sm:px-6">
           <p className="eyebrow">About</p>
           <h1 className="font-display mt-5 text-5xl text-ink md:text-6xl">
             Built for hiring that has to stand up to scrutiny.
           </h1>
-          <p className="mt-6 text-lg leading-relaxed text-[#6b5f7a]">
+          <p className="mt-6 text-lg leading-relaxed text-muted">
             AiRecruitex connects job seekers and companies through structured
             interviews, resume matching, and a ranked shortlist — not a stack of
             unread CVs.
@@ -28,17 +28,17 @@ export default function AboutPage() {
         <div className="mx-auto max-w-3xl space-y-16 px-4 sm:px-6">
           <div>
             <h2 className="font-display text-2xl text-ink">Our purpose</h2>
-            <p className="mt-4 leading-relaxed text-[#6b5f7a]">
+            <p className="mt-4 leading-relaxed text-muted">
               Make hiring fair, fast, and defensible. Candidates get structured
               practice and feedback. Hiring teams automate first-stage screening
               and spend time only on people who clear the bar.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-px bg-[#e0d6ea] md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-px bg-line md:grid-cols-2">
             <div className="bg-white p-8">
               <h3 className="font-display text-xl text-ink">For candidates</h3>
-              <p className="mt-3 text-sm leading-relaxed text-[#6b5f7a]">
+              <p className="mt-3 text-sm leading-relaxed text-muted">
                 Practice interviews, resume matching, scored feedback, and
                 guidance — in one place.
               </p>
@@ -51,7 +51,7 @@ export default function AboutPage() {
             </div>
             <div className="bg-white p-8">
               <h3 className="font-display text-xl text-ink">For hiring teams</h3>
-              <p className="mt-3 text-sm leading-relaxed text-[#6b5f7a]">
+              <p className="mt-3 text-sm leading-relaxed text-muted">
                 Create roles, match resumes, review interview reports, and
                 shortlist with evidence.
               </p>

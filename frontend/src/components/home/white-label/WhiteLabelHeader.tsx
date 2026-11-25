@@ -4,7 +4,7 @@ export const WhiteLabelHeader = () => (
     <h2 className="font-display mt-5 text-4xl text-ink md:text-5xl">
       Your brand, front and centre
     </h2>
-    <p className="mt-4 text-lg leading-relaxed text-[#6b5f7a]">
+    <p className="mt-4 text-lg leading-relaxed text-muted">
       White-label the experience in minutes. No engineering required.
     </p>
   </div>

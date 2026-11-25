@@ -2,14 +2,18 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { Briefcase, ShieldCheck, UserRound, Users } from "lucide-react";
 import {
+  AuthCardHeading,
   AuthError,
+  AuthSplitLayout,
   PasswordField,
   authInputClass,
-  authSubmitClass,
+  type AuthBenefit,
 } from "@/components/auth/AuthCardParts";
 import { VerifyEmailForm } from "@/components/auth/VerifyEmailForm";
-import { BrandWordmark } from "@/components/layout/Logo";
+import { Button } from "@/components/ui/Button";
+import { labelClass } from "@/components/ui/controls";
 import { useAuth } from "@/context/AuthContext";
 import { toErrorMessage } from "@/lib/api";
 import { ROLE_LABELS } from "@/lib/format";
@@ -27,15 +31,30 @@ const ROLE_BLURBS: Record<"hr" | "candidate", string> = {
   candidate: "Upload a resume, apply to jobs and take AI interviews.",
 };
 
+const REGISTER_BENEFITS: AuthBenefit[] = [
+  {
+    icon: <Briefcase />,
+    title: "For recruiters",
+    description: "Post jobs, get AI-ranked applicants and run interviews overnight.",
+  },
+  {
+    icon: <Users />,
+    title: "For candidates",
+    description: "Apply, practice AI interviews and track every application.",
+  },
+  {
+    icon: <ShieldCheck />,
+    title: "Verified accounts",
+    description: "A one-time code confirms your email before you start.",
+  },
+];
+
 export default function RegisterPage() {
   const { register } = useAuth();
 
   const [role, setRole] = useState<UserRole>("hr");
   // Signup emails an OTP instead of returning a session; this holds the step.
-  const [pending, setPending] = useState<{
-    email: string;
-    devOtp?: string;
-  } | null>(null);
+  const [pending, setPending] = useState<{ email: string } | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -63,7 +82,7 @@ export default function RegisterPage() {
         password,
         role,
       });
-      setPending({ email: result.email, devOtp: result.devOtp });
+      setPending({ email: result.email });
     } catch (err) {
       setError(toErrorMessage(err));
       setIsSubmitting(false);
@@ -71,157 +90,126 @@ export default function RegisterPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#f6f3f9]">
-      <div className="grid min-h-screen lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
-        <aside className="hidden flex-col justify-between border-r-4 border-brand bg-navy px-12 py-14 text-white lg:flex">
-          <Link href="/" className="transition-opacity hover:opacity-80">
-            <BrandWordmark className="text-[2rem]" tone="dark" />
-          </Link>
-          <div>
-            <p className="text-[11px] font-semibold tracking-[0.18em] text-[#d4b8f0] uppercase">
-              Get started
-            </p>
-            <h1 className="font-display mt-5 max-w-sm text-4xl leading-[1.15]">
-              One account. The whole hiring loop.
-            </h1>
-            <p className="mt-5 max-w-sm text-sm leading-relaxed text-[#9aa6c2]">
-              Recruiters screen overnight. Candidates practice and apply. Same
-              platform, same evidence.
-            </p>
-          </div>
-          <p className="text-[11px] font-medium tracking-[0.16em] text-[#9aa6c2] uppercase">
-            Screen with evidence
-          </p>
-        </aside>
+    <AuthSplitLayout
+      eyebrow="Get started"
+      tagline="One account. The whole hiring loop."
+      support="Recruiters screen overnight. Candidates practice and apply. Same platform, same evidence."
+      benefits={REGISTER_BENEFITS}
+    >
+      <AuthCardHeading
+        title="Create an account"
+        description="A short form. Then a code in your inbox."
+      />
 
-        <section className="flex items-center justify-center px-4 py-12 sm:px-8">
-          <div className="w-full max-w-md border border-[#e0d6ea] bg-white p-8 sm:p-10">
-            <div className="mb-8 lg:hidden">
-              <Link href="/" className="inline-block">
-                <BrandWordmark className="text-[1.7rem]" />
-              </Link>
-            </div>
-            <h2 className="font-display mb-1 text-2xl text-ink">
-              Create an account
-            </h2>
-            <p className="mb-8 text-sm text-[#6b5f7a]">
-              A short form. Then a code in your inbox.
-            </p>
+      {pending ? (
+        <VerifyEmailForm email={pending.email} />
+      ) : (
+        <form className="space-y-5" onSubmit={handleSubmit} noValidate>
+          <AuthError message={error} />
 
-              {pending ? (
-                <VerifyEmailForm
-                  email={pending.email}
-                  devOtp={pending.devOtp}
-                />
-              ) : (
-                <form className="space-y-5" onSubmit={handleSubmit} noValidate>
-                  <AuthError message={error} />
-
-                  <div>
-                    <span className="mb-2 block text-sm font-medium text-ink">
-                      I am signing up as
-                    </span>
-                    <div className="grid grid-cols-2 gap-3">
-                      {SELECTABLE_ROLES.map((option) => (
-                        <button
-                          key={option}
-                          type="button"
-                          onClick={() => setRole(option)}
-                          className={`border p-4 text-left transition-colors ${
-                            role === option
-                              ? "border-brand bg-brand-light"
-                              : "border-[#e0d6ea] bg-white hover:border-brand"
-                          }`}
-                        >
-                          <span
-                            className={`block text-sm font-semibold ${role === option ? "text-brand-dark" : "text-ink"}`}
-                          >
-                            {ROLE_LABELS[option]}
-                          </span>
-                          <span className="mt-1 block text-xs text-[#898b96]">
-                            {ROLE_BLURBS[option as "hr" | "candidate"]}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="register-name"
-                      className="mb-2 block text-sm font-medium text-ink"
-                    >
-                      Full name
-                    </label>
-                    <input
-                      id="register-name"
-                      name="name"
-                      type="text"
-                      autoComplete="name"
-                      required
-                      value={name}
-                      onChange={(event) => setName(event.target.value)}
-                      placeholder="Jane Doe"
-                      className={authInputClass}
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="register-email"
-                      className="mb-2 block text-sm font-medium text-ink"
-                    >
-                      Email
-                    </label>
-                    <input
-                      id="register-email"
-                      name="email"
-                      type="email"
-                      autoComplete="email"
-                      required
-                      value={email}
-                      onChange={(event) => setEmail(event.target.value)}
-                      placeholder="jane@acme.com"
-                      className={authInputClass}
-                    />
-                  </div>
-
-                  <PasswordField
-                    id="register-password"
-                    value={password}
-                    onChange={setPassword}
-                    autoComplete="new-password"
-                    minLength={6}
-                    placeholder="At least 6 characters"
-                  />
-
+          <fieldset>
+            <legend className={labelClass}>I am signing up as</legend>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {SELECTABLE_ROLES.map((option) => {
+                const isSelected = role === option;
+                const Icon = option === "hr" ? Briefcase : UserRound;
+                return (
                   <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className={`mt-4 ${authSubmitClass}`}
+                    key={option}
+                    type="button"
+                    aria-pressed={isSelected}
+                    onClick={() => setRole(option)}
+                    className={`flex items-start gap-3 rounded-xl border p-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 sm:flex-col ${
+                      isSelected
+                        ? "border-brand-600 bg-brand-50 ring-1 ring-inset ring-brand-600"
+                        : "border-line bg-white hover:border-brand-200 hover:bg-surface-2"
+                    }`}
                   >
-                    {isSubmitting ? "Creating account…" : "Create Account"}
+                    <span
+                      aria-hidden="true"
+                      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
+                        isSelected
+                          ? "bg-brand-700 text-white"
+                          : "bg-surface-3 text-muted"
+                      }`}
+                    >
+                      <Icon className="h-4 w-4" />
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block text-sm font-semibold text-ink">
+                        {ROLE_LABELS[option]}
+                      </span>
+                      <span className="mt-0.5 block text-xs text-muted">
+                        {ROLE_BLURBS[option as "hr" | "candidate"]}
+                      </span>
+                    </span>
                   </button>
-                  <p className="text-center text-xs text-[#9698a2]">
-                    We&apos;ll email you a 6-digit code to confirm your address.
-                  </p>
-                </form>
-              )}
+                );
+              })}
+            </div>
+          </fieldset>
 
-              <div className="mt-8 text-center">
-                <p className="text-sm text-[#6b5f7a]">
-                  Already have an account?{" "}
-                  <Link
-                    href="/login"
-                    className="font-semibold text-brand hover:text-brand-dark"
-                  >
-                    Sign in
-                  </Link>
-                </p>
-              </div>
+          <div>
+            <label htmlFor="register-name" className={labelClass}>
+              Full name
+            </label>
+            <input
+              id="register-name"
+              name="name"
+              type="text"
+              autoComplete="name"
+              required
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              placeholder="Jane Doe"
+              className={authInputClass}
+            />
           </div>
-        </section>
-      </div>
-    </main>
+
+          <div>
+            <label htmlFor="register-email" className={labelClass}>
+              Email
+            </label>
+            <input
+              id="register-email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              required
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="jane@acme.com"
+              className={authInputClass}
+            />
+          </div>
+
+          <PasswordField
+            id="register-password"
+            value={password}
+            onChange={setPassword}
+            autoComplete="new-password"
+            minLength={6}
+            placeholder="At least 6 characters"
+          />
+
+          <Button type="submit" size="lg" fullWidth loading={isSubmitting}>
+            {isSubmitting ? "Creating account…" : "Create account"}
+          </Button>
+          <p className="text-center text-xs text-muted">
+            We&apos;ll email you a 6-digit code to confirm your address.
+          </p>
+        </form>
+      )}
+
+      <p className="mt-6 text-center text-sm text-muted">
+        Already have an account?{" "}
+        <Link
+          href="/login"
+          className="rounded font-semibold text-brand-700 transition-colors hover:text-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+        >
+          Sign in
+        </Link>
+      </p>
+    </AuthSplitLayout>
   );
 }

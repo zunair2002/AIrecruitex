@@ -16,7 +16,7 @@ export const PowerfulFeaturesHeader = () => (
     </motion.h2>
     <motion.p
       variants={fadeInUp}
-      className="mt-4 text-lg leading-relaxed text-[#6b5f7a]"
+      className="mt-4 text-lg leading-relaxed text-muted"
     >
       Autopilot screening, structured scoring, and discrepancy checks that
       surface the candidates your team should meet.

@@ -30,8 +30,8 @@ const ToastContext = createContext<ToastContextValue | null>(null);
 const AUTO_DISMISS_MS = 4500;
 
 /**
- * App-wide toasts, styled to match the dashboards: flat white card, hairline
- * border, small uppercase-free type, brand purple accents.
+ * App-wide toasts: white card with a tone icon, bottom-right on desktop and
+ * full-width along the bottom on phones.
  */
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -58,7 +58,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       <div
         aria-live="polite"
         aria-atomic="false"
-        className="pointer-events-none fixed bottom-4 right-4 z-[100] flex w-[min(92vw,340px)] flex-col gap-2"
+        className="pointer-events-none fixed inset-x-4 bottom-4 z-[100] flex flex-col gap-3 sm:inset-x-auto sm:bottom-6 sm:right-6 sm:w-96"
       >
         {toasts.map((item) => (
           <ToastCard key={item.id} toast={item} onDismiss={dismiss} />
@@ -82,45 +82,43 @@ function ToastCard({
 
   const icon =
     toast.tone === "success" ? (
-      <CheckCircle2 aria-hidden="true" className="h-4 w-4 text-emerald-600" />
+      <CheckCircle2 aria-hidden="true" className="h-5 w-5" />
     ) : toast.tone === "error" ? (
-      <TriangleAlert aria-hidden="true" className="h-4 w-4 text-rose-600" />
+      <TriangleAlert aria-hidden="true" className="h-5 w-5" />
     ) : (
-      <Info aria-hidden="true" className="h-4 w-4 text-brand" />
+      <Info aria-hidden="true" className="h-5 w-5" />
     );
 
-  const iconBg =
+  const iconTone =
     toast.tone === "success"
-      ? "bg-emerald-50"
+      ? "bg-brand-50 text-brand-600"
       : toast.tone === "error"
-        ? "bg-rose-50"
-        : "bg-brand-light";
+        ? "bg-rose-50 text-rose-600"
+        : "bg-brand-50 text-brand-700";
 
   return (
     <div
       role="status"
-      className="pointer-events-auto flex items-start gap-2.5 border border-[#e9eaf0] bg-white p-3 shadow-[0_6px_24px_rgba(26,8,51,0.10)]"
+      className="pointer-events-auto flex items-start gap-3 rounded-xl border border-line bg-white p-4 shadow-lg motion-safe:animate-toast-in"
     >
       <span
-        className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md ${iconBg}`}
+        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${iconTone}`}
       >
         {icon}
       </span>
-      <div className="min-w-0 flex-1">
-        <p className="text-[12px] font-semibold text-[#292b35]">{toast.title}</p>
+      <div className="min-w-0 flex-1 pt-0.5">
+        <p className="text-sm font-semibold text-ink">{toast.title}</p>
         {toast.detail && (
-          <p className="mt-0.5 text-[11px] leading-4 text-[#686b77]">
-            {toast.detail}
-          </p>
+          <p className="mt-1 break-words text-sm text-muted">{toast.detail}</p>
         )}
       </div>
       <button
         type="button"
         onClick={() => onDismiss(toast.id)}
         aria-label="Dismiss notification"
-        className="shrink-0 rounded p-0.5 text-[#b6b8c2] transition-colors hover:text-[#292b35]"
+        className="-m-1 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-subtle transition-colors hover:bg-surface-3 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
       >
-        <X aria-hidden="true" className="h-3.5 w-3.5" />
+        <X aria-hidden="true" className="h-4 w-4" />
       </button>
     </div>
   );

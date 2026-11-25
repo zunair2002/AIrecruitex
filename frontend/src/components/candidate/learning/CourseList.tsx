@@ -1,20 +1,33 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { listActiveCourses } from "@/lib/learningApi";
 import { useApiResource } from "@/lib/useApiResource";
 import { formatDate } from "@/lib/format";
 import {
-  Card,
+  CalendarDays,
+  BadgeCheck,
+  GraduationCap,
+  Lock,
+  PlayCircle,
+  Search,
+  SearchX,
+} from "lucide-react";
+import { Badge } from "@/components/ui/Badge";
+import { PlanBanner, planOf } from "@/components/candidate/plan/PlanBits";
+import { PortalPage } from "@/components/dashboard/primitives";
+import { buttonClass } from "@/components/ui/Button";
+import {
   EmptyState,
   ErrorBlock,
   LoadingBlock,
   PageHeader,
   SkillChips,
 } from "@/components/ui/Feedback";
-import { compactInputClass } from "@/components/ui/controls";
+import { inputClass, selectClass } from "@/components/ui/controls";
 
 const ALL = "all";
 
@@ -26,7 +39,8 @@ const topicLabel = (topic: string) => topic.replace(/_/g, " ");
  * only ever see active ones; the backend filters them out server-side.
  */
 export function CourseList() {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
+  const plan = planOf(user);
   const searchParams = useSearchParams();
   const [search, setSearch] = useState("");
   // A failed interview links here with ?topic=<weak topic>, so the list opens
@@ -61,35 +75,47 @@ export function CourseList() {
   }, [list, search, topic]);
 
   return (
-    <div className="min-h-full bg-[#f7f8fa] px-3 py-4 sm:px-5 sm:py-5 lg:px-6">
+    <PortalPage>
       <PageHeader
         title="Learning"
         description="Courses published by the hiring team. Useful when an interview report flags a weak topic."
+        icon={<GraduationCap />}
       />
 
+      <PlanBanner plan={plan} />
+
       {courses.isLoading ? (
-        <LoadingBlock label="Loading courses…" />
+        <LoadingBlock label="Loading courses…" variant="skeleton" rows={4} />
       ) : courses.error ? (
         <ErrorBlock message={courses.error} onRetry={courses.reload} />
       ) : list.length === 0 ? (
         <EmptyState
           title="No courses published yet."
           description="When the hiring team adds learning material, it appears here."
+          icon={<GraduationCap />}
         />
       ) : (
         <>
-          <div className="mb-6 flex flex-col gap-3 sm:flex-row">
-            <input
-              type="text"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search courses…"
-              className={`${compactInputClass} flex-1`}
-            />
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+            <div className="relative w-full sm:max-w-sm sm:flex-1">
+              <Search
+                aria-hidden="true"
+                className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-subtle"
+              />
+              <input
+                type="search"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Search courses…"
+                aria-label="Search courses"
+                className={`${inputClass} pl-9`}
+              />
+            </div>
             <select
               value={topic}
               onChange={(event) => setTopic(event.target.value)}
-              className={compactInputClass}
+              aria-label="Filter by topic"
+              className={`${selectClass} capitalize sm:w-56`}
             >
               <option value={ALL}>All topics</option>
               {topics.map((item) => (
@@ -98,40 +124,106 @@ export function CourseList() {
                 </option>
               ))}
             </select>
-          </div>
-
-          <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-            {filtered.map((course) => (
-              <Card key={course._id}>
-                <h2 className="text-lg font-bold text-[#292b35]">{course.title}</h2>
-                <p className="mt-1 text-xs text-[#898b96]">
-                  Added {formatDate(course.createdAt)}
-                </p>
-                <p className="mt-3 whitespace-pre-line text-sm text-[#686b77]">
-                  {course.description}
-                </p>
-                <div className="mt-4">
-                  <SkillChips skills={course.topics.map(topicLabel)} />
-                </div>
-                <a
-                  href={course.videoUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="mt-4 inline-block rounded bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-indigo-700"
-                >
-                  Watch course
-                </a>
-              </Card>
-            ))}
-          </div>
-
-          {filtered.length === 0 && (
-            <p className="py-12 text-center text-[#898b96]">
-              No courses match those filters.
+            <p className="text-sm tabular-nums text-muted sm:ml-auto">
+              {filtered.length} of {list.length} course{list.length === 1 ? "" : "s"}
             </p>
+          </div>
+
+          {filtered.length === 0 ? (
+            <EmptyState
+              title="No courses match those filters."
+              description="Try a different search or pick another topic."
+              icon={<SearchX />}
+            />
+          ) : (
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:gap-6 xl:grid-cols-3">
+              {filtered.map((course) => {
+                // Locked = premium course for a free-plan candidate; the API sends no video link.
+                const locked = Boolean(course.locked) || (course.tier === "premium" && !course.videoUrl);
+                return (
+                <article
+                  key={course._id}
+                  className={`relative flex min-w-0 flex-col rounded-xl border p-5 shadow-xs transition-colors sm:p-6 ${
+                    locked
+                      ? "border-line bg-surface-2"
+                      : "border-line bg-surface hover:border-brand-200"
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <span
+                      aria-hidden="true"
+                      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
+                        locked ? "bg-surface-3 text-muted" : "bg-brand-50 text-brand-700"
+                      }`}
+                    >
+                      {locked ? <Lock className="h-5 w-5" /> : <PlayCircle className="h-5 w-5" />}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <h2 className="text-base font-semibold leading-6 text-ink">
+                        {course.title}
+                      </h2>
+                      <p className="mt-0.5 flex items-center gap-1.5 text-xs text-muted">
+                        <CalendarDays aria-hidden="true" className="h-3.5 w-3.5" />
+                        Added {formatDate(course.createdAt)}
+                      </p>
+                    </div>
+                    {course.tier === "premium" && (
+                      <Badge tone="brand" icon={<BadgeCheck aria-hidden="true" />}>
+                        Premium
+                      </Badge>
+                    )}
+                  </div>
+                  <p
+                    className={`mt-4 flex-1 whitespace-pre-line text-sm leading-6 text-muted ${
+                      locked ? "line-clamp-2 select-none opacity-60 blur-[1.5px]" : ""
+                    }`}
+                  >
+                    {course.description}
+                  </p>
+                  <div className={`mt-4 ${locked ? "opacity-60 grayscale" : ""}`}>
+                    <SkillChips skills={course.topics.map(topicLabel)} />
+                  </div>
+                  <div className="mt-5 border-t border-line-soft pt-4">
+                    {locked ? (
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                        <p className="flex items-center gap-1.5 text-xs text-muted">
+                          <Lock aria-hidden="true" className="h-3.5 w-3.5" />
+                          Included with Premium
+                        </p>
+                        <Link
+                          href="/candidate/billing"
+                          className={buttonClass({
+                            variant: "primary",
+                            size: "sm",
+                            className: "w-full sm:w-auto",
+                          })}
+                        >
+                          <BadgeCheck aria-hidden="true" />
+                          Upgrade to watch
+                        </Link>
+                      </div>
+                    ) : (
+                    <a
+                      href={course.videoUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={buttonClass({
+                        variant: "soft",
+                        className: "w-full sm:w-auto",
+                      })}
+                    >
+                      <PlayCircle aria-hidden="true" />
+                      Watch course
+                    </a>
+                    )}
+                  </div>
+                </article>
+                );
+              })}
+            </div>
           )}
         </>
       )}
-    </div>
+    </PortalPage>
   );
 }

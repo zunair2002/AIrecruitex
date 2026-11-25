@@ -32,7 +32,7 @@ export const RaaS = () => {
         >
           <motion.p
             variants={fadeInUp}
-            className="inline-flex items-center gap-3 text-[11px] font-semibold tracking-[0.18em] text-[#d4b8f0] uppercase before:block before:h-px before:w-7 before:bg-[#d4b8f0]"
+            className="inline-flex items-center gap-3 text-xs font-semibold tracking-[0.18em] text-brand-200 uppercase before:block before:h-px before:w-7 before:bg-brand-200"
           >
             Recruitment as a service
           </motion.p>
@@ -44,7 +44,7 @@ export const RaaS = () => {
           </motion.h2>
           <motion.p
             variants={fadeInUp}
-            className="mt-4 text-lg leading-relaxed text-[#9aa6c2]"
+            className="mt-4 text-lg leading-relaxed text-subtle"
           >
             AiRecruitex can also run the first-stage process: post the role,
             screen every applicant, and deliver a scored shortlist of people
@@ -84,7 +84,7 @@ export const RaaS = () => {
         >
           <a
             href="#contact"
-            className="inline-flex items-center bg-white px-6 py-3 text-sm font-semibold text-ink transition hover:bg-[#f6f3f9]"
+            className="inline-flex items-center bg-white px-6 py-3 text-sm font-semibold text-ink transition hover:bg-canvas"
           >
             Speak with us
           </a>

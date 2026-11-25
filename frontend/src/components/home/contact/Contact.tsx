@@ -22,7 +22,7 @@ export const Contact = () => {
       initial="hidden"
       animate={sectionControls}
       variants={fadeInUp}
-      className="bg-[#f6f3f9] py-24"
+      className="bg-canvas py-24"
       id="contact"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

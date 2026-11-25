@@ -44,8 +44,18 @@ export function refId(
 
 export type UserRole = "candidate" | "hr" | "admin";
 export type AuthProvider = "password" | "google";
+/** Candidate subscription tier — gates premium courses and the daily practice allowance. */
+export type UserPlan = "free" | "premium";
 
 export const USER_ROLES: UserRole[] = ["candidate", "hr", "admin"];
+export const USER_PLANS: UserPlan[] = ["free", "premium"];
+
+/** The Stripe subscription fields stored on a user (admin user list). */
+export type UserSubscriptionSnapshot = {
+  status?: string | null;
+  currentPeriodEnd?: string | null;
+  cancelAtPeriodEnd?: boolean;
+};
 export const AUTH_PROVIDERS: AuthProvider[] = ["password", "google"];
 
 /** Full User document — returned by the admin user-management endpoints. */
@@ -61,6 +71,12 @@ export type User = {
   headline?: string;
   about?: string;
   interests?: string[];
+  /** Missing on older accounts — treat as "free". */
+  plan?: UserPlan;
+  /** When a Premium plan ends; absent/null = no end date (or not Premium). */
+  planExpiresAt?: string | null;
+  /** Stripe subscription snapshot, when the candidate has ever subscribed. */
+  subscription?: UserSubscriptionSnapshot;
   isActive: boolean;
   /**
    * Password accounts start false and must confirm the emailed OTP before they
@@ -84,6 +100,8 @@ export type AuthUser = {
   about?: string;
   interests?: string[];
   emailVerified: boolean;
+  /** Missing on older accounts — treat as "free". */
+  plan?: UserPlan;
   /** Only present on GET /api/auth/me. */
   orgId?: ObjectId;
 };
@@ -95,18 +113,16 @@ export type AuthSession = {
 
 /**
  * POST /api/auth/signup no longer returns a session — it emails a 6-digit OTP and
- * the session is issued by POST /api/auth/verify-email instead.
- * `devOtp` is echoed back only when the server is not running in production.
+ * the session is issued by POST /api/auth/verify-email instead. The code itself
+ * is only ever delivered by email.
  */
 export type SignupResult = {
   email: string;
   message: string;
-  devOtp?: string;
 };
 
 export type ResendOtpResult = {
   message?: string;
-  devOtp?: string;
 };
 
 /** Minimal projection used by every `.populate("...Id", "name email")` call. */
@@ -147,9 +163,14 @@ export type JobRef = {
 
 /* ----------------------------------------------------------- application */
 
-export type ApplicationStatus = "pending" | "selected" | "rejected";
+export type ApplicationStatus =
+  | "pending"
+  | "shortlisted"
+  | "selected"
+  | "rejected";
 export const APPLICATION_STATUSES: ApplicationStatus[] = [
   "pending",
+  "shortlisted",
   "selected",
   "rejected",
 ];
@@ -166,13 +187,26 @@ export type AiInterview = {
  * candidate opens any time inside a validity window — not a fixed slot. HR sets
  * only how many days the link stays valid.
  */
-export type OrgInterviewStatus = "invited" | "completed" | "expired";
+export type OrgInterviewStatus = "invited" | "completed" | "expired" | "cancelled";
 
 export const ORG_INTERVIEW_STATUSES: OrgInterviewStatus[] = [
   "invited",
   "completed",
   "expired",
+  "cancelled",
 ];
+
+/** A proctoring event the candidate's browser reported during the org interview. */
+export type OrgInterviewViolationType =
+  | "tab_hidden"
+  | "window_blur"
+  | "fullscreen_exit"
+  | "camera_off";
+
+export type OrgInterviewViolation = {
+  type: OrgInterviewViolationType;
+  at: string;
+};
 
 export type OrgInterview = {
   status?: OrgInterviewStatus;
@@ -181,6 +215,14 @@ export type OrgInterview = {
   expiresAt?: string;
   invitedAt?: string;
   completedAt?: string;
+  /** When the candidate first opened the interview session. */
+  startedAt?: string;
+  /** Set with status "cancelled" (proctoring policy or HR). */
+  cancelledAt?: string;
+  cancelReason?: string;
+  cancelledBy?: "proctoring" | "hr";
+  /** Proctoring violations, oldest first; the 3rd cancels the interview. */
+  violations?: OrgInterviewViolation[];
   notes?: string;
   /** All-day "add to calendar" link covering the validity window. */
   calendarLink?: string;
@@ -222,6 +264,7 @@ export type ResumeStatus = "parsed" | "failed";
 export type ResumeUploadResult = {
   fileUrl: string;
   status: ResumeStatus;
+  mimeType?: string;
   originalName?: string;
   fileSize?: number;
   createdAt?: string;
@@ -232,6 +275,7 @@ export type ResumeUploadResult = {
 export type MyResume = {
   fileUrl: string;
   status: ResumeStatus;
+  mimeType?: string;
   originalName?: string;
   fileSize?: number;
   createdAt?: string;
@@ -417,6 +461,22 @@ export type InterviewTurn = {
   /** Structured org-interview turns only — HR's exact grading. */
   marksEarned?: number;
   marksPossible?: number;
+  /**
+   * Org interviews with warm-ups: this turn's number among the scored pool
+   * questions (1-based). `questionNumber` counts the whole interview, warm-ups
+   * included, so show this one. Absent on older sessions.
+   */
+  poolQuestionNumber?: number;
+};
+
+/** Org interviews: "warmup" questions are asked first and never scored. */
+export type OrgQuestionKind = "warmup" | "pool";
+
+/** One unscored warm-up answer on an org interview (HR report only). */
+export type InterviewIntroductionItem = {
+  questionNumber: number;
+  question: string;
+  answer: string;
 };
 
 export type InterviewMessage = {
@@ -434,6 +494,8 @@ export type SelectedQuestion = {
   question: string;
   referenceAnswer: string;
   marks: number;
+  /** Org interviews: warm-up (unscored) or pool question. Absent on older sessions. */
+  kind?: OrgQuestionKind;
 };
 
 /**
@@ -447,8 +509,21 @@ export type InterviewSessionInProgress = {
   track?: TrackId;
   questionNumber?: number;
   question?: string;
-  /** Length of this session's question list (5 for Round 1, 8 for Round 2). */
+  /**
+   * Length of this session's question list (5 for Round 1, 8 for Round 2).
+   * Org interviews: includes the warm-up questions.
+   */
   totalQuestions?: number;
+  /**
+   * Org interviews only (all absent on older sessions): whether the current
+   * question is an unscored warm-up or a scored pool question, and its
+   * position within that group.
+   */
+  kind?: OrgQuestionKind;
+  warmupNumber?: number;
+  totalWarmup?: number;
+  poolQuestionNumber?: number;
+  totalPoolQuestions?: number;
   round?: InterviewRound;
   turns: InterviewTurnView[];
   /**
@@ -462,6 +537,10 @@ export type InterviewSessionInProgress = {
   /** Seconds left when the response was built — count down from this locally. */
   remainingSeconds?: number;
   timeUp?: boolean;
+  /** Org interviews: the session was cancelled (proctoring/HR); no question is sent. */
+  cancelled?: boolean;
+  cancelledAt?: string;
+  cancelReason?: string;
 };
 
 export type InterviewSessionCompleted = {
@@ -487,6 +566,8 @@ export type InterviewSessionCompleted = {
   timedOut: boolean;
   /** Returned only when a visible interview was failed. */
   elearningTips?: string[];
+  /** Org interviews: the backend's closing message for the candidate. */
+  closingMessage?: string;
 };
 
 export type InterviewSessionView =
@@ -521,6 +602,80 @@ export type InterviewSessionSummary = {
   updatedAt: string;
 };
 
+/**
+ * GET /api/interview/usage — the candidate's practice-interview allowance.
+ * Free: 5 per day, then a 6h wait from the session that hit the limit.
+ * Premium: 10 per rolling 24h. Resuming an in-progress session never counts.
+ */
+export type PracticeUsage = {
+  plan: UserPlan;
+  limit: number;
+  used: number;
+  remaining: number;
+  /** When a slot frees up next; null while nothing has been used. */
+  resetsAt: string | null;
+  /** Only while the limit is reached: the earliest time a new session can start. */
+  nextAvailableAt: string | null;
+};
+
+/* --------------------------------------------------------------- billing */
+
+/** One entry of GET /api/billing/plans. Prices are in the smallest currency unit. */
+export type BillingPlan = {
+  id: UserPlan;
+  name: string;
+  priceCents: number;
+  currency: string;
+  interval: "month" | "year";
+  trialDays: number;
+  practiceInterviewsPerDay: number;
+  premiumCourses: boolean;
+};
+
+/** GET /api/billing/plans. `checkoutAvailable` is false when Stripe isn't configured. */
+export type BillingPlans = {
+  plans: BillingPlan[];
+  checkoutAvailable: boolean;
+};
+
+/**
+ * GET /api/billing/subscription (and the cancel / resume / confirm results).
+ * `plan` is the plan in effect right now. `status` is Stripe's subscription
+ * status (active, trialing, past_due, canceled, incomplete, unpaid, …) or null
+ * when the candidate never subscribed; `source` says where Premium came from.
+ */
+export type SubscriptionStatus = {
+  plan: UserPlan;
+  source: "stripe" | "admin" | null;
+  status: string | null;
+  currentPeriodEnd: string | null;
+  cancelAtPeriodEnd: boolean;
+  /** When Premium ends; null = no end date. */
+  planExpiresAt: string | null;
+  canUpgrade: boolean;
+  canCancel: boolean;
+  canResume: boolean;
+};
+
+export type PaymentKind = "subscription" | "certificate";
+export type PaymentStatus = "paid" | "failed";
+
+/** GET /api/billing/payments — newest first. */
+export type Payment = {
+  _id: ObjectId;
+  kind: PaymentKind;
+  status: PaymentStatus;
+  amountCents: number;
+  currency: string;
+  description: string;
+  invoiceNumber?: string;
+  periodStart?: string;
+  periodEnd?: string;
+  hostedInvoiceUrl?: string;
+  invoicePdfUrl?: string;
+  createdAt: string;
+};
+
 /** The full document, as embedded in the HR application report. */
 export type InterviewSession = {
   _id: ObjectId;
@@ -534,7 +689,10 @@ export type InterviewSession = {
   visibility: InterviewVisibility;
   status: InterviewStatus;
   messages: InterviewMessage[];
+  /** Org interviews with warm-ups: scored pool questions only. */
   turns: InterviewTurn[];
+  /** Org interviews: the unscored warm-up answers. `[]` or absent on older sessions. */
+  introduction?: InterviewIntroductionItem[];
   currentQuestionNumber?: number;
   currentQuestion?: string;
   startedAt?: string;
@@ -546,6 +704,9 @@ export type InterviewSession = {
   feedback?: string;
   report?: InterviewReport;
   certificatePayment: CertificatePayment;
+  /** Org interviews only: set when proctoring (or HR) cancelled it. */
+  cancelledAt?: string;
+  cancelReason?: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -600,6 +761,28 @@ export type OrgInterviewInvite = {
   calendarLink?: string;
   /** True once the interview has been started, so the UI can resume it. */
   started: boolean;
+  /**
+   * "invited" while it can still be taken. For "completed" / "cancelled" the
+   * link returns only this summary — never the questions, answers or scores.
+   */
+  status?: OrgInterviewStatus;
+  invitedAt?: string;
+  startedAt?: string;
+  completedAt?: string;
+  cancelledAt?: string;
+  cancelReason?: string;
+  /** Proctoring violations so far, and how many cancel the interview. */
+  violationCount?: number;
+  maxViolations?: number;
+};
+
+/** POST /api/applications/org-interview/:token/violation (and /cancel). */
+export type OrgInterviewViolationResult = {
+  status?: OrgInterviewStatus;
+  violationCount: number;
+  maxViolations: number;
+  cancelled: boolean;
+  cancelReason?: string;
 };
 
 /* -------------------------------------------------------------- learning */
@@ -615,17 +798,27 @@ export type Course = {
   description: string;
   videoUrl: string;
   topics: string[];
+  /** Missing on older courses — treat as "free". */
+  tier?: CourseTier;
+  /**
+   * Candidate listing only: a premium course the free-plan candidate can't play.
+   * The backend sends it with `videoUrl` emptied.
+   */
+  locked?: boolean;
   isActive: boolean;
   createdBy: ObjectId;
   createdAt: string;
   updatedAt: string;
 };
 
+export type CourseTier = "free" | "premium";
+
 export type CourseInput = {
   title: string;
   description: string;
   videoUrl: string;
   topics: string[];
+  tier: CourseTier;
 };
 
 /** The exact topic slugs the backend accepts on a course. */
@@ -665,14 +858,32 @@ export const SUPPORT_TICKET_STATUSES: SupportTicketStatus[] = [
   "resolved",
 ];
 
+/**
+ * One chat message on a ticket. `authorId` is populated with `{ name, role }`;
+ * it is null for a legacy admin reply (or a deleted user). Legacy tickets get
+ * synthesized ids like `<ticketId>-opener`.
+ */
+export type SupportMessage = {
+  _id: string;
+  authorId: Populated<Pick<UserRef, "_id" | "name"> & { role?: UserRole }> | null;
+  authorRole: UserRole;
+  body: string;
+  createdAt: string;
+};
+
 export type SupportTicket = {
   _id: ObjectId;
-  /** Populated with `{ name, email }` on the admin support desk. */
+  /** Populated with `{ name, email, role }` by every support endpoint. */
   userId: Populated<UserRef>;
   subject: string;
+  /** The opening message — also `messages[0]`. */
   message: string;
   status: SupportTicketStatus;
+  /** Legacy single admin reply — already folded into `messages`. */
   adminReply?: string;
+  /** The chat thread, oldest first. Always non-empty. */
+  messages: SupportMessage[];
+  lastMessageAt: string;
   createdAt: string;
   updatedAt: string;
 };

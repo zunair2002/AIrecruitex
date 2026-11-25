@@ -58,14 +58,14 @@ export const WhiteLabel = () => {
   }, [currentIndex, translateX]);
 
   return (
-    <section className="bg-[#f6f3f9] py-24" id="white-label">
+    <section className="bg-canvas py-24" id="white-label">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-14 max-w-2xl">
           <p className="eyebrow">White label</p>
           <h2 className="font-display mt-5 text-4xl text-ink md:text-5xl">
             Your brand, front and centre
           </h2>
-          <p className="mt-4 text-lg leading-relaxed text-[#6b5f7a]">
+          <p className="mt-4 text-lg leading-relaxed text-muted">
             Candidates see your identity throughout the interview. No code, no
             extra engineering.
           </p>
@@ -105,8 +105,8 @@ export const WhiteLabel = () => {
                 className="w-full shrink-0 px-2 md:w-1/2"
               >
                 <article className="framed-card overflow-hidden">
-                  <div className="flex h-56 flex-col justify-between border-t-4 border-[#d4b8f0] bg-navy p-8">
-                    <p className="text-[11px] font-semibold tracking-[0.18em] text-[#d4b8f0] uppercase">
+                  <div className="flex h-56 flex-col justify-between border-t-4 border-brand-200 bg-navy p-8">
+                    <p className="text-xs font-semibold tracking-[0.18em] text-brand-200 uppercase">
                       {slide.sector}
                     </p>
                     <h3 className="font-display text-3xl text-white">
@@ -114,7 +114,7 @@ export const WhiteLabel = () => {
                     </h3>
                   </div>
                   <div className="bg-white p-6">
-                    <p className="text-sm leading-relaxed text-[#6b5f7a]">
+                    <p className="text-sm leading-relaxed text-muted">
                       {slide.description}
                     </p>
                   </div>

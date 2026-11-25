@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, type DragEvent } from "react";
-import { FileUp } from "lucide-react";
+import { CircleAlert, FileUp } from "lucide-react";
 import { RESUME_ACCEPT_ATTRIBUTE } from "@/lib/resumeApi";
 
 type ResumeDropzoneProps = {
@@ -46,10 +46,12 @@ export function ResumeDropzone({
       role="button"
       tabIndex={0}
       aria-label="Upload a PDF or DOCX resume"
-      className={`cursor-pointer rounded border border-dashed px-4 py-8 text-center transition-colors sm:py-9 ${
+      className={`group cursor-pointer rounded-xl border-2 border-dashed px-5 py-10 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 sm:py-12 ${
         isDragging
-          ? "border-[#6b5ce7] bg-[#f7f6ff]"
-          : "border-[#c9c4f1] bg-white hover:border-[#6b5ce7] hover:bg-[#fcfbff]"
+          ? "border-brand-500 bg-brand-50"
+          : error
+            ? "border-rose-300 bg-rose-50/40 hover:border-rose-400"
+            : "border-line bg-surface-2 hover:border-brand-300 hover:bg-brand-50/50"
       }`}
     >
       <input
@@ -63,17 +65,26 @@ export function ResumeDropzone({
           event.target.value = "";
         }}
       />
-      <div className="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-[#f0efff] text-[#6658d9]">
-        <FileUp aria-hidden="true" className="h-4 w-4" />
+      <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-brand-100 text-brand-700 ring-8 ring-brand-50">
+        <FileUp aria-hidden="true" className="h-6 w-6" />
       </div>
-      <p className="text-[12px] font-semibold text-[#454752]">
-        <span className="text-[#6658d9]">Click to upload</span> or drag and drop
+      <p className="text-base font-semibold text-ink">
+        <span className="text-brand-700">Click to upload</span> or drag and drop
       </p>
-      <p className="mt-1.5 text-[9px] text-[#92949d]">
+      <p className="mt-1 text-sm text-muted">
         PDF or DOCX · Maximum file size {maxSizeMB}MB
       </p>
+      <span
+        aria-hidden="true"
+        className="mt-5 inline-flex h-10 items-center rounded-lg border border-line bg-white px-4 text-sm font-semibold text-body shadow-xs transition-colors group-hover:text-ink"
+      >
+        Choose file
+      </span>
       {error && (
-        <p className="mt-3 text-[10px] font-medium text-red-600">{error}</p>
+        <p className="mx-auto mt-4 flex max-w-md items-start justify-center gap-1.5 text-sm font-medium text-rose-600">
+          <CircleAlert aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0" />
+          {error}
+        </p>
       )}
     </div>
   );

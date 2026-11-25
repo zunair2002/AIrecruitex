@@ -79,12 +79,15 @@ export function RequireAuth({
 
   if (isLoading || !isAllowed) {
     return (
-      <div className="flex min-h-screen flex-1 items-center justify-center">
+      <div className="flex min-h-dvh flex-1 flex-col items-center justify-center gap-4 bg-canvas px-4">
         <div
-          className="h-8 w-8 animate-spin rounded-full border-2 border-[#e9eaf0] border-t-brand"
+          className="h-9 w-9 animate-spin rounded-full border-[3px] border-brand-100 border-t-brand-600"
           role="status"
           aria-label="Loading"
         />
+        <p aria-hidden="true" className="text-sm text-muted">
+          Loading your workspace…
+        </p>
       </div>
     );
   }

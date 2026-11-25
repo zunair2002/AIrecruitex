@@ -34,7 +34,7 @@ const benefits = [
 ];
 
 export const CandidateBenefits = () => (
-  <section className="bg-[#f6f3f9] py-24" id="candidate-benefits">
+  <section className="bg-canvas py-24" id="candidate-benefits">
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <motion.div
         initial="hidden"
@@ -47,7 +47,7 @@ export const CandidateBenefits = () => (
         <h2 className="font-display mt-5 text-4xl text-ink md:text-5xl">
           Prepared before the first real interview
         </h2>
-        <p className="mt-4 text-lg leading-relaxed text-[#6b5f7a]">
+        <p className="mt-4 text-lg leading-relaxed text-muted">
           Practice, improve, and apply with structured coaching from resume to
           offer.
         </p>
@@ -66,11 +66,11 @@ export const CandidateBenefits = () => (
             variants={fadeUp}
             className="framed-card p-7"
           >
-            <p className="inline-flex bg-brand-light px-2.5 py-1 text-[11px] font-bold tracking-[0.16em] text-brand uppercase">
+            <p className="inline-flex bg-brand-light px-2.5 py-1 text-xs font-bold tracking-[0.16em] text-brand uppercase">
               {String(index + 1).padStart(2, "0")}
             </p>
             <h3 className="font-display mt-4 text-xl text-ink">{item.title}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-[#6b5f7a]">
+            <p className="mt-2 text-sm leading-relaxed text-muted">
               {item.description}
             </p>
           </motion.div>

@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Mic, Square, Volume2 } from "lucide-react";
 import { useVoiceInterview } from "@/hooks/useVoiceInterview";
+import { Button } from "@/components/ui/Button";
 import { InlineError } from "@/components/ui/Feedback";
+import { textareaClass } from "@/components/ui/controls";
 
 const joinText = (base: string, spoken: string) =>
   [base.trim(), spoken.trim()].filter(Boolean).join(" ");
@@ -91,42 +94,47 @@ export function VoiceAnswerField({
 
   return (
     <>
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <label htmlFor={id} className="block text-sm font-semibold text-[#292b35]">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <label htmlFor={id} className="block text-base font-semibold text-ink">
           {label}
         </label>
         <div className="flex flex-wrap items-center gap-2">
           {voice.ttsSupported && (
-            <button
-              type="button"
+            <Button
+              variant="secondary"
               onClick={answer.readQuestion}
               disabled={disabled || voice.speaking}
-              className="rounded-lg border border-[#e9eaf0] bg-white px-3 py-1.5 text-xs font-semibold text-[#44464f] transition-colors hover:bg-[#f8f8fb] disabled:cursor-not-allowed disabled:opacity-50"
+              leadingIcon={<Volume2 aria-hidden="true" />}
             >
-              {voice.speaking ? "🔊 Reading…" : "🔊 Read question"}
-            </button>
+              {voice.speaking ? "Reading…" : "Read question"}
+            </Button>
           )}
           {voice.sttSupported && (
-            <button
-              type="button"
+            <Button
+              variant={voice.listening ? "danger" : "soft"}
               onClick={answer.toggleListening}
               disabled={disabled}
               aria-pressed={voice.listening}
-              className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
-                voice.listening
-                  ? "bg-red-600 text-white hover:bg-red-700"
-                  : "bg-indigo-600 text-white hover:bg-indigo-700"
-              }`}
+              leadingIcon={
+                voice.listening ? (
+                  <Square aria-hidden="true" />
+                ) : (
+                  <Mic aria-hidden="true" />
+                )
+              }
             >
-              {voice.listening ? "⏹ Stop" : "🎤 Speak answer"}
-            </button>
+              {voice.listening ? "Stop" : "Speak answer"}
+            </Button>
           )}
         </div>
       </div>
 
       {voice.listening && (
-        <p className="mb-2 flex items-center gap-2 text-xs font-medium text-red-600">
-          <span className="h-2 w-2 animate-pulse rounded-full bg-red-600" />
+        <p className="mb-3 flex items-center gap-2 text-sm font-medium text-rose-700">
+          <span
+            aria-hidden="true"
+            className="h-2 w-2 shrink-0 rounded-full bg-brand-200 motion-safe:animate-pulse"
+          />
           Listening — speak your answer. You can edit the text at any time.
         </p>
       )}
@@ -143,12 +151,14 @@ export function VoiceAnswerField({
             : "Type your answer here…"
         }
         disabled={disabled}
-        className="w-full resize-none rounded border border-[#e9eaf0] px-4 py-3 text-sm text-[#292b35] placeholder:text-[#9698a2] focus:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-[#f8f8fb]"
+        className={`${textareaClass} resize-none`}
       />
-      <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-[#9698a2]">
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs tabular-nums text-muted">
         <span>{answer.value.split(/\s+/).filter(Boolean).length} words</span>
-        <span>{answer.value.length}/{MAX_ANSWER_CHARS} characters</span>
         {!voice.sttSupported && <span>Voice answers work in Chrome or Edge</span>}
+        <span>
+          {answer.value.length}/{MAX_ANSWER_CHARS} characters
+        </span>
       </div>
 
       {voice.error && (

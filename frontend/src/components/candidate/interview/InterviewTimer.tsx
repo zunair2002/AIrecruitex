@@ -22,9 +22,15 @@ import type { InterviewSessionInProgress } from "@/lib/types";
 export function InterviewTimer({
   session,
   onExpire,
+  paused = false,
+  pausedLabel,
 }: {
   session: InterviewSessionInProgress;
   onExpire?: () => void;
+  /** Freeze the countdown (e.g. while the final answer is submitting). */
+  paused?: boolean;
+  /** Shown in place of the countdown while paused. */
+  pausedLabel?: string;
 }) {
   const { remainingSeconds, timeLimitSeconds } = session;
   const hasTimer = typeof remainingSeconds === "number";
@@ -32,18 +38,18 @@ export function InterviewTimer({
   const [secondsLeft, setSecondsLeft] = useState(remainingSeconds ?? 0);
 
   useEffect(() => {
-    if (!hasTimer) return;
+    if (!hasTimer || paused) return;
     const id = window.setInterval(() => {
       setSecondsLeft((previous) => Math.max(0, previous - 1));
     }, 1000);
     return () => window.clearInterval(id);
-  }, [hasTimer]);
+  }, [hasTimer, paused]);
 
   // Once at zero the tick above is a no-op, so this fires exactly once.
   useEffect(() => {
-    if (!hasTimer || secondsLeft > 0) return;
+    if (!hasTimer || paused || secondsLeft > 0) return;
     onExpire?.();
-  }, [hasTimer, secondsLeft, onExpire]);
+  }, [hasTimer, paused, secondsLeft, onExpire]);
 
   if (!hasTimer) return null;
 
@@ -56,34 +62,38 @@ export function InterviewTimer({
 
   return (
     <div
-      className={`flex items-center gap-2 border px-2.5 py-1.5 ${
+      className={`inline-flex h-10 shrink-0 items-center gap-2.5 rounded-full px-3.5 shadow-xs ring-1 ring-inset ${
         isOut
-          ? "border-rose-200 bg-rose-50"
+          ? "bg-rose-50 ring-rose-600/20"
           : isLow
-            ? "border-amber-200 bg-amber-50"
-            : "border-[#e9eaf0] bg-white"
+            ? "bg-brand-50 ring-brand-500/20"
+            : "bg-surface ring-line"
       }`}
     >
       <Clock3
         aria-hidden="true"
-        className={`h-3.5 w-3.5 shrink-0 ${
-          isOut ? "text-rose-600" : isLow ? "text-amber-600" : "text-[#767985]"
+        className={`h-4 w-4 shrink-0 ${
+          isOut ? "text-rose-600" : isLow ? "text-brand-500" : "text-brand-700"
         }`}
       />
       <div className="min-w-0">
         <p
           aria-live={isLow || isOut ? "assertive" : "off"}
-          className={`text-[13px] font-bold leading-none tabular-nums tracking-[-0.03em] ${
-            isOut ? "text-rose-700" : isLow ? "text-amber-700" : "text-[#292b35]"
+          className={`font-display text-sm font-semibold leading-none tabular-nums ${
+            isOut ? "text-rose-700" : isLow ? "text-brand-600" : "text-ink"
           }`}
         >
-          {isOut ? "Time up" : formatCountdown(secondsLeft)}
+          {paused && pausedLabel
+            ? pausedLabel
+            : isOut
+              ? "Time up"
+              : formatCountdown(secondsLeft)}
         </p>
         {timeLimitSeconds ? (
-          <div className="mt-1 h-0.5 w-16 overflow-hidden rounded-full bg-[#ececf1]">
+          <div className="mt-1.5 h-1 w-14 overflow-hidden rounded-full bg-surface-3">
             <div
-              className={`h-full transition-[width] duration-1000 ease-linear ${
-                isOut ? "bg-rose-500" : isLow ? "bg-amber-500" : "bg-[#6b5ce7]"
+              className={`h-full rounded-full transition-[width] duration-1000 ease-linear motion-reduce:transition-none ${
+                isOut ? "bg-brand-200" : isLow ? "bg-brand-300" : "bg-brand-600"
               }`}
               style={{ width: `${elapsedFraction * 100}%` }}
             />

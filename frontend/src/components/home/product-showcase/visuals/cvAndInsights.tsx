@@ -25,7 +25,7 @@ export const CVParsingVisual = () => (
           {[
             { label: "NAME", value: "Jonathan D.", color: "text-slate-800" },
             { label: "SKILLS", value: "React, Go, AWS", color: "text-brand" },
-            { label: "EXP", value: "5+ Years", color: "text-emerald-705" },
+            { label: "EXP", value: "5+ Years", color: "text-brand-705" },
           ].map(({ label, value, color }) => (
             <div
               key={label}

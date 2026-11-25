@@ -61,20 +61,26 @@ export const Hero = () => {
           </dl>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.12, ease: easeOutExpo }}
-          className="relative min-h-[320px] border-t-4 border-brand bg-navy lg:min-h-full lg:border-t-0 lg:border-l-4"
-        >
-          <Image
-            src="/landing/images/hero-3-images.png"
-            alt="AiRecruitex hiring workspace"
-            fill
-            priority
-            className="object-contain p-6 sm:p-10"
-          />
-        </motion.div>
+        
+
+
+<motion.div
+  initial={{ opacity: 0 }}
+  animate={{ opacity: 1 }}
+  transition={{ duration: 0.8, delay: 0.12, ease: easeOutExpo }}
+  className="relative min-h-[520px] w-full lg:min-h-[550px]"
+>
+  <Image
+    src="/landing/images/AIX.png"
+    alt="AiRecruitex hiring workspace"
+    fill
+    priority
+    className="object-contain p-4 sm:p-6"
+  />
+</motion.div>
+
+
+
       </div>
 
       <div className="border-t border-line bg-white">

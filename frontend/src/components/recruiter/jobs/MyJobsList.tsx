@@ -10,7 +10,7 @@ import {
   Users,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { listMyJobs } from "@/lib/jobsApi";
+import { listMyJobs, setJobStatus } from "@/lib/jobsApi";
 import { useApiResource } from "@/lib/useApiResource";
 import { JOB_STATUS_BADGE, JOB_STATUS_LABELS, formatDate } from "@/lib/format";
 import {
@@ -27,9 +27,22 @@ import { QuestionPoolButton } from "./QuestionPoolIndex";
 /** GET /api/jobs/mine — everything the Job schema stores for the HR user's postings. */
 export function MyJobsList() {
   const { token } = useAuth();
+  const [changingJobId, setChangingJobId] = useState<string | null>(null);
   const jobs = useApiResource((signal) => listMyJobs(token, signal), [token], {
     enabled: Boolean(token),
   });
+
+  const changeJobStatus = async (jobId: string, status: "open" | "closed") => {
+    setChangingJobId(jobId);
+    try {
+      const updated = await setJobStatus(jobId, status, token);
+      jobs.setData((current) =>
+        (current ?? []).map((job) => (job._id === updated._id ? updated : job)),
+      );
+    } finally {
+      setChangingJobId(null);
+    }
+  };
 
   return (
     <PortalPage>
@@ -132,6 +145,20 @@ export function MyJobsList() {
                   Interview reports
                 </Button>
                 <QuestionPoolButton jobId={job._id} />
+                <Button
+                  variant={job.status === "open" ? "danger-soft" : "soft"}
+                  size="sm"
+                  onClick={() =>
+                    changeJobStatus(
+                      job._id,
+                      job.status === "open" ? "closed" : "open",
+                    )
+                  }
+                  loading={changingJobId === job._id}
+                  disabled={changingJobId !== null}
+                >
+                  {job.status === "open" ? "Close opening" : "Reopen job"}
+                </Button>
                 {job.jdFileUrl && (
                   <a
                     href={job.jdFileUrl}

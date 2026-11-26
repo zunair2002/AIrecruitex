@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { isAbortError, toErrorMessage } from "@/lib/api";
 import {
@@ -33,13 +33,16 @@ export function CertificatePanel({
   score,
   result,
   certificatePaid,
+  checkoutStatus,
 }: {
   sessionId: ObjectId;
   score?: number;
   result?: InterviewResultVerdict;
   certificatePaid: boolean;
+  /** Stripe's return state for this exact interview session. */
+  checkoutStatus?: string | null;
 }) {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const [certificate, setCertificate] = useState<CertificateView | null>(null);
   const [isPaid, setIsPaid] = useState(certificatePaid);
   const [busy, setBusy] = useState<null | "checkout" | "confirm" | "generate">(
@@ -47,6 +50,9 @@ export function CertificatePanel({
   );
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const confirmedReturnFor = useRef<ObjectId | null>(null);
+  const premiumIncludesCertificate = user?.plan === "premium";
+  const canGenerate = isPaid || premiumIncludesCertificate;
 
   // An already-issued certificate is fetched up front; a 404 just means it
   // has not been generated yet, which is the normal first-visit case.
@@ -60,6 +66,34 @@ export function CertificatePanel({
       });
     return () => controller.abort();
   }, [sessionId, token]);
+
+  // A successful Stripe return is verified against Stripe before the certificate
+  // UI is unlocked. The ref prevents duplicate checks in Strict Mode/re-renders.
+  useEffect(() => {
+    if (
+      checkoutStatus !== "success" ||
+      !token ||
+      isPaid ||
+      confirmedReturnFor.current === sessionId
+    ) {
+      return;
+    }
+
+    confirmedReturnFor.current = sessionId;
+    setBusy("confirm");
+    setError(null);
+    confirmPayment(sessionId, token)
+      .then(({ paid }) => {
+        setIsPaid(paid);
+        setNotice(
+          paid
+            ? "Payment confirmed. You can generate your certificate now."
+            : "Stripe hasn't recorded this payment yet. Try again in a moment.",
+        );
+      })
+      .catch((err) => setError(toErrorMessage(err)))
+      .finally(() => setBusy(null));
+  }, [checkoutStatus, isPaid, sessionId, token]);
 
   const run = async (
     kind: "checkout" | "confirm" | "generate",
@@ -173,7 +207,7 @@ export function CertificatePanel({
           {notice && <InlineSuccess message={notice} />}
 
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            {!isPaid && (
+            {!canGenerate && (
               <>
                 <Button
                   onClick={handleCheckout}
@@ -196,7 +230,7 @@ export function CertificatePanel({
                 </Button>
               </>
             )}
-            {isPaid && (
+            {canGenerate && (
               <Button
                 onClick={handleGenerate}
                 disabled={busy !== null}

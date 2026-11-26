@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   ArrowRight,
   BookOpen,
@@ -64,10 +65,17 @@ const ALL = "all";
  */
 export function InterviewHistory() {
   const { token } = useAuth();
+  const searchParams = useSearchParams();
   const [typeFilter, setTypeFilter] = useState<
     InterviewHistoryType | typeof ALL
   >(ALL);
-  const [requestedId, setRequestedId] = useState<ObjectId | null>(null);
+  // Stripe returns certificate buyers with their interview id in the URL so
+  // the same result (and its certificate panel) is restored after checkout.
+  const returnedSessionId = searchParams.get("sessionId") as ObjectId | null;
+  const checkoutStatus = searchParams.get("checkout");
+  const [requestedId, setRequestedId] = useState<ObjectId | null>(
+    () => returnedSessionId,
+  );
 
   const sessions = useApiResource(
     (signal) =>
@@ -316,6 +324,11 @@ export function InterviewHistory() {
                       score={report.data.score}
                       result={report.data.result}
                       certificatePaid={report.data.certificatePaid}
+                      checkoutStatus={
+                        selected.sessionId === returnedSessionId
+                          ? checkoutStatus
+                          : null
+                      }
                     />
                   )}
                 </>

@@ -4,7 +4,7 @@
  * hr/job-posting/routes/job-posting.routes.ts (POST /, GET /mine)
  */
 import { apiRequest } from "./api";
-import type { Job, ObjectId, OrgInterviewQuestionSet } from "./types";
+import type { Job, JobStatus, ObjectId, OrgInterviewQuestionSet } from "./types";
 
 /** The multer field name the backend's `uploadJdFile` expects. */
 export const JD_FILE_FIELD = "jd";
@@ -51,6 +51,19 @@ export function createJob(
   if (input.jdFile) formData.append(JD_FILE_FIELD, input.jdFile);
 
   return apiRequest<Job>("/api/jobs", { method: "POST", formData, token });
+}
+
+/** PATCH /api/jobs/:jobId/status — closes or reopens one of the HR user's postings. */
+export function setJobStatus(
+  jobId: ObjectId,
+  status: JobStatus,
+  token: string | null,
+): Promise<Job> {
+  return apiRequest<Job>(`/api/jobs/${jobId}/status`, {
+    method: "PATCH",
+    body: { status },
+    token,
+  });
 }
 
 /* ------------------------------ organisational interview question pool ---- */

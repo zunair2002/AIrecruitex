@@ -1,0 +1,11 @@
+{
+  "mongoUri": "mongodb://127.0.0.1:62837/airecruitx_e2e",
+  "mailbox": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\.out\\mailbox.jsonl",
+  "ports": {
+    "mock": 8011,
+    "api": 5055,
+    "web": 3100,
+    "files": 5099
+  },
+  "backendDir": "C:/backend/Airecruitx-backend"
+}

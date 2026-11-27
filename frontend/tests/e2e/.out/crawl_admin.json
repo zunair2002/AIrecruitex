@@ -1,0 +1,202 @@
+[
+  {
+    "role": "admin",
+    "vp": "desktop",
+    "route": "/admin",
+    "finalUrl": "/admin/dashboard",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/admin_desktop__admin.png"
+  },
+  {
+    "role": "admin",
+    "vp": "desktop",
+    "route": "/admin/dashboard",
+    "finalUrl": "/admin/dashboard",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/admin_desktop__admin_dashboard.png"
+  },
+  {
+    "role": "admin",
+    "vp": "desktop",
+    "route": "/admin/users",
+    "finalUrl": "/admin/users",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/admin_desktop__admin_users.png"
+  },
+  {
+    "role": "admin",
+    "vp": "desktop",
+    "route": "/admin/activity-logs",
+    "finalUrl": "/admin/activity-logs",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/admin_desktop__admin_activity-logs.png"
+  },
+  {
+    "role": "admin",
+    "vp": "desktop",
+    "route": "/admin/content",
+    "finalUrl": "/admin/content",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/admin_desktop__admin_content.png"
+  },
+  {
+    "role": "admin",
+    "vp": "desktop",
+    "route": "/admin/reports",
+    "finalUrl": "/admin/reports",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/admin_desktop__admin_reports.png"
+  },
+  {
+    "role": "admin",
+    "vp": "desktop",
+    "route": "/admin/notifications",
+    "finalUrl": "/admin/notifications",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/admin_desktop__admin_notifications.png"
+  },
+  {
+    "role": "admin",
+    "vp": "desktop",
+    "route": "/admin/settings",
+    "finalUrl": "/admin/settings",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/admin_desktop__admin_settings.png"
+  },
+  {
+    "role": "admin",
+    "vp": "desktop",
+    "route": "/admin/support",
+    "finalUrl": "/admin/support",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/admin_desktop__admin_support.png"
+  },
+  {
+    "role": "admin",
+    "vp": "desktop",
+    "route": "/admin/monitoring",
+    "finalUrl": "/admin/monitoring",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/admin_desktop__admin_monitoring.png"
+  },
+  {
+    "role": "admin",
+    "vp": "mobile",
+    "route": "/admin",
+    "finalUrl": "/admin/dashboard",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/admin_mobile__admin.png"
+  },
+  {
+    "role": "admin",
+    "vp": "mobile",
+    "route": "/admin/dashboard",
+    "finalUrl": "/admin/dashboard",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/admin_mobile__admin_dashboard.png"
+  },
+  {
+    "role": "admin",
+    "vp": "mobile",
+    "route": "/admin/users",
+    "finalUrl": "/admin/users",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/admin_mobile__admin_users.png"
+  },
+  {
+    "role": "admin",
+    "vp": "mobile",
+    "route": "/admin/activity-logs",
+    "finalUrl": "/admin/activity-logs",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/admin_mobile__admin_activity-logs.png"
+  },
+  {
+    "role": "admin",
+    "vp": "mobile",
+    "route": "/admin/content",
+    "finalUrl": "/admin/content",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/admin_mobile__admin_content.png"
+  },
+  {
+    "role": "admin",
+    "vp": "mobile",
+    "route": "/admin/reports",
+    "finalUrl": "/admin/reports",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/admin_mobile__admin_reports.png"
+  },
+  {
+    "role": "admin",
+    "vp": "mobile",
+    "route": "/admin/notifications",
+    "finalUrl": "/admin/notifications",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/admin_mobile__admin_notifications.png"
+  },
+  {
+    "role": "admin",
+    "vp": "mobile",
+    "route": "/admin/settings",
+    "finalUrl": "/admin/settings",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/admin_mobile__admin_settings.png"
+  },
+  {
+    "role": "admin",
+    "vp": "mobile",
+    "route": "/admin/support",
+    "finalUrl": "/admin/support",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/admin_mobile__admin_support.png"
+  },
+  {
+    "role": "admin",
+    "vp": "mobile",
+    "route": "/admin/monitoring",
+    "finalUrl": "/admin/monitoring",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/admin_mobile__admin_monitoring.png"
+  }
+]

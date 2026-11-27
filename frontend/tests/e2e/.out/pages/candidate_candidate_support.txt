@@ -1,0 +1,47 @@
+URL: http://localhost:3100/candidate/support
+
+Skip to content
+Aı
+Recruitex
+Candidate Portal
+Dashboard
+JOB BOARD
+Job board
+Resume
+APPLICATIONS
+My applications
+Interview results
+INTERVIEW PREPARATION
+Basic interview
+Technical interview
+Learning
+GENERAL
+My profile
+Plan & billing
+Notifications
+Support
+EC
+E2E crawlc
+e2e-crawlc-1795381169481-0@example.com
+Support
+
+Chat with the platform admins. Replies arrive here live and in your notifications.
+
+My tickets
+
+No tickets yet
+
+Open one and an admin will reply here.
+
+New ticket
+
+Tell us what happened — an admin will pick it up and chat with you here.
+
+Subject
+Message
+
+Include the job title or page you were on, if it applies.
+
+Both fields are required.
+
+Submit ticket

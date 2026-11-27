@@ -1,0 +1,32 @@
+URL: http://localhost:3100/admin/activity-logs
+
+Skip to content
+Aı
+Recruitex
+Admin Portal
+Overview
+PLATFORM
+User management
+Jobs & applications
+INSIGHT
+Reports
+Activity log
+Monitoring
+GENERAL
+Support desk
+Broadcast
+Settings
+EC
+E2E crawla
+e2e-crawla-1795381409292-2@example.com
+Activity log
+
+Every action the backend records, newest first (latest 200).
+
+Action
+Actor user ID
+Filter
+
+No activity recorded
+
+Admin actions such as role changes, job closures, broadcasts and settings edits are logged here.

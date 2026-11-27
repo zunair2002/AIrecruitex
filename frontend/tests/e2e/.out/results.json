@@ -1,0 +1,1351 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\frontend\\AIrecruitex\\frontend\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "-c",
+      "playwright.e2e.config.ts",
+      "tests/e2e/40-admin-billing-errors.spec.ts",
+      "tests/e2e/30-hr-org.spec.ts",
+      "tests/e2e/20-practice.spec.ts",
+      "-g",
+      "settings|support desk|billing|HR|Proctored|Round 1 full",
+      "--retries",
+      "1"
+    ],
+    "configFile": "C:\\frontend\\AIrecruitex\\frontend\\playwright.e2e.config.ts",
+    "rootDir": "C:/frontend/AIrecruitex/frontend/tests/e2e",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/frontend/AIrecruitex/frontend/tests/e2e/.out/artifacts",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "C:/frontend/AIrecruitex/frontend/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 180000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\.out\\artifacts",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "",
+        "testDir": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e",
+        "snapshotDir": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e",
+        "testIgnore": [],
+        "testMatch": "**/*.@(spec|test).?(c|m)[jt]s?(x)",
+        "timeout": 180000,
+        "use": {
+          "baseURL": "http://localhost:3100",
+          "browserName": "chromium",
+          "screenshot": "only-on-failure",
+          "trace": "off",
+          "permissions": [
+            "camera",
+            "microphone"
+          ],
+          "launchOptions": {
+            "args": [
+              "--use-fake-ui-for-media-stream",
+              "--use-fake-device-for-media-stream"
+            ]
+          }
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": ""
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "tests/e2e/.out/results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.65.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "20-practice.spec.ts",
+      "file": "20-practice.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Round 1 full: intro first, closing last, pass -> Round 2 unlocked; Round 2 on selected track",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 147530,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('button', { name: /Resume|Start Round 2/i }).last()\nExpected: visible\nTimeout: 90000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByRole('button', { name: /Resume|Start Round 2/i }).last() with timeout 90000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('button', { name: /Resume|Start Round 2/i }).last()\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('button', { name: /Resume|Start Round 2/i }).last()\nExpected: visible\nTimeout: 90000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByRole('button', { name: /Resume|Start Round 2/i }).last() with timeout 90000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('button', { name: /Resume|Start Round 2/i }).last()\u001b[22m\n\n    at C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\20-practice.spec.ts:79:27",
+                    "location": {
+                      "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\20-practice.spec.ts",
+                      "column": 27,
+                      "line": 79
+                    },
+                    "snippet": " \u001b[90m 77 |\u001b[39m   \u001b[36mawait\u001b[39m shot(page\u001b[33m,\u001b[39m \u001b[32m\"practice_r2_after_reload\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 78 |\u001b[39m   \u001b[36mconst\u001b[39m resumeBtn \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"button\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/Resume|Start Round 2/i\u001b[39m })\u001b[33m.\u001b[39mlast()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 79 |\u001b[39m   \u001b[36mawait\u001b[39m expect(resumeBtn)\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m90000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                           \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 80 |\u001b[39m   \u001b[36mconst\u001b[39m btnLabel \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m resumeBtn\u001b[33m.\u001b[39minnerText()\u001b[33m;\u001b[39m\n \u001b[90m 81 |\u001b[39m   \u001b[36mawait\u001b[39m resumeBtn\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m 82 |\u001b[39m   \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByText(\u001b[35m/Question 2 of 8/\u001b[39m)\u001b[33m.\u001b[39mfirst())\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m30000\u001b[39m })\u001b[33m;\u001b[39m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\20-practice.spec.ts",
+                        "column": 27,
+                        "line": 79
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('button', { name: /Resume|Start Round 2/i }).last()\nExpected: visible\nTimeout: 90000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByRole('button', { name: /Resume|Start Round 2/i }).last() with timeout 90000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('button', { name: /Resume|Start Round 2/i }).last()\u001b[22m\n\n\n  77 |   await shot(page, \"practice_r2_after_reload\");\n  78 |   const resumeBtn = page.getByRole(\"button\", { name: /Resume|Start Round 2/i }).last();\n> 79 |   await expect(resumeBtn).toBeVisible({ timeout: 90000 });\n     |                           ^\n  80 |   const btnLabel = await resumeBtn.innerText();\n  81 |   await resumeBtn.click();\n  82 |   await expect(page.getByText(/Question 2 of 8/).first()).toBeVisible({ timeout: 30000 });\n    at C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\20-practice.spec.ts:79:27"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-22T21:46:03.838Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\.out\\artifacts\\20-practice-Round-1-full-i-eb4ed-d-Round-2-on-selected-track\\test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\.out\\artifacts\\20-practice-Round-1-full-i-eb4ed-d-Round-2-on-selected-track\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\20-practice.spec.ts",
+                    "column": 27,
+                    "line": 79
+                  }
+                },
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 108168,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('button', { name: /Resume|Start Round 2/i }).last()\nExpected: visible\nTimeout: 90000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByRole('button', { name: /Resume|Start Round 2/i }).last() with timeout 90000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('button', { name: /Resume|Start Round 2/i }).last()\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('button', { name: /Resume|Start Round 2/i }).last()\nExpected: visible\nTimeout: 90000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByRole('button', { name: /Resume|Start Round 2/i }).last() with timeout 90000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('button', { name: /Resume|Start Round 2/i }).last()\u001b[22m\n\n    at C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\20-practice.spec.ts:79:27",
+                    "location": {
+                      "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\20-practice.spec.ts",
+                      "column": 27,
+                      "line": 79
+                    },
+                    "snippet": " \u001b[90m 77 |\u001b[39m   \u001b[36mawait\u001b[39m shot(page\u001b[33m,\u001b[39m \u001b[32m\"practice_r2_after_reload\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 78 |\u001b[39m   \u001b[36mconst\u001b[39m resumeBtn \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"button\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/Resume|Start Round 2/i\u001b[39m })\u001b[33m.\u001b[39mlast()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 79 |\u001b[39m   \u001b[36mawait\u001b[39m expect(resumeBtn)\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m90000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                           \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 80 |\u001b[39m   \u001b[36mconst\u001b[39m btnLabel \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m resumeBtn\u001b[33m.\u001b[39minnerText()\u001b[33m;\u001b[39m\n \u001b[90m 81 |\u001b[39m   \u001b[36mawait\u001b[39m resumeBtn\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m 82 |\u001b[39m   \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByText(\u001b[35m/Question 2 of 8/\u001b[39m)\u001b[33m.\u001b[39mfirst())\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m30000\u001b[39m })\u001b[33m;\u001b[39m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\20-practice.spec.ts",
+                        "column": 27,
+                        "line": 79
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('button', { name: /Resume|Start Round 2/i }).last()\nExpected: visible\nTimeout: 90000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByRole('button', { name: /Resume|Start Round 2/i }).last() with timeout 90000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('button', { name: /Resume|Start Round 2/i }).last()\u001b[22m\n\n\n  77 |   await shot(page, \"practice_r2_after_reload\");\n  78 |   const resumeBtn = page.getByRole(\"button\", { name: /Resume|Start Round 2/i }).last();\n> 79 |   await expect(resumeBtn).toBeVisible({ timeout: 90000 });\n     |                           ^\n  80 |   const btnLabel = await resumeBtn.innerText();\n  81 |   await resumeBtn.click();\n  82 |   await expect(page.getByText(/Question 2 of 8/).first()).toBeVisible({ timeout: 30000 });\n    at C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\20-practice.spec.ts:79:27"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 1,
+                  "startTime": "2026-11-22T21:48:33.872Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\.out\\artifacts\\20-practice-Round-1-full-i-eb4ed-d-Round-2-on-selected-track-retry1\\test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\.out\\artifacts\\20-practice-Round-1-full-i-eb4ed-d-Round-2-on-selected-track-retry1\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\20-practice.spec.ts",
+                    "column": 27,
+                    "line": 79
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "20b3e064fdbf009d39ad-4e4fe516fa36e7859d89",
+          "file": "20-practice.spec.ts",
+          "line": 33,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "30-hr-org.spec.ts",
+      "file": "30-hr-org.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "HR: create job with JD upload -> skills suggested",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\30-hr-org.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 32291,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-22T21:50:24.408Z",
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\30-hr-org.spec.ts",
+                        "line": 0,
+                        "column": 0
+                      }
+                    }
+                  ],
+                  "attachments": []
+                },
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 100553,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 1,
+                  "startTime": "2026-11-22T21:52:32.026Z",
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\30-hr-org.spec.ts",
+                        "line": 0,
+                        "column": 0
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6acdf55eb2d6457a845a-37cde2dd94b30430f174",
+          "file": "30-hr-org.spec.ts",
+          "line": 22,
+          "column": 1
+        },
+        {
+          "title": "HR: question pool upload (Data_Analyst_Question_Pool.docx, Q1:/Answer:/Marks:)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\30-hr-org.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 13506,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-22T21:50:56.913Z",
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\30-hr-org.spec.ts",
+                        "line": 0,
+                        "column": 0
+                      }
+                    }
+                  ],
+                  "attachments": []
+                },
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 94877,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 1,
+                  "startTime": "2026-11-22T21:54:12.785Z",
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\30-hr-org.spec.ts",
+                        "line": 0,
+                        "column": 0
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6acdf55eb2d6457a845a-5a4ad9fd508f1f78fa19",
+          "file": "30-hr-org.spec.ts",
+          "line": 47,
+          "column": 1
+        },
+        {
+          "title": "HR: applicants list shows match score; status + per-row invite; bulk-invite with 1 ticked",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\30-hr-org.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 28243,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-22T21:51:10.450Z",
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\30-hr-org.spec.ts",
+                        "line": 0,
+                        "column": 0
+                      }
+                    }
+                  ],
+                  "attachments": []
+                },
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 108130,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 1,
+                  "startTime": "2026-11-22T21:55:47.686Z",
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\30-hr-org.spec.ts",
+                        "line": 0,
+                        "column": 0
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6acdf55eb2d6457a845a-0460fa6a362b00d7f487",
+          "file": "30-hr-org.spec.ts",
+          "line": 61,
+          "column": 1
+        },
+        {
+          "title": "HR: cancel invite; AI interview single + bulk via API (no UI control)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\30-hr-org.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 11329,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-22T21:51:38.725Z",
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\30-hr-org.spec.ts",
+                        "line": 0,
+                        "column": 0
+                      }
+                    }
+                  ],
+                  "attachments": []
+                },
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 11885,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 1,
+                  "startTime": "2026-11-22T21:57:35.843Z",
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\30-hr-org.spec.ts",
+                        "line": 0,
+                        "column": 0
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6acdf55eb2d6457a845a-acc22bac82f1ea741ab3",
+          "file": "30-hr-org.spec.ts",
+          "line": 107,
+          "column": 1
+        },
+        {
+          "title": "Proctored run 1: warm-ups, pool numbering, 3 violations -> cancelled",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\30-hr-org.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 39789,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('heading', { name: 'Before you begin' })\nExpected: visible\nTimeout: 30000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByRole('heading', { name: 'Before you begin' }) with timeout 30000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('heading', { name: 'Before you begin' })\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('heading', { name: 'Before you begin' })\nExpected: visible\nTimeout: 30000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByRole('heading', { name: 'Before you begin' }) with timeout 30000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('heading', { name: 'Before you begin' })\u001b[22m\n\n    at openInvite (C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\30-hr-org.spec.ts:144:73)\n    at C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\30-hr-org.spec.ts:169:3",
+                    "location": {
+                      "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\30-hr-org.spec.ts",
+                      "column": 73,
+                      "line": 144
+                    },
+                    "snippet": " \u001b[90m 142 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m openInvite(page\u001b[33m:\u001b[39m \u001b[33mPage\u001b[39m\u001b[33m,\u001b[39m token\u001b[33m:\u001b[39m string) {\n \u001b[90m 143 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`${WEB}/candidate/interview/org?token=${token}`\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 144 |\u001b[39m   \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"heading\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[32m\"Before you begin\"\u001b[39m }))\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m30000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                                                         \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 145 |\u001b[39m }\n \u001b[90m 146 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m startProctored(page\u001b[33m:\u001b[39m \u001b[33mPage\u001b[39m) {\n \u001b[90m 147 |\u001b[39m   \u001b[36mconst\u001b[39m start \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"button\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/Start interview|Resume interview/i\u001b[39m })\u001b[33m;\u001b[39m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\30-hr-org.spec.ts",
+                        "column": 73,
+                        "line": 144
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('heading', { name: 'Before you begin' })\nExpected: visible\nTimeout: 30000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByRole('heading', { name: 'Before you begin' }) with timeout 30000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('heading', { name: 'Before you begin' })\u001b[22m\n\n\n  142 | async function openInvite(page: Page, token: string) {\n  143 |   await page.goto(`${WEB}/candidate/interview/org?token=${token}`);\n> 144 |   await expect(page.getByRole(\"heading\", { name: \"Before you begin\" })).toBeVisible({ timeout: 30000 });\n      |                                                                         ^\n  145 | }\n  146 | async function startProctored(page: Page) {\n  147 |   const start = page.getByRole(\"button\", { name: /Start interview|Resume interview/i });\n    at openInvite (C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\30-hr-org.spec.ts:144:73)\n    at C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\30-hr-org.spec.ts:169:3"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-22T21:51:50.090Z",
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\30-hr-org.spec.ts",
+                        "line": 0,
+                        "column": 0
+                      }
+                    }
+                  ],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\.out\\artifacts\\30-hr-org-Proctored-run-1--e8659-ng-3-violations---cancelled\\test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\.out\\artifacts\\30-hr-org-Proctored-run-1--e8659-ng-3-violations---cancelled\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\30-hr-org.spec.ts",
+                    "column": 73,
+                    "line": 144
+                  }
+                },
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 11962,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 1,
+                  "startTime": "2026-11-22T21:57:47.757Z",
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\30-hr-org.spec.ts",
+                        "line": 0,
+                        "column": 0
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "flaky"
+            }
+          ],
+          "id": "6acdf55eb2d6457a845a-75fb3f71030515ce66c7",
+          "file": "30-hr-org.spec.ts",
+          "line": 165,
+          "column": 1
+        },
+        {
+          "title": "Proctored run 2: complete -> closing message; reload mid-way resumes",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\30-hr-org.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": -1,
+                  "parallelIndex": -1,
+                  "status": "skipped",
+                  "duration": 0,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-22T21:52:30.005Z",
+                  "annotations": [],
+                  "attachments": []
+                },
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 38588,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText(/already in progress/i).first()\nExpected: visible\nTimeout: 30000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByText(/already in progress/i).first() with timeout 30000ms\u001b[22m\n\u001b[2m  - waiting for getByText(/already in progress/i).first()\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText(/already in progress/i).first()\nExpected: visible\nTimeout: 30000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByText(/already in progress/i).first() with timeout 30000ms\u001b[22m\n\u001b[2m  - waiting for getByText(/already in progress/i).first()\u001b[22m\n\n    at C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\30-hr-org.spec.ts:220:64",
+                    "location": {
+                      "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\30-hr-org.spec.ts",
+                      "column": 64,
+                      "line": 220
+                    },
+                    "snippet": " \u001b[90m 218 |\u001b[39m   \u001b[90m// reload mid-interview\u001b[39m\n \u001b[90m 219 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mreload()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 220 |\u001b[39m   \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByText(\u001b[35m/already in progress/i\u001b[39m)\u001b[33m.\u001b[39mfirst())\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m30000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 221 |\u001b[39m   \u001b[36mawait\u001b[39m shot(page\u001b[33m,\u001b[39m \u001b[32m\"org_reload_resume\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 222 |\u001b[39m   \u001b[36mawait\u001b[39m startProctored(page)\u001b[33m;\u001b[39m\n \u001b[90m 223 |\u001b[39m   \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByText(\u001b[32m\"Warm-up 2 of 3\"\u001b[39m)\u001b[33m.\u001b[39mfirst())\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m30000\u001b[39m })\u001b[33m;\u001b[39m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\30-hr-org.spec.ts",
+                        "column": 64,
+                        "line": 220
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText(/already in progress/i).first()\nExpected: visible\nTimeout: 30000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByText(/already in progress/i).first() with timeout 30000ms\u001b[22m\n\u001b[2m  - waiting for getByText(/already in progress/i).first()\u001b[22m\n\n\n  218 |   // reload mid-interview\n  219 |   await page.reload();\n> 220 |   await expect(page.getByText(/already in progress/i).first()).toBeVisible({ timeout: 30000 });\n      |                                                                ^\n  221 |   await shot(page, \"org_reload_resume\");\n  222 |   await startProctored(page);\n  223 |   await expect(page.getByText(\"Warm-up 2 of 3\").first()).toBeVisible({ timeout: 30000 });\n    at C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\30-hr-org.spec.ts:220:64"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 1,
+                  "startTime": "2026-11-22T21:57:59.745Z",
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\30-hr-org.spec.ts",
+                        "line": 0,
+                        "column": 0
+                      }
+                    }
+                  ],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\.out\\artifacts\\30-hr-org-Proctored-run-2--cdd22-sage-reload-mid-way-resumes-retry1\\test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\.out\\artifacts\\30-hr-org-Proctored-run-2--cdd22-sage-reload-mid-way-resumes-retry1\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\30-hr-org.spec.ts",
+                    "column": 64,
+                    "line": 220
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "6acdf55eb2d6457a845a-0c16a3620402f0cd533d",
+          "file": "30-hr-org.spec.ts",
+          "line": 206,
+          "column": 1
+        },
+        {
+          "title": "HR: reports (AI report + org report: Introduction (not scored), Q1/Q2 pool numbering); shortlisted",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\30-hr-org.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": -1,
+                  "parallelIndex": -1,
+                  "status": "skipped",
+                  "duration": 0,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-22T21:52:30.005Z",
+                  "annotations": [],
+                  "attachments": []
+                },
+                {
+                  "workerIndex": -1,
+                  "parallelIndex": -1,
+                  "status": "skipped",
+                  "duration": 0,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 1,
+                  "startTime": "2026-11-22T21:58:38.436Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "skipped"
+            }
+          ],
+          "id": "6acdf55eb2d6457a845a-71c219646790e2859e89",
+          "file": "30-hr-org.spec.ts",
+          "line": 237,
+          "column": 1
+        },
+        {
+          "title": "HR: courses CRUD + candidate premium lock",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\30-hr-org.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": -1,
+                  "parallelIndex": -1,
+                  "status": "skipped",
+                  "duration": 0,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-22T21:52:30.005Z",
+                  "annotations": [],
+                  "attachments": []
+                },
+                {
+                  "workerIndex": -1,
+                  "parallelIndex": -1,
+                  "status": "skipped",
+                  "duration": 0,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 1,
+                  "startTime": "2026-11-22T21:58:38.436Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "skipped"
+            }
+          ],
+          "id": "6acdf55eb2d6457a845a-b9f15f9163db64c14460",
+          "file": "30-hr-org.spec.ts",
+          "line": 261,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "40-admin-billing-errors.spec.ts",
+      "file": "40-admin-billing-errors.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "admin: dashboard, users (plan change, block), activity logs, content, reports",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 82295,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-22T21:58:40.114Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "764182d5fc7db0f3d543-b613a271e2172179c570",
+          "file": "40-admin-billing-errors.spec.ts",
+          "line": 8,
+          "column": 1
+        },
+        {
+          "title": "admin: broadcast notification reaches candidate",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 13882,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-22T22:00:02.692Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "764182d5fc7db0f3d543-8567dbce4f942c42ce1a",
+          "file": "40-admin-billing-errors.spec.ts",
+          "line": 58,
+          "column": 1
+        },
+        {
+          "title": "admin: settings save + are they enforced (signups, resume size, match threshold)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 18593,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-22T22:00:16.620Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "764182d5fc7db0f3d543-514b6139e866d7209f0d",
+          "file": "40-admin-billing-errors.spec.ts",
+          "line": 74,
+          "column": 1
+        },
+        {
+          "title": "admin: support desk reply, resolve, reopen",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 33192,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('button', { name: 'Mark resolved' })\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByRole('button', { name: 'Mark resolved' }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('button', { name: 'Mark resolved' })\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('button', { name: 'Mark resolved' })\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByRole('button', { name: 'Mark resolved' }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('button', { name: 'Mark resolved' })\u001b[22m\n\n    at C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\40-admin-billing-errors.spec.ts:123:69",
+                    "location": {
+                      "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\40-admin-billing-errors.spec.ts",
+                      "column": 69,
+                      "line": 123
+                    },
+                    "snippet": " \u001b[90m 121 |\u001b[39m   \u001b[36mawait\u001b[39m shot(page\u001b[33m,\u001b[39m \u001b[32m\"admin_support_resolved\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 122 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"button\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[32m\"Reopen\"\u001b[39m })\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 123 |\u001b[39m   \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"button\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[32m\"Mark resolved\"\u001b[39m }))\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m15000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                                                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 124 |\u001b[39m   \u001b[36mconst\u001b[39m mine \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m api(\u001b[32m\"GET\"\u001b[39m\u001b[33m,\u001b[39m \u001b[32m`/api/support/tickets/${t.data._id}`\u001b[39m\u001b[33m,\u001b[39m { token\u001b[33m:\u001b[39m cand\u001b[33m.\u001b[39mtoken })\u001b[33m;\u001b[39m\n \u001b[90m 125 |\u001b[39m   expect(mine\u001b[33m.\u001b[39mdata\u001b[33m.\u001b[39mmessages\u001b[33m.\u001b[39msome((m\u001b[33m:\u001b[39m any) \u001b[33m=>\u001b[39m m\u001b[33m.\u001b[39mbody \u001b[33m===\u001b[39m \u001b[32m\"No, only once.\"\u001b[39m))\u001b[33m.\u001b[39mtoBe(\u001b[36mtrue\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 126 |\u001b[39m   expect(mine\u001b[33m.\u001b[39mdata\u001b[33m.\u001b[39mstatus)\u001b[33m.\u001b[39mtoBe(\u001b[32m\"open\"\u001b[39m)\u001b[33m;\u001b[39m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\40-admin-billing-errors.spec.ts",
+                        "column": 69,
+                        "line": 123
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('button', { name: 'Mark resolved' })\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByRole('button', { name: 'Mark resolved' }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('button', { name: 'Mark resolved' })\u001b[22m\n\n\n  121 |   await shot(page, \"admin_support_resolved\");\n  122 |   await page.getByRole(\"button\", { name: \"Reopen\" }).click();\n> 123 |   await expect(page.getByRole(\"button\", { name: \"Mark resolved\" })).toBeVisible({ timeout: 15000 });\n      |                                                                     ^\n  124 |   const mine = await api(\"GET\", `/api/support/tickets/${t.data._id}`, { token: cand.token });\n  125 |   expect(mine.data.messages.some((m: any) => m.body === \"No, only once.\")).toBe(true);\n  126 |   expect(mine.data.status).toBe(\"open\");\n    at C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\40-admin-billing-errors.spec.ts:123:69"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-22T22:00:35.232Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\.out\\artifacts\\40-admin-billing-errors-ad-6f479-t-desk-reply-resolve-reopen\\test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\.out\\artifacts\\40-admin-billing-errors-ad-6f479-t-desk-reply-resolve-reopen\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\40-admin-billing-errors.spec.ts",
+                    "column": 69,
+                    "line": 123
+                  }
+                },
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 28190,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('button', { name: 'Mark resolved' })\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByRole('button', { name: 'Mark resolved' }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('button', { name: 'Mark resolved' })\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('button', { name: 'Mark resolved' })\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByRole('button', { name: 'Mark resolved' }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('button', { name: 'Mark resolved' })\u001b[22m\n\n    at C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\40-admin-billing-errors.spec.ts:123:69",
+                    "location": {
+                      "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\40-admin-billing-errors.spec.ts",
+                      "column": 69,
+                      "line": 123
+                    },
+                    "snippet": " \u001b[90m 121 |\u001b[39m   \u001b[36mawait\u001b[39m shot(page\u001b[33m,\u001b[39m \u001b[32m\"admin_support_resolved\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 122 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"button\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[32m\"Reopen\"\u001b[39m })\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 123 |\u001b[39m   \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"button\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[32m\"Mark resolved\"\u001b[39m }))\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m15000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                                                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 124 |\u001b[39m   \u001b[36mconst\u001b[39m mine \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m api(\u001b[32m\"GET\"\u001b[39m\u001b[33m,\u001b[39m \u001b[32m`/api/support/tickets/${t.data._id}`\u001b[39m\u001b[33m,\u001b[39m { token\u001b[33m:\u001b[39m cand\u001b[33m.\u001b[39mtoken })\u001b[33m;\u001b[39m\n \u001b[90m 125 |\u001b[39m   expect(mine\u001b[33m.\u001b[39mdata\u001b[33m.\u001b[39mmessages\u001b[33m.\u001b[39msome((m\u001b[33m:\u001b[39m any) \u001b[33m=>\u001b[39m m\u001b[33m.\u001b[39mbody \u001b[33m===\u001b[39m \u001b[32m\"No, only once.\"\u001b[39m))\u001b[33m.\u001b[39mtoBe(\u001b[36mtrue\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 126 |\u001b[39m   expect(mine\u001b[33m.\u001b[39mdata\u001b[33m.\u001b[39mstatus)\u001b[33m.\u001b[39mtoBe(\u001b[32m\"open\"\u001b[39m)\u001b[33m;\u001b[39m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\40-admin-billing-errors.spec.ts",
+                        "column": 69,
+                        "line": 123
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('button', { name: 'Mark resolved' })\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByRole('button', { name: 'Mark resolved' }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('button', { name: 'Mark resolved' })\u001b[22m\n\n\n  121 |   await shot(page, \"admin_support_resolved\");\n  122 |   await page.getByRole(\"button\", { name: \"Reopen\" }).click();\n> 123 |   await expect(page.getByRole(\"button\", { name: \"Mark resolved\" })).toBeVisible({ timeout: 15000 });\n      |                                                                     ^\n  124 |   const mine = await api(\"GET\", `/api/support/tickets/${t.data._id}`, { token: cand.token });\n  125 |   expect(mine.data.messages.some((m: any) => m.body === \"No, only once.\")).toBe(true);\n  126 |   expect(mine.data.status).toBe(\"open\");\n    at C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\40-admin-billing-errors.spec.ts:123:69"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 1,
+                  "startTime": "2026-11-22T22:01:10.572Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\.out\\artifacts\\40-admin-billing-errors-ad-6f479-t-desk-reply-resolve-reopen-retry1\\test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\.out\\artifacts\\40-admin-billing-errors-ad-6f479-t-desk-reply-resolve-reopen-retry1\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\40-admin-billing-errors.spec.ts",
+                    "column": 69,
+                    "line": 123
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "764182d5fc7db0f3d543-243c0b13344ed33db98e",
+          "file": "40-admin-billing-errors.spec.ts",
+          "line": 104,
+          "column": 1
+        },
+        {
+          "title": "billing: plan card, upgrade -> checkout redirect stub -> premium, cancel, resume; pricing matches /api/billing/plans",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 6,
+                  "parallelIndex": 0,
+                  "status": "timedOut",
+                  "duration": 180154,
+                  "error": {
+                    "message": "\u001b[31mTest timeout of 180000ms exceeded.\u001b[39m",
+                    "stack": "\u001b[31mTest timeout of 180000ms exceeded.\u001b[39m"
+                  },
+                  "errors": [
+                    {
+                      "message": "\u001b[31mTest timeout of 180000ms exceeded.\u001b[39m"
+                    },
+                    {
+                      "location": {
+                        "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\40-admin-billing-errors.spec.ts",
+                        "column": 67,
+                        "line": 156
+                      },
+                      "message": "Error: locator.click: Test timeout of 180000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Cancel subscription' })\u001b[22m\n\n\n  154 |   expect(sub.data.plan).toBe(\"premium\");\n  155 |   await page.reload();\n> 156 |   await page.getByRole(\"button\", { name: \"Cancel subscription\" }).click();\n      |                                                                   ^\n  157 |   const dlg = page.getByRole(\"dialog\");\n  158 |   if (await dlg.isVisible().catch(() => false)) await dlg.getByRole(\"button\", { name: /cancel subscription|confirm|yes/i }).last().click();\n  159 |   await expect(page.getByText(/Ends on|cancel/i).first()).toBeVisible({ timeout: 15000 });\n    at C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\40-admin-billing-errors.spec.ts:156:67"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-22T22:01:41.053Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\.out\\artifacts\\40-admin-billing-errors-bi-86908-g-matches-api-billing-plans\\test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\.out\\artifacts\\40-admin-billing-errors-bi-86908-g-matches-api-billing-plans\\error-context.md"
+                    }
+                  ]
+                },
+                {
+                  "workerIndex": 7,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 38339,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText(/Premium/).first()\nExpected: visible\nTimeout: 20000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByText(/Premium/).first() with timeout 20000ms\u001b[22m\n\u001b[2m  - waiting for getByText(/Premium/).first()\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText(/Premium/).first()\nExpected: visible\nTimeout: 20000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByText(/Premium/).first() with timeout 20000ms\u001b[22m\n\u001b[2m  - waiting for getByText(/Premium/).first()\u001b[22m\n\n    at C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\40-admin-billing-errors.spec.ts:150:51",
+                    "location": {
+                      "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\40-admin-billing-errors.spec.ts",
+                      "column": 51,
+                      "line": 150
+                    },
+                    "snippet": " \u001b[90m 148 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"button\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/Upgrade/i\u001b[39m })\u001b[33m.\u001b[39mfirst()\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m 149 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForURL(\u001b[35m/checkout=success/\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m30000\u001b[39m })\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 150 |\u001b[39m   \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByText(\u001b[35m/Premium/\u001b[39m)\u001b[33m.\u001b[39mfirst())\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                                   \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 151 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForTimeout(\u001b[35m3000\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 152 |\u001b[39m   \u001b[36mawait\u001b[39m shot(page\u001b[33m,\u001b[39m \u001b[32m\"billing_premium\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 153 |\u001b[39m   \u001b[36mconst\u001b[39m sub \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m api(\u001b[32m\"GET\"\u001b[39m\u001b[33m,\u001b[39m \u001b[32m\"/api/billing/subscription\"\u001b[39m\u001b[33m,\u001b[39m { token\u001b[33m:\u001b[39m u\u001b[33m.\u001b[39mtoken })\u001b[33m;\u001b[39m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\40-admin-billing-errors.spec.ts",
+                        "column": 51,
+                        "line": 150
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText(/Premium/).first()\nExpected: visible\nTimeout: 20000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByText(/Premium/).first() with timeout 20000ms\u001b[22m\n\u001b[2m  - waiting for getByText(/Premium/).first()\u001b[22m\n\n\n  148 |   await page.getByRole(\"button\", { name: /Upgrade/i }).first().click();\n  149 |   await page.waitForURL(/checkout=success/, { timeout: 30000 });\n> 150 |   await expect(page.getByText(/Premium/).first()).toBeVisible();\n      |                                                   ^\n  151 |   await page.waitForTimeout(3000);\n  152 |   await shot(page, \"billing_premium\");\n  153 |   const sub = await api(\"GET\", \"/api/billing/subscription\", { token: u.token });\n    at C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\40-admin-billing-errors.spec.ts:150:51"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 1,
+                  "startTime": "2026-11-22T22:04:43.456Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\.out\\artifacts\\40-admin-billing-errors-bi-86908-g-matches-api-billing-plans-retry1\\test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\.out\\artifacts\\40-admin-billing-errors-bi-86908-g-matches-api-billing-plans-retry1\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\40-admin-billing-errors.spec.ts",
+                    "column": 51,
+                    "line": 150
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "764182d5fc7db0f3d543-fc4c085ed76a1455c55a",
+          "file": "40-admin-billing-errors.spec.ts",
+          "line": 131,
+          "column": 1
+        },
+        {
+          "title": "errors: backend down, 503 AI down, 429 rate limit on login, 409 already-applied, 410 time-up",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 8,
+                  "parallelIndex": 0,
+                  "status": "timedOut",
+                  "duration": 180151,
+                  "error": {
+                    "message": "\u001b[31mTest timeout of 180000ms exceeded.\u001b[39m",
+                    "stack": "\u001b[31mTest timeout of 180000ms exceeded.\u001b[39m"
+                  },
+                  "errors": [
+                    {
+                      "message": "\u001b[31mTest timeout of 180000ms exceeded.\u001b[39m"
+                    },
+                    {
+                      "location": {
+                        "file": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\40-admin-billing-errors.spec.ts",
+                        "column": 76,
+                        "line": 198
+                      },
+                      "message": "Error: locator.click: Test timeout of 180000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /Start Round 1|Resume/i }).last()\u001b[22m\n\n\n  196 |   // 409 on submit (answered elsewhere) -> what does the UI offer?\n  197 |   await page.reload();\n> 198 |   await page.getByRole(\"button\", { name: /Start Round 1|Resume/i }).last().click();\n      |                                                                            ^\n  199 |   await expect(page.getByText(/Question 1 of 5/).first()).toBeVisible({ timeout: 60000 });\n  200 |   await page.route(\"**/api/interview/answer\", (r) => r.fulfill({ status: 409, contentType: \"application/json\", body: JSON.stringify({ success: false, message: \"This question has already been answered\" }) }));\n  201 |   await page.locator(\"#interview-answer\").fill(\"my answer\");\n    at C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\40-admin-billing-errors.spec.ts:198:76"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-22T22:05:24.190Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\.out\\artifacts\\40-admin-billing-errors-er-d8079-already-applied-410-time-up\\test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\frontend\\AIrecruitex\\frontend\\tests\\e2e\\.out\\artifacts\\40-admin-billing-errors-er-d8079-already-applied-410-time-up\\error-context.md"
+                    }
+                  ]
+                },
+                {
+                  "workerIndex": 9,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 76791,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 1,
+                  "startTime": "2026-11-22T22:08:27.426Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "flaky"
+            }
+          ],
+          "id": "764182d5fc7db0f3d543-1479357aeac4fd512f2e",
+          "file": "40-admin-billing-errors.spec.ts",
+          "line": 173,
+          "column": 1
+        },
+        {
+          "title": "security: signup role=admin; login form submitted before JS = credentials in URL",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 9,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3494,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-22T22:09:44.530Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "764182d5fc7db0f3d543-59209c02ad760b4cbd36",
+          "file": "40-admin-billing-errors.spec.ts",
+          "line": 248,
+          "column": 1
+        },
+        {
+          "title": "a11y: unlabeled controls, keyboard nav on login, image alts",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 9,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 149515,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-22T22:09:48.053Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "764182d5fc7db0f3d543-80a2deb3f5a1157d5a5f",
+          "file": "40-admin-billing-errors.spec.ts",
+          "line": 271,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-22T21:46:00.270Z",
+    "duration": 1577472.443,
+    "expected": 9,
+    "skipped": 2,
+    "unexpected": 4,
+    "flaky": 2
+  }
+}

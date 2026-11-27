@@ -1,0 +1,10 @@
+URL: http://localhost:3100/candidate/interview/org
+
+Aı
+Recruitex
+
+This link is missing its interview token.
+
+Open the interview from the link in your invitation email.
+
+Secure, proctored interview link · Powered by AiRecruitex

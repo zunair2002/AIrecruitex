@@ -1,0 +1,108 @@
+[e2e-stubs] cloudinary/nodemailer/stripe/firebase-admin stubbed
+Firebase Admin Config done
+[practiceBank] loaded 528 practice questions (0 error(s), 0 warning(s))
+MongoDB connected
+Airecruitx backend running on port 5055
+[interviewTimerScheduler] Finishing 1 timed-out interview(s).
+[interview] session 6b0363405791fc28c1fc12b8 finalized (expired)
+[03:09:35] GET /health 200 12ms
+[03:09:35] POST /api/auth/login 401 108ms — Invalid email or password
+[03:09:35] POST /api/auth/login 401 84ms — Invalid email or password
+[03:09:35] POST /api/auth/login 401 85ms — Invalid email or password
+[03:09:35] POST /api/auth/login 401 84ms — Invalid email or password
+[03:09:35] POST /api/auth/login 401 80ms — Invalid email or password
+[03:09:35] POST /api/auth/login 401 81ms — Invalid email or password
+[03:09:35] POST /api/auth/login 401 79ms — Invalid email or password
+[03:09:35] POST /api/auth/login 401 78ms — Invalid email or password
+[03:09:36] POST /api/auth/login 401 77ms — Invalid email or password
+[03:09:36] POST /api/auth/login 401 79ms — Invalid email or password
+[03:09:36] POST /api/auth/login 429 1ms — Too many requests. Please try again in 900 seconds.
+[03:09:41] OPTIONS /api/auth/login 204 2ms
+[03:09:41] POST /api/auth/login 429 1ms — Too many requests. Please try again in 895 seconds.
+[03:09:44] POST /api/auth/signup 201 107ms
+[03:09:48] POST /api/auth/signup 201 92ms
+[03:09:48] POST /api/auth/verify-email 200 11ms
+[03:10:23] OPTIONS /api/auth/login 204 0ms
+[03:10:24] POST /api/auth/login 200 120ms
+[03:10:26] OPTIONS /api/applications/mine 204 0ms
+[03:10:26] OPTIONS /api/jobs/open 204 0ms
+[03:10:26] OPTIONS /api/notifications/mine 204 0ms
+[03:10:26] OPTIONS /api/notifications/mine 204 1ms
+[03:10:26] GET /api/applications/mine 200 20ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:10:26] GET /api/applications/mine 304 25ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:10:26] GET /api/jobs/open 200 29ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:10:26] GET /api/notifications/mine 200 25ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:10:26] GET /api/notifications/mine 304 7ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:10:29] OPTIONS /api/auth/me 204 0ms
+[03:10:29] GET /api/auth/me 200 5ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:10:29] GET /api/applications/mine 304 8ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:10:29] GET /api/jobs/open 304 14ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:10:29] GET /api/notifications/mine 304 15ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:10:29] GET /api/applications/mine 304 17ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:10:29] GET /api/jobs/open 304 21ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:10:29] GET /api/notifications/mine 304 22ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:10:29] GET /api/notifications/mine 304 8ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:10:29] GET /api/notifications/mine 304 7ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:10:35] OPTIONS /api/auth/me 204 1ms
+[03:10:35] GET /api/auth/me 304 3ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:10:36] OPTIONS /api/jobs/open 204 0ms
+[03:10:36] OPTIONS /api/applications/mine 204 1ms
+[03:10:36] GET /api/jobs/open 304 15ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:10:36] OPTIONS /api/notifications/mine 204 0ms
+[03:10:36] GET /api/applications/mine 304 25ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:10:36] GET /api/notifications/mine 304 17ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:10:36] GET /api/jobs/open 304 10ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:10:36] GET /api/applications/mine 304 16ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:10:36] GET /api/notifications/mine 304 17ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:10:49] OPTIONS /api/auth/me 204 0ms
+[03:10:49] GET /api/auth/me 304 5ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:10:49] OPTIONS /api/resume/mine 204 0ms
+[03:10:49] OPTIONS /api/notifications/mine 204 1ms
+[03:10:49] GET /api/resume/mine 200 11ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:10:49] GET /api/notifications/mine 304 12ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:10:49] GET /api/resume/mine 304 11ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:10:49] GET /api/notifications/mine 304 8ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:10:56] OPTIONS /api/auth/me 204 0ms
+[03:10:56] GET /api/auth/me 304 3ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:10:56] OPTIONS /api/notifications/mine 204 0ms
+[03:10:56] GET /api/notifications/mine 304 11ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:10:56] GET /api/notifications/mine 304 9ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:11:00] GET /api/auth/me 304 4ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:11:00] GET /api/billing/plans 200 1ms
+[03:11:00] OPTIONS /api/billing/subscription 204 0ms
+[03:11:00] OPTIONS /api/billing/payments 204 1ms
+[03:11:00] GET /api/billing/subscription 200 12ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:11:00] GET /api/billing/plans 304 11ms
+[03:11:00] GET /api/notifications/mine 304 24ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:11:00] GET /api/billing/payments 200 25ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:11:00] GET /api/billing/subscription 304 21ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:11:00] GET /api/notifications/mine 304 14ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:11:00] GET /api/billing/payments 304 16ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:11:05] OPTIONS /api/auth/me 204 0ms
+[03:11:05] GET /api/auth/me 304 4ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:11:05] GET /api/interview/tracks 200 1ms
+[03:11:05] OPTIONS /api/interview/usage 204 0ms
+[03:11:05] OPTIONS /api/interview/mine?type=practice 204 0ms
+[03:11:05] OPTIONS /api/notifications/mine 204 0ms
+[03:11:05] GET /api/interview/usage 200 18ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:11:05] GET /api/interview/tracks 304 5ms
+[03:11:05] GET /api/interview/mine?type=practice 200 20ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:11:05] GET /api/notifications/mine 304 22ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:11:05] GET /api/interview/usage 304 15ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:11:05] GET /api/interview/mine?type=practice 304 11ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:11:05] GET /api/notifications/mine 304 13ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:11:13] OPTIONS /api/auth/me 204 0ms
+[03:11:13] GET /api/auth/me 304 5ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:11:13] GET /api/interview/tracks 304 1ms
+[03:11:13] OPTIONS /api/interview/usage 204 1ms
+[03:11:14] GET /api/interview/usage 304 9ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:11:14] OPTIONS /api/interview/mine?type=practice 204 1ms
+[03:11:14] OPTIONS /api/notifications/mine 204 0ms
+[03:11:14] GET /api/interview/mine?type=practice 304 16ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:11:14] GET /api/notifications/mine 304 19ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:11:14] GET /api/interview/tracks 304 6ms
+[03:11:14] GET /api/interview/usage 304 21ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:11:14] GET /api/interview/mine?type=practice 304 25ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:11:14] GET /api/notifications/mine 304 20ms candidate:e2e-a11y-1795385388161-1@example.com
+[03:12:14] OPTIONS /api/auth/me 204 0ms
+[03:12:14] GET /api/auth/me 304 4ms candidate:e2e-a11y-1795385388161-1@example.com

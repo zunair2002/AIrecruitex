@@ -1,0 +1,185 @@
+URL: http://localhost:3100/privacy
+
+Aı
+Recruitex
+How it works
+Platform
+About
+Pricing
+Contact
+Candidate
+Recruiter login
+Privacy Policy
+
+Last updated: 11 February 2026
+
+Summary
+
+AiRecruitex is an AI-powered recruiting platform. We process candidate data on behalf of recruiters (as a processor) and manage recruiter accounts directly (as a controller). We use AI to conduct interviews and score candidates. We do not sell your data. Candidates can delete all their data at any time via the Candidate Portal.
+
+1. Who We Are
+
+AIRECRUITEX LIMITED("AiRecruitex", "we", "our", "us") is a company registered in England and Wales.
+
+Company Number: 16983568
+Registered Address: 71-75 Shelton Street, Covent Garden, London, WC2H 9JQ, United Kingdom
+Contact: hello@airecruitex.com
+
+This Privacy Policy explains how we collect, use, and protect personal data when you use our AI-powered recruiting platform at airecruitex.com (the "Service").
+
+2. Our Role: Controller vs Processor
+
+Under UK GDPR, we act in different capacities depending on whose data we process:
+
+When we are the Data Controller:
+Recruiter account data (company name, email, password, settings)
+Payment and billing information
+Communications with us
+When we are the Data Processor:
+Candidate data submitted through our platform (CVs, interview responses, contact details)
+In this case, the recruiter (our customer) is the Data Controller
+
+If you are a candidate who has applied for a role through AiRecruitex and wish to exercise your data protection rights, please contact the recruiter/employer you applied to directly. If you need assistance identifying them, contact us at hello@airecruitex.com.
+
+3. Information We Collect
+From Recruiters:
+Data Type	Examples	Purpose
+Account Information	Company name, email address, password	Account creation and authentication
+Job Data	Job descriptions, requirements, interview questions	Providing the Service
+Settings	Language preferences, AI assistant name, branding	Customising the Service
+Usage Data	Login times, features used, credit usage	Service improvement and billing
+Payment Data	Processed securely via Stripe (we do not store card details)	Processing payments
+From Candidates (on behalf of Recruiters):
+Data Type	Examples	Purpose
+Contact Information	Name, email address, phone number	Application processing
+CV/Resume Data	Work history, skills, education, qualifications	AI analysis and matching
+Interview Responses	Answers to interview questions, conversation transcripts	AI scoring and recruiter review
+Technical Data	Browser type, session information, IP address	Security and fraud prevention
+4. How We Use Your Information
+To provide and maintain the Service
+To conduct AI-powered candidate interviews
+To analyse CVs and generate match scores
+To create candidate insights and summaries for recruiters
+To send transactional emails (interview invitations, notifications, password resets)
+To process payments and manage accounts
+To improve and develop our Service
+To detect and prevent fraud and abuse
+To comply with legal obligations
+5. AI Processing
+
+AiRecruitex uses artificial intelligence (powered by Anthropic's Claude) to:
+
+Conduct automated candidate interviews via chat
+Parse and analyse CV content
+Score candidates against job requirements
+Generate summaries and insights for recruiters
+Detect potential discrepancies between CV claims and interview responses
+
+Important: AI-generated scores and insights are provided to assist recruiters in their decision-making. All final hiring decisions are made by human recruiters, not by our AI systems. AiRecruitex is a screening tool that helps prioritise candidates; it does not make employment decisions.
+
+We have tested our AI systems to ensure consistent scoring regardless of candidate name, gender, ethnicity, or age. The system evaluates qualifications and responses only.
+
+6. Legal Basis for Processing
+
+Under UK GDPR, we process personal data on the following legal bases:
+
+Contract: To provide the Service to recruiters who have signed up
+Legitimate Interests: To improve our Service, ensure security, and prevent fraud
+Legal Obligation: To comply with applicable laws and regulations
+Consent: Where specifically requested (e.g., marketing communications)
+
+For candidate data, recruiters are the Data Controllers and are responsible for ensuring they have the appropriate legal basis to collect and process candidate applications.
+
+7. Data Sharing and Sub-processors
+
+We share personal data with the following categories of service providers who help us deliver the Service:
+
+Provider	Purpose	Location
+Anthropic (Claude AI)	AI interview processing, CV analysis, scoring	United States
+SendGrid (Twilio)	Transactional email delivery	United States
+Cloudflare	Security, DNS, email routing	Global
+IONOS	Server hosting and data storage	European Union
+Stripe	Payment processing	United States
+
+We do not sell your personal data to third parties.
+
+We may also disclose personal data where required by law, to protect our legal rights, or in connection with a business transfer (e.g., merger or acquisition).
+
+8. International Data Transfers
+
+Some of our sub-processors are located outside the United Kingdom. When we transfer personal data internationally, we ensure appropriate safeguards are in place:
+
+Transfers to countries with an adequacy decision from the UK
+Standard Contractual Clauses (SCCs) approved by the ICO
+UK International Data Transfer Agreement (IDTA) where applicable
+9. Data Retention
+Recruiter accounts: Retained while the account is active. Deleted upon account closure or request.
+Candidate data: Retained for 12 months after the application date, unless deleted sooner by the recruiter or by the candidate via the Candidate Portal.
+Interview transcripts: Retained for 12 months, then automatically deleted.
+Payment records: Retained for 7 years as required by UK tax law.
+10. Your Rights
+
+Under UK GDPR, you have the following rights:
+
+Right of Access: Request a copy of the personal data we hold about you
+Right to Rectification: Request correction of inaccurate personal data
+Right to Erasure:Request deletion of your personal data ("right to be forgotten")
+Right to Restrict Processing: Request limitation of how we use your data
+Right to Data Portability: Request transfer of your data in a machine-readable format
+Right to Object: Object to processing based on legitimate interests
+Right to Withdraw Consent: Where processing is based on consent
+
+For candidates: You can exercise your right to erasure and data portability directly through the Candidate Portal. Log in with the email you used to apply, and you can view all your applications, export your data, or permanently delete your account and all associated data. No need to contact us or the recruiter.
+
+For all other rights, contact us at hello@airecruitex.com. We will respond within 30 days.
+
+11. Data Security
+
+We implement appropriate technical and organisational measures to protect personal data, including:
+
+Encryption in transit (HTTPS/TLS)
+Secure password hashing (bcrypt)
+Email verification for new devices
+Rate limiting to prevent abuse
+Access controls and authentication
+Regular security reviews
+Secure cloud infrastructure
+12. Cookies and Local Storage
+
+We use essential browser storage (localStorage) to:
+
+Keep you logged into your account
+Remember trusted devices for security
+Store session information
+13. Children
+
+Our Service is not intended for individuals under 16 years of age. We do not knowingly collect personal data from children under 16. If you believe we have collected data from a child under 16, please contact us immediately at hello@airecruitex.com and we will delete it promptly.
+
+14. Changes to This Policy
+
+We may update this Privacy Policy from time to time. We will notify registered users of significant changes by email. The "Last updated" date at the top of this page indicates when the policy was last revised.
+
+15. Complaints
+
+If you have concerns about how we handle your personal data, please contact us first at hello@airecruitex.com. We will do our best to resolve your concerns.
+
+You also have the right to lodge a complaint with the UK supervisory authority:
+
+Information Commissioner's Office (ICO)
+Website: ico.org.uk/make-a-complaint
+Telephone: 0303 123 1113
+
+16. Contact Us
+
+For any questions about this Privacy Policy or our data practices, please contact us:
+
+AIRECRUITEX LIMITED
+71-75 Shelton Street, Covent Garden
+London, WC2H 9JQ
+United Kingdom
+
+Email: hello@airecruitex.com
+
+© 2026 AIRECRUITEX LIMITED. All rights reserved.
+
+Home ·Terms of Service ·Privacy Policy

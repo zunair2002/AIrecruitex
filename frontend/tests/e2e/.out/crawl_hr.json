@@ -1,0 +1,212 @@
+[
+  {
+    "role": "hr",
+    "vp": "desktop",
+    "route": "/recruiter/dashboard",
+    "finalUrl": "/recruiter/dashboard",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/hr_desktop__recruiter_dashboard.png"
+  },
+  {
+    "role": "hr",
+    "vp": "desktop",
+    "route": "/recruiter/jobs",
+    "finalUrl": "/recruiter/jobs",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/hr_desktop__recruiter_jobs.png"
+  },
+  {
+    "role": "hr",
+    "vp": "desktop",
+    "route": "/recruiter/jobs/create",
+    "finalUrl": "/recruiter/jobs/create",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/hr_desktop__recruiter_jobs_create.png"
+  },
+  {
+    "role": "hr",
+    "vp": "desktop",
+    "route": "/recruiter/applicants",
+    "finalUrl": "/recruiter/applicants",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/hr_desktop__recruiter_applicants.png"
+  },
+  {
+    "role": "hr",
+    "vp": "desktop",
+    "route": "/recruiter/question-pool",
+    "finalUrl": "/recruiter/question-pool",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/hr_desktop__recruiter_question-pool.png"
+  },
+  {
+    "role": "hr",
+    "vp": "desktop",
+    "route": "/recruiter/reports",
+    "finalUrl": "/recruiter/reports",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/hr_desktop__recruiter_reports.png"
+  },
+  {
+    "role": "hr",
+    "vp": "desktop",
+    "route": "/recruiter/shortlisted",
+    "finalUrl": "/recruiter/shortlisted",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/hr_desktop__recruiter_shortlisted.png"
+  },
+  {
+    "role": "hr",
+    "vp": "desktop",
+    "route": "/recruiter/courses",
+    "finalUrl": "/recruiter/courses",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/hr_desktop__recruiter_courses.png"
+  },
+  {
+    "role": "hr",
+    "vp": "desktop",
+    "route": "/recruiter/notifications",
+    "finalUrl": "/recruiter/notifications",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/hr_desktop__recruiter_notifications.png"
+  },
+  {
+    "role": "hr",
+    "vp": "desktop",
+    "route": "/recruiter/support",
+    "finalUrl": "/recruiter/support",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/hr_desktop__recruiter_support.png"
+  },
+  {
+    "role": "hr",
+    "vp": "mobile",
+    "route": "/recruiter/dashboard",
+    "finalUrl": "/recruiter/dashboard",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/hr_mobile__recruiter_dashboard.png"
+  },
+  {
+    "role": "hr",
+    "vp": "mobile",
+    "route": "/recruiter/jobs",
+    "finalUrl": "/recruiter/jobs",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/hr_mobile__recruiter_jobs.png"
+  },
+  {
+    "role": "hr",
+    "vp": "mobile",
+    "route": "/recruiter/jobs/create",
+    "finalUrl": "/recruiter/jobs/create",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [
+      "pageerror: Invalid or unexpected token"
+    ],
+    "screenshot": "tests/e2e/screenshots/hr_mobile__recruiter_jobs_create.png"
+  },
+  {
+    "role": "hr",
+    "vp": "mobile",
+    "route": "/recruiter/applicants",
+    "finalUrl": "/recruiter/applicants",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [
+      "pageerror: Invalid or unexpected token"
+    ],
+    "screenshot": "tests/e2e/screenshots/hr_mobile__recruiter_applicants.png"
+  },
+  {
+    "role": "hr",
+    "vp": "mobile",
+    "route": "/recruiter/question-pool",
+    "finalUrl": "/recruiter/question-pool",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [
+      "pageerror: Invalid or unexpected token"
+    ],
+    "screenshot": "tests/e2e/screenshots/hr_mobile__recruiter_question-pool.png"
+  },
+  {
+    "role": "hr",
+    "vp": "mobile",
+    "route": "/recruiter/reports",
+    "finalUrl": "/recruiter/reports",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [
+      "pageerror: Invalid or unexpected token"
+    ],
+    "screenshot": "tests/e2e/screenshots/hr_mobile__recruiter_reports.png"
+  },
+  {
+    "role": "hr",
+    "vp": "mobile",
+    "route": "/recruiter/shortlisted",
+    "finalUrl": "/recruiter/shortlisted",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/hr_mobile__recruiter_shortlisted.png"
+  },
+  {
+    "role": "hr",
+    "vp": "mobile",
+    "route": "/recruiter/courses",
+    "finalUrl": "/recruiter/courses",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/hr_mobile__recruiter_courses.png"
+  },
+  {
+    "role": "hr",
+    "vp": "mobile",
+    "route": "/recruiter/notifications",
+    "finalUrl": "/recruiter/notifications",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/hr_mobile__recruiter_notifications.png"
+  },
+  {
+    "role": "hr",
+    "vp": "mobile",
+    "route": "/recruiter/support",
+    "finalUrl": "/recruiter/support",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [
+      "pageerror: Invalid or unexpected token"
+    ],
+    "screenshot": "tests/e2e/screenshots/hr_mobile__recruiter_support.png"
+  }
+]

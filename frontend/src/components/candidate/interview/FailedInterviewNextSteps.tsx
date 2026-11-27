@@ -20,6 +20,7 @@ export function FailedInterviewNextSteps({
   report?: InterviewReport;
 }) {
   const weakTopics = report?.weakTopics ?? [];
+  const additionalTips = tips.filter((tip) => !report?.learningPlan?.includes(tip));
   const learningHref = weakTopics.length
     ? `/candidate/learning?topic=${encodeURIComponent(weakTopics[0])}`
     : "/candidate/learning";
@@ -57,9 +58,9 @@ export function FailedInterviewNextSteps({
             </div>
           )}
 
-          {tips.length > 0 && (
+          {additionalTips.length > 0 && (
             <ul className="mt-4 space-y-2">
-              {tips.map((tip) => (
+              {additionalTips.map((tip) => (
                 <li
                   key={tip}
                   className="flex items-start gap-3 text-sm leading-6 text-body"

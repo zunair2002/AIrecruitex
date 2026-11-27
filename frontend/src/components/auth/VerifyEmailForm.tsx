@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth, homePathForRole } from "@/context/AuthContext";
-import { toErrorMessage } from "@/lib/api";
+import { ApiError, toErrorMessage } from "@/lib/api";
 import { AuthError } from "./AuthCardParts";
 import { MailCheck } from "lucide-react";
 import { InlineSuccess } from "@/components/ui/Feedback";
@@ -25,6 +25,8 @@ export function VerifyEmailForm({ email }: { email: string }) {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const requestPending = useRef(false);
+  const [resending, setResending] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(30);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -39,6 +41,8 @@ export function VerifyEmailForm({ email }: { email: string }) {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    if (requestPending.current || otp.length !== 6) return;
+    requestPending.current = true;
     setError(null);
     setIsSubmitting(true);
     try {
@@ -46,19 +50,27 @@ export function VerifyEmailForm({ email }: { email: string }) {
       router.replace(homePathForRole(user.role));
     } catch (err) {
       setError(toErrorMessage(err));
+      requestPending.current = false;
       setIsSubmitting(false);
     }
   };
 
   const handleResend = async () => {
+    if (requestPending.current || secondsLeft > 0) return;
+    requestPending.current = true;
+    setResending(true);
     setError(null);
     setNotice(null);
     try {
       await resendOtp(email);
       setSecondsLeft(30);
-      setNotice("A new code is on its way to your inbox.");
+      setNotice("Your request for a new code was accepted.");
     } catch (err) {
       setError(toErrorMessage(err));
+      if (err instanceof ApiError && err.status === 429) setSecondsLeft(err.retryAfterSeconds ?? 30);
+    } finally {
+      requestPending.current = false;
+      setResending(false);
     }
   };
 
@@ -73,7 +85,7 @@ export function VerifyEmailForm({ email }: { email: string }) {
         </span>
         <h2 className="mt-4 text-lg font-semibold text-ink">Check your email</h2>
         <p className="mt-1 text-sm text-muted">
-          We sent a 6-digit code to{" "}
+          A 6-digit verification code was requested for{" "}
           <span className="break-all font-medium text-ink">{email}</span>. Enter
           it to finish setting up your account.
         </p>
@@ -109,7 +121,7 @@ export function VerifyEmailForm({ email }: { email: string }) {
         type="submit"
         size="lg"
         fullWidth
-        disabled={otp.length !== 6}
+        disabled={otp.length !== 6 || resending}
         loading={isSubmitting}
       >
         {isSubmitting ? "Verifying…" : "Verify and continue"}
@@ -119,7 +131,8 @@ export function VerifyEmailForm({ email }: { email: string }) {
         variant="ghost"
         fullWidth
         onClick={handleResend}
-        disabled={secondsLeft > 0}
+        loading={resending}
+        disabled={secondsLeft > 0 || isSubmitting}
         className="tabular-nums"
       >
         {secondsLeft > 0 ? `Resend code in ${secondsLeft}s` : "Resend code"}

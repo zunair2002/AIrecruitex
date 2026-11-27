@@ -1,0 +1,273 @@
+
+> frontend@0.1.0 lint
+> eslint
+
+
+c:\frontend\AIrecruitex\frontend\src\components\home\WhiteLabel.tsx
+  89:15  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+
+c:\frontend\AIrecruitex\frontend\src\components\home\powerful-features\PowerfulFeatures.tsx
+  16:12  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+c:\frontend\AIrecruitex\frontend\src\components\home\powerful-features\PowerfulFeatures.tsx:16:12
+  14 |   return (
+  15 |     <motion.section
+> 16 |       ref={state.sectionRef}
+     |            ^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  17 |       initial="hidden"
+  18 |       animate={state.sectionControls}
+  19 |       variants={fadeInUp}                                                                                        react-hooks/refs
+  18:16  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+c:\frontend\AIrecruitex\frontend\src\components\home\powerful-features\PowerfulFeatures.tsx:18:16
+  16 |       ref={state.sectionRef}
+  17 |       initial="hidden"
+> 18 |       animate={state.sectionControls}
+     |                ^^^^^^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  19 |       variants={fadeInUp}
+  20 |       className="overflow-hidden bg-white py-24"
+  21 |     >                                                       react-hooks/refs
+  25:18  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+c:\frontend\AIrecruitex\frontend\src\components\home\powerful-features\PowerfulFeatures.tsx:25:18
+  23 |         <div className="features-collapsible-content">
+  24 |           <motion.div
+> 25 |             ref={state.headerRef}
+     |                  ^^^^^^^^^^^^^^^ Cannot access ref value during render
+  26 |             initial="hidden"
+  27 |             animate={state.headerControls}
+  28 |             variants={fadeInUp}               react-hooks/refs
+  27:22  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+c:\frontend\AIrecruitex\frontend\src\components\home\powerful-features\PowerfulFeatures.tsx:27:22
+  25 |             ref={state.headerRef}
+  26 |             initial="hidden"
+> 27 |             animate={state.headerControls}
+     |                      ^^^^^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  28 |             variants={fadeInUp}
+  29 |           >
+  30 |             <PowerfulFeaturesHeader />                                react-hooks/refs
+  34:18  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+c:\frontend\AIrecruitex\frontend\src\components\home\powerful-features\PowerfulFeatures.tsx:34:18
+  32 |
+  33 |           <motion.div
+> 34 |             ref={state.carouselRef}
+     |                  ^^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  35 |             initial="hidden"
+  36 |             animate={state.carouselControls}
+  37 |             variants={fadeInUp}                                                                react-hooks/refs
+  36:22  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+c:\frontend\AIrecruitex\frontend\src\components\home\powerful-features\PowerfulFeatures.tsx:36:22
+  34 |             ref={state.carouselRef}
+  35 |             initial="hidden"
+> 36 |             animate={state.carouselControls}
+     |                      ^^^^^^^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  37 |             variants={fadeInUp}
+  38 |           >
+  39 |             <FeaturesCarousel wrapperRef={state.wrapperRef} />  react-hooks/refs
+  39:43  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+c:\frontend\AIrecruitex\frontend\src\components\home\powerful-features\PowerfulFeatures.tsx:39:43
+  37 |             variants={fadeInUp}
+  38 |           >
+> 39 |             <FeaturesCarousel wrapperRef={state.wrapperRef} />
+     |                                           ^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  40 |           </motion.div>
+  41 |
+  42 |           <FeaturesCarouselNav                                          react-hooks/refs
+  43:26  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+c:\frontend\AIrecruitex\frontend\src\components\home\powerful-features\PowerfulFeatures.tsx:43:26
+  41 |
+  42 |           <FeaturesCarouselNav
+> 43 |             activeScene={state.activeScene}
+     |                          ^^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  44 |             onPrev={state.prevScene}
+  45 |             onNext={state.nextScene}
+  46 |             onGoTo={state.setActiveScene}                             react-hooks/refs
+  44:21  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+c:\frontend\AIrecruitex\frontend\src\components\home\powerful-features\PowerfulFeatures.tsx:44:21
+  42 |           <FeaturesCarouselNav
+  43 |             activeScene={state.activeScene}
+> 44 |             onPrev={state.prevScene}
+     |                     ^^^^^^^^^^^^^^^ Cannot access ref value during render
+  45 |             onNext={state.nextScene}
+  46 |             onGoTo={state.setActiveScene}
+  47 |           />                       react-hooks/refs
+  45:21  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+c:\frontend\AIrecruitex\frontend\src\components\home\powerful-features\PowerfulFeatures.tsx:45:21
+  43 |             activeScene={state.activeScene}
+  44 |             onPrev={state.prevScene}
+> 45 |             onNext={state.nextScene}
+     |                     ^^^^^^^^^^^^^^^ Cannot access ref value during render
+  46 |             onGoTo={state.setActiveScene}
+  47 |           />
+  48 |                                                      react-hooks/refs
+  46:21  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+c:\frontend\AIrecruitex\frontend\src\components\home\powerful-features\PowerfulFeatures.tsx:46:21
+  44 |             onPrev={state.prevScene}
+  45 |             onNext={state.nextScene}
+> 46 |             onGoTo={state.setActiveScene}
+     |                     ^^^^^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  47 |           />
+  48 |
+  49 |           <motion.div                                                                       react-hooks/refs
+  50:18  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+c:\frontend\AIrecruitex\frontend\src\components\home\powerful-features\PowerfulFeatures.tsx:50:18
+  48 |
+  49 |           <motion.div
+> 50 |             ref={state.moreFeaturesRef}
+     |                  ^^^^^^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  51 |             initial="hidden"
+  52 |             animate={state.moreFeaturesControls}
+  53 |             variants={fadeInUp}                                                    react-hooks/refs
+  52:22  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+c:\frontend\AIrecruitex\frontend\src\components\home\powerful-features\PowerfulFeatures.tsx:52:22
+  50 |             ref={state.moreFeaturesRef}
+  51 |             initial="hidden"
+> 52 |             animate={state.moreFeaturesControls}
+     |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  53 |             variants={fadeInUp}
+  54 |           >
+  55 |             <MoreFeaturesSection />                 react-hooks/refs
+
+c:\frontend\AIrecruitex\frontend\src\components\home\product-showcase\useProductShowcaseCarousel.ts
+  32:6  warning  React Hook useEffect has a missing dependency: 'nextSlide'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+c:\frontend\AIrecruitex\frontend\src\components\home\raas\RaaS.tsx
+  18:12  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+c:\frontend\AIrecruitex\frontend\src\components\home\raas\RaaS.tsx:18:12
+  16 |   return (
+  17 |     <motion.section
+> 18 |       ref={anim.sectionRef}
+     |            ^^^^^^^^^^^^^^^ Cannot access ref value during render
+  19 |       initial="hidden"
+  20 |       animate={anim.sectionControls}
+  21 |       variants={fadeInUp}                                                                                                                         react-hooks/refs
+  20:16  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+c:\frontend\AIrecruitex\frontend\src\components\home\raas\RaaS.tsx:20:16
+  18 |       ref={anim.sectionRef}
+  19 |       initial="hidden"
+> 20 |       animate={anim.sectionControls}
+     |                ^^^^^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  21 |       variants={fadeInUp}
+  22 |       className="bg-navy py-24"
+  23 |       id="recruitment-service"                                                                                react-hooks/refs
+  27:16  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+c:\frontend\AIrecruitex\frontend\src\components\home\raas\RaaS.tsx:27:16
+  25 |       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+  26 |         <motion.div
+> 27 |           ref={anim.contentRef}
+     |                ^^^^^^^^^^^^^^^ Cannot access ref value during render
+  28 |           initial="hidden"
+  29 |           animate={anim.contentControls}
+  30 |           variants={fadeInUp}                                                 react-hooks/refs
+  29:20  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+c:\frontend\AIrecruitex\frontend\src\components\home\raas\RaaS.tsx:29:20
+  27 |           ref={anim.contentRef}
+  28 |           initial="hidden"
+> 29 |           animate={anim.contentControls}
+     |                    ^^^^^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  30 |           variants={fadeInUp}
+  31 |           className="max-w-3xl"
+  32 |         >                                                                                 react-hooks/refs
+  56:16  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+c:\frontend\AIrecruitex\frontend\src\components\home\raas\RaaS.tsx:56:16
+  54 |
+  55 |         <motion.div
+> 56 |           ref={anim.featuresRef}
+     |                ^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  57 |           initial="hidden"
+  58 |           animate={anim.featuresControls}
+  59 |           variants={staggerContainer}                                                                                                     react-hooks/refs
+  58:20  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+c:\frontend\AIrecruitex\frontend\src\components\home\raas\RaaS.tsx:58:20
+  56 |           ref={anim.featuresRef}
+  57 |           initial="hidden"
+> 58 |           animate={anim.featuresControls}
+     |                    ^^^^^^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  59 |           variants={staggerContainer}
+  60 |           className="mt-12 grid grid-cols-1 border-t border-white/15 md:grid-cols-2 lg:grid-cols-4"
+  61 |         >  react-hooks/refs
+  79:16  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+c:\frontend\AIrecruitex\frontend\src\components\home\raas\RaaS.tsx:79:16
+  77 |
+  78 |         <motion.div
+> 79 |           ref={anim.ctaRef}
+     |                ^^^^^^^^^^^ Cannot access ref value during render
+  80 |           initial="hidden"
+  81 |           animate={anim.ctaControls}
+  82 |           variants={scaleUp}                                                                                                                             react-hooks/refs
+  81:20  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+c:\frontend\AIrecruitex\frontend\src\components\home\raas\RaaS.tsx:81:20
+  79 |           ref={anim.ctaRef}
+  80 |           initial="hidden"
+> 81 |           animate={anim.ctaControls}
+     |                    ^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  82 |           variants={scaleUp}
+  83 |           className="mt-12"
+  84 |         >                                                                                                  react-hooks/refs
+
+c:\frontend\AIrecruitex\frontend\src\components\home\white-label\useWhiteLabelCarousel.ts
+  23:6  warning  React Hook useEffect has a missing dependency: 'nextSlide'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+✖ 24 problems (21 errors, 3 warnings)
+
+EXIT 1

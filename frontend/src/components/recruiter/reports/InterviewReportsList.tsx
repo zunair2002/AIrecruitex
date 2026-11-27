@@ -192,9 +192,14 @@ export function InterviewReportsList() {
               <ErrorBlock message={report.error} onRetry={report.reload} />
             ) : report.data ? (
               <InterviewReportDetail
+                key={report.data.application._id}
                 report={report.data}
                 jobTitle={selectedJob?.title ?? "This job"}
-                onStatusChanged={applications.reload}
+                onStatusChanged={(id, status) => {
+                  report.setData(current => current?.application._id === id
+                    ? { ...current, application: { ...current.application, status } }
+                    : current);
+                }}
               />
             ) : null}
           </div>

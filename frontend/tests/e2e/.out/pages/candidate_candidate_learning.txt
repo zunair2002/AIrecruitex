@@ -1,0 +1,49 @@
+URL: http://localhost:3100/candidate/learning
+
+Skip to content
+Aı
+Recruitex
+Candidate Portal
+Dashboard
+JOB BOARD
+Job board
+Resume
+APPLICATIONS
+My applications
+Interview results
+INTERVIEW PREPARATION
+Basic interview
+Technical interview
+Learning
+GENERAL
+My profile
+Plan & billing
+Notifications
+Support
+EC
+E2E crawlc
+e2e-crawlc-1795381169481-0@example.com
+Learning
+
+Courses published by the hiring team. Useful when an interview report flags a weak topic.
+
+Free
+
+Your plan
+5 practice interviews per day
+Free learning courses
+Basic interview feedback
+Resume upload
+
+Premium
+
+$29/month
+10 practice interviews per day
+Every course, including Premium
+Advanced role-based interviews
+Detailed AI scoring & feedback
+Upgrade to Premium
+
+No courses published yet.
+
+When the hiring team adds learning material, it appears here.

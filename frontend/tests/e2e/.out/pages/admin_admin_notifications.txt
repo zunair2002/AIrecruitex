@@ -1,0 +1,49 @@
+URL: http://localhost:3100/admin/notifications
+
+Skip to content
+Aı
+Recruitex
+Admin Portal
+Overview
+PLATFORM
+User management
+Jobs & applications
+INSIGHT
+Reports
+Activity log
+Monitoring
+GENERAL
+Support desk
+Broadcast
+Settings
+EC
+E2E crawla
+e2e-crawla-1795381409292-2@example.com
+Broadcast notification
+
+Push a notification to one user or to everyone with a given role. Recipients see it in their notifications and live over the socket.
+
+Compose
+Send to
+Everyone with a role
+A single user
+Role
+Candidate (1)
+HR (1)
+Admin (1)
+Message *
+
+Plain text. 0 characters.
+
+Send notification
+Preview
+
+How the notification reaches people.
+
+Audience
+
+Everyone with the Candidate role · 1 account
+
+Notification
+
+Your message will appear here.

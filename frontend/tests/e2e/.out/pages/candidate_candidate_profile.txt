@@ -1,0 +1,82 @@
+URL: http://localhost:3100/candidate/profile
+
+Skip to content
+Aı
+Recruitex
+Candidate Portal
+Dashboard
+JOB BOARD
+Job board
+Resume
+APPLICATIONS
+My applications
+Interview results
+INTERVIEW PREPARATION
+Basic interview
+Technical interview
+Learning
+GENERAL
+My profile
+Plan & billing
+Notifications
+Support
+EC
+E2E crawlc
+e2e-crawlc-1795381169481-0@example.com
+My profile
+
+How you present yourself. Your name and email come from your account and can't be changed here.
+
+Profile details
+
+Shown to employers alongside your applications.
+
+EC
+
+E2E crawlc
+
+e2e-crawlc-1795381169481-0@example.com
+
+Profile photo
+
+JPG, PNG or WEBP, max 5MB.
+
+Headline
+
+16/120
+
+About
+
+17/1000
+
+Interests
+
+Comma separated.
+
+web
+Save profile
+Profile preview
+
+A live preview of your candidate profile.
+
+EC
+
+E2E crawlc
+
+Free plan
+
+Junior developer
+
+I build web apps.
+
+web
+Profile strength
+75%
+
+Add a photo, headline, about section and interests to stand out.
+
+Free plan
+
+Free courses · 5 practice interviews a day
+
+Upgrade to Premium

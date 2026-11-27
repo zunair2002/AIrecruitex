@@ -1,0 +1,336 @@
+
+Running 28 tests using 1 worker
+
+  ok  1 tests\e2e\10-candidate-core.spec.ts:9:1 › candidate signup -> OTP -> lands on profile gate -> save -> dashboard (18.5s)
+  ok  2 tests\e2e\10-candidate-core.spec.ts:56:1 › login with wrong password shows error; correct password works; logout (10.7s)
+  ok  3 tests\e2e\10-candidate-core.spec.ts:74:1 › resume: reject bad type, reject >5MB, upload pdf, delete (11.9s)
+  ok  4 tests\e2e\10-candidate-core.spec.ts:98:1 › job board -> apply -> my applications (+ notifications) (1.7m)
+  ok  5 tests\e2e\10-candidate-core.spec.ts:131:1 › support ticket + messages; admin reply visible to candidate (1.5m)
+  x   6 tests\e2e\20-practice.spec.ts:33:1 › Round 1 full: intro first, closing last, pass -> Round 2 unlocked; Round 2 on selected track (41.2s)
+  x   7 tests\e2e\20-practice.spec.ts:33:1 › Round 1 full: intro first, closing last, pass -> Round 2 unlocked; Round 2 on selected track (retry #1) (33.4s)
+  ok  8 tests\e2e\20-practice.spec.ts:109:1 › Round 1 fail -> Round 2 locked card; expired-but-passing Round 1 vs Round 2 lock (36.7s)
+  ok  9 tests\e2e\20-practice.spec.ts:141:1 › voice controls: Speak button when supported, text box only when not (1.6m)
+  ok 10 tests\e2e\20-practice.spec.ts:158:1 › double-click submit records exactly one answer; API resubmit without questionNumber (1.6m)
+  ok 11 tests\e2e\20-practice.spec.ts:177:1 › usage limit: 6th practice is locked with a message (free plan) (1.5m)
+  ok 12 tests\e2e\30-hr-org.spec.ts:22:1 › HR: create job with JD upload -> skills suggested (38.0s)
+  ok 13 tests\e2e\30-hr-org.spec.ts:46:1 › HR: question pool upload (Data_Analyst_Question_Pool.docx, Q1:/Answer:/Marks:) (15.8s)
+  x  14 tests\e2e\30-hr-org.spec.ts:60:1 › HR: applicants list shows match score; status + per-row invite; bulk-invite with 1 ticked (3.0m)
+  -  15 tests\e2e\30-hr-org.spec.ts:106:1 › HR: cancel invite; AI interview single + bulk via API (no UI control)
+  -  16 tests\e2e\30-hr-org.spec.ts:164:1 › Proctored run 1: warm-ups, pool numbering, 3 violations -> cancelled
+  -  17 tests\e2e\30-hr-org.spec.ts:205:1 › Proctored run 2: complete -> closing message; reload mid-way resumes
+  -  18 tests\e2e\30-hr-org.spec.ts:236:1 › HR: reports (AI report + org report: Introduction (not scored), Q1/Q2 pool numbering); shortlisted
+  -  19 tests\e2e\30-hr-org.spec.ts:260:1 › HR: courses CRUD + candidate premium lock
+  x  20 tests\e2e\30-hr-org.spec.ts:22:1 › HR: create job with JD upload -> skills suggested (retry #1) (1.6m)
+  -  21 tests\e2e\30-hr-org.spec.ts:60:1 › HR: applicants list shows match score; status + per-row invite; bulk-invite with 1 ticked (retry #1)
+  -  22 tests\e2e\30-hr-org.spec.ts:46:1 › HR: question pool upload (Data_Analyst_Question_Pool.docx, Q1:/Answer:/Marks:) (retry #1)
+  -  23 tests\e2e\30-hr-org.spec.ts:106:1 › HR: cancel invite; AI interview single + bulk via API (no UI control) (retry #1)
+  -  24 tests\e2e\30-hr-org.spec.ts:164:1 › Proctored run 1: warm-ups, pool numbering, 3 violations -> cancelled (retry #1)
+  -  25 tests\e2e\30-hr-org.spec.ts:205:1 › Proctored run 2: complete -> closing message; reload mid-way resumes (retry #1)
+  -  26 tests\e2e\30-hr-org.spec.ts:236:1 › HR: reports (AI report + org report: Introduction (not scored), Q1/Q2 pool numbering); shortlisted (retry #1)
+  -  27 tests\e2e\30-hr-org.spec.ts:260:1 › HR: courses CRUD + candidate premium lock (retry #1)
+  ok 28 tests\e2e\40-admin-billing-errors.spec.ts:8:1 › admin: dashboard, users (plan change, block), activity logs, content, reports (1.0m)
+  ok 29 tests\e2e\40-admin-billing-errors.spec.ts:58:1 › admin: broadcast notification reaches candidate (10.6s)
+  x  30 tests\e2e\40-admin-billing-errors.spec.ts:74:1 › admin: settings save + are they enforced (signups, resume size, match threshold) (1.8m)
+  x  31 tests\e2e\40-admin-billing-errors.spec.ts:74:1 › admin: settings save + are they enforced (signups, resume size, match threshold) (retry #1) (22.3s)
+  x  32 tests\e2e\40-admin-billing-errors.spec.ts:104:1 › admin: support desk reply, resolve, reopen (26.5s)
+  x  33 tests\e2e\40-admin-billing-errors.spec.ts:104:1 › admin: support desk reply, resolve, reopen (retry #1) (1.8m)
+  x  34 tests\e2e\40-admin-billing-errors.spec.ts:127:1 › billing: plan card, upgrade -> checkout redirect stub -> premium, cancel, resume; pricing matches /api/billing/plans (3.0m)
+  x  35 tests\e2e\40-admin-billing-errors.spec.ts:127:1 › billing: plan card, upgrade -> checkout redirect stub -> premium, cancel, resume; pricing matches /api/billing/plans (retry #1) (33.4s)
+  ok 36 tests\e2e\40-admin-billing-errors.spec.ts:169:1 › errors: backend down, 503 AI down, 429 rate limit on login, 409 already-applied, 410 time-up (2.4m)
+  ok 37 tests\e2e\40-admin-billing-errors.spec.ts:244:1 › security: signup role=admin; login form submitted before JS = credentials in URL (3.2s)
+  ok 38 tests\e2e\40-admin-billing-errors.spec.ts:267:1 › a11y: unlabeled controls, keyboard nav on login, image alts (2.1m)
+  ok 39 tests\e2e\50-responsive.spec.ts:10:1 › home page horizontal overflow source (375 + 1280) (9.3s)
+  ok 40 tests\e2e\50-responsive.spec.ts:21:1 › profile preview + sidebar card with long name on 375px (2.0m)
+
+
+  1) tests\e2e\20-practice.spec.ts:33:1 › Round 1 full: intro first, closing last, pass -> Round 2 unlocked; Round 2 on selected track 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('button', { name: /Resume|Start Round 2/i }).last()
+    Expected: visible
+    Timeout: 20000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('button', { name: /Resume|Start Round 2/i }).last() with timeout 20000ms
+      - waiting for getByRole('button', { name: /Resume|Start Round 2/i }).last()
+
+
+      77 |   await shot(page, "practice_r2_after_reload");
+      78 |   const resumeBtn = page.getByRole("button", { name: /Resume|Start Round 2/i }).last();
+    > 79 |   await expect(resumeBtn).toBeVisible();
+         |                           ^
+      80 |   const btnLabel = await resumeBtn.innerText();
+      81 |   await resumeBtn.click();
+      82 |   await expect(page.getByText(/Question 2 of 8/).first()).toBeVisible({ timeout: 30000 });
+        at c:\frontend\AIrecruitex\frontend\tests\e2e\20-practice.spec.ts:79:27
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    tests\e2e\.out\artifacts\20-practice-Round-1-full-i-eb4ed-d-Round-2-on-selected-track\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: tests\e2e\.out\artifacts\20-practice-Round-1-full-i-eb4ed-d-Round-2-on-selected-track\error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('button', { name: /Resume|Start Round 2/i }).last()
+    Expected: visible
+    Timeout: 20000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('button', { name: /Resume|Start Round 2/i }).last() with timeout 20000ms
+      - waiting for getByRole('button', { name: /Resume|Start Round 2/i }).last()
+
+
+      77 |   await shot(page, "practice_r2_after_reload");
+      78 |   const resumeBtn = page.getByRole("button", { name: /Resume|Start Round 2/i }).last();
+    > 79 |   await expect(resumeBtn).toBeVisible();
+         |                           ^
+      80 |   const btnLabel = await resumeBtn.innerText();
+      81 |   await resumeBtn.click();
+      82 |   await expect(page.getByText(/Question 2 of 8/).first()).toBeVisible({ timeout: 30000 });
+        at c:\frontend\AIrecruitex\frontend\tests\e2e\20-practice.spec.ts:79:27
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    tests\e2e\.out\artifacts\20-practice-Round-1-full-i-eb4ed-d-Round-2-on-selected-track-retry1\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: tests\e2e\.out\artifacts\20-practice-Round-1-full-i-eb4ed-d-Round-2-on-selected-track-retry1\error-context.md
+
+  2) tests\e2e\30-hr-org.spec.ts:60:1 › HR: applicants list shows match score; status + per-row invite; bulk-invite with 1 ticked 
+
+    Test timeout of 180000ms exceeded.
+
+    Error: locator.check: Test timeout of 180000ms exceeded.
+    Call log:
+      - waiting for locator('li').filter({ hasText: 'e2e-appD-1795382533284-9@example.com' }).first().getByRole('checkbox').first()
+
+
+      90 |   await page.reload();
+      91 |   const rowD = page.locator("li").filter({ hasText: D.email }).first();
+    > 92 |   await rowD.getByRole("checkbox").first().check();
+         |                                            ^
+      93 |   const bulk = page.getByRole("region", { name: "Bulk actions" });
+      94 |   await bulk.getByRole("button", { name: /Invite to org interview/i }).click();
+      95 |   const dlg2 = page.getByRole("dialog");
+        at c:\frontend\AIrecruitex\frontend\tests\e2e\30-hr-org.spec.ts:92:44
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    tests\e2e\.out\artifacts\30-hr-org-HR-applicants-li-2e746-e-bulk-invite-with-1-ticked\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: tests\e2e\.out\artifacts\30-hr-org-HR-applicants-li-2e746-e-bulk-invite-with-1-ticked\error-context.md
+
+  3) tests\e2e\40-admin-billing-errors.spec.ts:74:1 › admin: settings save + are they enforced (signups, resume size, match threshold) 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByText(/saved/i).first()
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByText(/saved/i).first() with timeout 15000ms
+      - waiting for getByText(/saved/i).first()
+
+
+      81 |   if ((await signups.getAttribute("aria-checked")) !== "false") await signups.click();
+      82 |   await page.getByRole("button", { name: /save settings/i }).click();
+    > 83 |   await expect(page.getByText(/saved/i).first()).toBeVisible({ timeout: 15000 });
+         |                                                  ^
+      84 |   await shot(page, "admin_settings_saved");
+      85 |   const s = await api("GET", "/api/admin/settings", { token: admin.token });
+      86 |   expect(s.data.matchThreshold).toBe(90);
+        at c:\frontend\AIrecruitex\frontend\tests\e2e\40-admin-billing-errors.spec.ts:83:50
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    tests\e2e\.out\artifacts\40-admin-billing-errors-ad-e0416-esume-size-match-threshold-\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: tests\e2e\.out\artifacts\40-admin-billing-errors-ad-e0416-esume-size-match-threshold-\error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByText(/saved/i).first()
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByText(/saved/i).first() with timeout 15000ms
+      - waiting for getByText(/saved/i).first()
+
+
+      81 |   if ((await signups.getAttribute("aria-checked")) !== "false") await signups.click();
+      82 |   await page.getByRole("button", { name: /save settings/i }).click();
+    > 83 |   await expect(page.getByText(/saved/i).first()).toBeVisible({ timeout: 15000 });
+         |                                                  ^
+      84 |   await shot(page, "admin_settings_saved");
+      85 |   const s = await api("GET", "/api/admin/settings", { token: admin.token });
+      86 |   expect(s.data.matchThreshold).toBe(90);
+        at c:\frontend\AIrecruitex\frontend\tests\e2e\40-admin-billing-errors.spec.ts:83:50
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    tests\e2e\.out\artifacts\40-admin-billing-errors-ad-e0416-esume-size-match-threshold--retry1\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: tests\e2e\.out\artifacts\40-admin-billing-errors-ad-e0416-esume-size-match-threshold--retry1\error-context.md
+
+  4) tests\e2e\40-admin-billing-errors.spec.ts:104:1 › admin: support desk reply, resolve, reopen ──
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('button', { name: 'Reopen' })
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('button', { name: 'Reopen' }) with timeout 15000ms
+      - waiting for getByRole('button', { name: 'Reopen' })
+
+
+      114 |   await expect(page.getByText("No, only once.").first()).toBeVisible({ timeout: 15000 });
+      115 |   await page.getByRole("button", { name: "Mark resolved" }).click();
+    > 116 |   await expect(page.getByRole("button", { name: "Reopen" })).toBeVisible({ timeout: 15000 });
+          |                                                              ^
+      117 |   await shot(page, "admin_support_resolved");
+      118 |   await page.getByRole("button", { name: "Reopen" }).click();
+      119 |   await expect(page.getByRole("button", { name: "Mark resolved" })).toBeVisible({ timeout: 15000 });
+        at c:\frontend\AIrecruitex\frontend\tests\e2e\40-admin-billing-errors.spec.ts:116:62
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    tests\e2e\.out\artifacts\40-admin-billing-errors-ad-6f479-t-desk-reply-resolve-reopen\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: tests\e2e\.out\artifacts\40-admin-billing-errors-ad-6f479-t-desk-reply-resolve-reopen\error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('button', { name: 'Reopen' })
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('button', { name: 'Reopen' }) with timeout 15000ms
+      - waiting for getByRole('button', { name: 'Reopen' })
+
+
+      114 |   await expect(page.getByText("No, only once.").first()).toBeVisible({ timeout: 15000 });
+      115 |   await page.getByRole("button", { name: "Mark resolved" }).click();
+    > 116 |   await expect(page.getByRole("button", { name: "Reopen" })).toBeVisible({ timeout: 15000 });
+          |                                                              ^
+      117 |   await shot(page, "admin_support_resolved");
+      118 |   await page.getByRole("button", { name: "Reopen" }).click();
+      119 |   await expect(page.getByRole("button", { name: "Mark resolved" })).toBeVisible({ timeout: 15000 });
+        at c:\frontend\AIrecruitex\frontend\tests\e2e\40-admin-billing-errors.spec.ts:116:62
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    tests\e2e\.out\artifacts\40-admin-billing-errors-ad-6f479-t-desk-reply-resolve-reopen-retry1\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: tests\e2e\.out\artifacts\40-admin-billing-errors-ad-6f479-t-desk-reply-resolve-reopen-retry1\error-context.md
+
+  5) tests\e2e\40-admin-billing-errors.spec.ts:127:1 › billing: plan card, upgrade -> checkout redirect stub -> premium, cancel, resume; pricing matches /api/billing/plans 
+
+    Test timeout of 180000ms exceeded.
+
+    Error: locator.click: Test timeout of 180000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'Cancel subscription' })
+
+
+      150 |   expect(sub.data.plan).toBe("premium");
+      151 |   await page.reload();
+    > 152 |   await page.getByRole("button", { name: "Cancel subscription" }).click();
+          |                                                                   ^
+      153 |   const dlg = page.getByRole("dialog");
+      154 |   if (await dlg.isVisible().catch(() => false)) await dlg.getByRole("button", { name: /cancel subscription|confirm|yes/i }).last().click();
+      155 |   await expect(page.getByText(/Ends on|cancel/i).first()).toBeVisible({ timeout: 15000 });
+        at c:\frontend\AIrecruitex\frontend\tests\e2e\40-admin-billing-errors.spec.ts:152:67
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    tests\e2e\.out\artifacts\40-admin-billing-errors-bi-86908-g-matches-api-billing-plans\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: tests\e2e\.out\artifacts\40-admin-billing-errors-bi-86908-g-matches-api-billing-plans\error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByText(/Premium/).first()
+    Expected: visible
+    Timeout: 20000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByText(/Premium/).first() with timeout 20000ms
+      - waiting for getByText(/Premium/).first()
+
+
+      144 |   await page.getByRole("button", { name: /Upgrade/i }).first().click();
+      145 |   await page.waitForURL(/checkout=success/, { timeout: 30000 });
+    > 146 |   await expect(page.getByText(/Premium/).first()).toBeVisible();
+          |                                                   ^
+      147 |   await page.waitForTimeout(3000);
+      148 |   await shot(page, "billing_premium");
+      149 |   const sub = await api("GET", "/api/billing/subscription", { token: u.token });
+        at c:\frontend\AIrecruitex\frontend\tests\e2e\40-admin-billing-errors.spec.ts:146:51
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    tests\e2e\.out\artifacts\40-admin-billing-errors-bi-86908-g-matches-api-billing-plans-retry1\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: tests\e2e\.out\artifacts\40-admin-billing-errors-bi-86908-g-matches-api-billing-plans-retry1\error-context.md
+
+  6) tests\e2e\30-hr-org.spec.ts:22:1 › HR: create job with JD upload -> skills suggested ──────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 3
+
+    - Array []
+    + Array [
+    +   "console: Can't perform a React state update on a component that hasn't mounted yet. This indicates that you have a side-effect in your render function that asynchronously tries to update the component. Move this work to useEffect instead.",
+    + ]
+
+      41 |   expect(job.requiredSkills.length).toBeGreaterThan(0);
+      42 |   await shot(page, "hr_job_created");
+    > 43 |   expect(errors.filter((e) => !/status of 4/.test(e))).toEqual([]);
+         |                                                        ^
+      44 | });
+      45 |
+      46 | test("HR: question pool upload (Data_Analyst_Question_Pool.docx, Q1:/Answer:/Marks:)", async ({ page }) => {
+        at c:\frontend\AIrecruitex\frontend\tests\e2e\30-hr-org.spec.ts:43:56
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    tests\e2e\.out\artifacts\30-hr-org-HR-create-job-with-JD-upload---skills-suggested-retry1\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: tests\e2e\.out\artifacts\30-hr-org-HR-create-job-with-JD-upload---skills-suggested-retry1\error-context.md
+
+  5 failed
+    tests\e2e\20-practice.spec.ts:33:1 › Round 1 full: intro first, closing last, pass -> Round 2 unlocked; Round 2 on selected track 
+    tests\e2e\30-hr-org.spec.ts:60:1 › HR: applicants list shows match score; status + per-row invite; bulk-invite with 1 ticked 
+    tests\e2e\40-admin-billing-errors.spec.ts:74:1 › admin: settings save + are they enforced (signups, resume size, match threshold) 
+    tests\e2e\40-admin-billing-errors.spec.ts:104:1 › admin: support desk reply, resolve, reopen ───
+    tests\e2e\40-admin-billing-errors.spec.ts:127:1 › billing: plan card, upgrade -> checkout redirect stub -> premium, cancel, resume; pricing matches /api/billing/plans 
+  1 flaky
+    tests\e2e\30-hr-org.spec.ts:22:1 › HR: create job with JD upload -> skills suggested ───────────
+  5 did not run
+  17 passed (32.4m)
+FINISHED

@@ -1,0 +1,60 @@
+URL: http://localhost:3100/candidate/interview/result
+
+Skip to content
+Aı
+Recruitex
+Candidate Portal
+Dashboard
+JOB BOARD
+Job board
+Resume
+APPLICATIONS
+My applications
+Interview results
+INTERVIEW PREPARATION
+Basic interview
+Technical interview
+Learning
+GENERAL
+My profile
+Plan & billing
+Notifications
+Support
+EC
+E2E crawlc
+e2e-crawlc-1795381169481-0@example.com
+Interview results
+
+Review your scores, feedback and interview progress.
+
+Start interview
+
+Total interviews
+
+0
+
+In the selected category
+
+Completed
+
+0
+
+Reports available
+
+In progress
+
+0
+
+Interviews to finish
+
+Practice sessions
+
+0
+
+With detailed feedback
+
+No interviews yet.
+
+Take a practice interview, or wait for HR to schedule one on an application.
+
+Start a practice interview

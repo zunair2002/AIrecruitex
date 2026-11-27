@@ -1,0 +1,29 @@
+URL: http://localhost:3100/recruiter/applicants
+
+Skip to content
+Aı
+Recruitex
+HR Portal
+Dashboard
+HIRING
+Create job
+My jobs
+Question pool
+CANDIDATES
+Applicants
+Interview reports
+Selected
+GENERAL
+Learning courses
+Notifications
+Support
+EC
+E2E crawlh
+e2e-crawlh-1795381310025-1@example.com
+Applicants
+
+No jobs posted yet.
+
+Applicants appear once you post a job and candidates apply to it.
+
+Create job

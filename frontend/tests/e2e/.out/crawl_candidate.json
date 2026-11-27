@@ -1,0 +1,272 @@
+[
+  {
+    "role": "candidate",
+    "vp": "desktop",
+    "route": "/candidate/dashboard",
+    "finalUrl": "/candidate/dashboard",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [
+      "pageerror: Internal Next.js error: Router action dispatched before initialization."
+    ],
+    "screenshot": "tests/e2e/screenshots/candidate_desktop__candidate_dashboard.png"
+  },
+  {
+    "role": "candidate",
+    "vp": "desktop",
+    "route": "/candidate/profile",
+    "finalUrl": "/candidate/profile",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/candidate_desktop__candidate_profile.png"
+  },
+  {
+    "role": "candidate",
+    "vp": "desktop",
+    "route": "/candidate/resume",
+    "finalUrl": "/candidate/resume",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/candidate_desktop__candidate_resume.png"
+  },
+  {
+    "role": "candidate",
+    "vp": "desktop",
+    "route": "/candidate/jobs",
+    "finalUrl": "/candidate/jobs",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/candidate_desktop__candidate_jobs.png"
+  },
+  {
+    "role": "candidate",
+    "vp": "desktop",
+    "route": "/candidate/applications",
+    "finalUrl": "/candidate/applications",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/candidate_desktop__candidate_applications.png"
+  },
+  {
+    "role": "candidate",
+    "vp": "desktop",
+    "route": "/candidate/interview/basic",
+    "finalUrl": "/candidate/interview/basic",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/candidate_desktop__candidate_interview_basic.png"
+  },
+  {
+    "role": "candidate",
+    "vp": "desktop",
+    "route": "/candidate/interview/advanced",
+    "finalUrl": "/candidate/interview/advanced",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/candidate_desktop__candidate_interview_advanced.png"
+  },
+  {
+    "role": "candidate",
+    "vp": "desktop",
+    "route": "/candidate/interview/result",
+    "finalUrl": "/candidate/interview/result",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/candidate_desktop__candidate_interview_result.png"
+  },
+  {
+    "role": "candidate",
+    "vp": "desktop",
+    "route": "/candidate/learning",
+    "finalUrl": "/candidate/learning",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/candidate_desktop__candidate_learning.png"
+  },
+  {
+    "role": "candidate",
+    "vp": "desktop",
+    "route": "/candidate/billing",
+    "finalUrl": "/candidate/billing",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/candidate_desktop__candidate_billing.png"
+  },
+  {
+    "role": "candidate",
+    "vp": "desktop",
+    "route": "/candidate/notifications",
+    "finalUrl": "/candidate/notifications",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/candidate_desktop__candidate_notifications.png"
+  },
+  {
+    "role": "candidate",
+    "vp": "desktop",
+    "route": "/candidate/support",
+    "finalUrl": "/candidate/support",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/candidate_desktop__candidate_support.png"
+  },
+  {
+    "role": "candidate",
+    "vp": "desktop",
+    "route": "/candidate/interview/org",
+    "finalUrl": "/candidate/interview/org",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/candidate_desktop__candidate_interview_org.png"
+  },
+  {
+    "role": "candidate",
+    "vp": "mobile",
+    "route": "/candidate/dashboard",
+    "finalUrl": "/candidate/dashboard",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/candidate_mobile__candidate_dashboard.png"
+  },
+  {
+    "role": "candidate",
+    "vp": "mobile",
+    "route": "/candidate/profile",
+    "finalUrl": "/candidate/profile",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/candidate_mobile__candidate_profile.png"
+  },
+  {
+    "role": "candidate",
+    "vp": "mobile",
+    "route": "/candidate/resume",
+    "finalUrl": "/candidate/resume",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/candidate_mobile__candidate_resume.png"
+  },
+  {
+    "role": "candidate",
+    "vp": "mobile",
+    "route": "/candidate/jobs",
+    "finalUrl": "/candidate/jobs",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/candidate_mobile__candidate_jobs.png"
+  },
+  {
+    "role": "candidate",
+    "vp": "mobile",
+    "route": "/candidate/applications",
+    "finalUrl": "/candidate/applications",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/candidate_mobile__candidate_applications.png"
+  },
+  {
+    "role": "candidate",
+    "vp": "mobile",
+    "route": "/candidate/interview/basic",
+    "finalUrl": "/candidate/interview/basic",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/candidate_mobile__candidate_interview_basic.png"
+  },
+  {
+    "role": "candidate",
+    "vp": "mobile",
+    "route": "/candidate/interview/advanced",
+    "finalUrl": "/candidate/interview/advanced",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/candidate_mobile__candidate_interview_advanced.png"
+  },
+  {
+    "role": "candidate",
+    "vp": "mobile",
+    "route": "/candidate/interview/result",
+    "finalUrl": "/candidate/interview/result",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/candidate_mobile__candidate_interview_result.png"
+  },
+  {
+    "role": "candidate",
+    "vp": "mobile",
+    "route": "/candidate/learning",
+    "finalUrl": "/candidate/learning",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [],
+    "screenshot": "tests/e2e/screenshots/candidate_mobile__candidate_learning.png"
+  },
+  {
+    "role": "candidate",
+    "vp": "mobile",
+    "route": "/candidate/billing",
+    "finalUrl": "/candidate/billing",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [
+      "pageerror: Invalid or unexpected token"
+    ],
+    "screenshot": "tests/e2e/screenshots/candidate_mobile__candidate_billing.png"
+  },
+  {
+    "role": "candidate",
+    "vp": "mobile",
+    "route": "/candidate/notifications",
+    "finalUrl": "/candidate/notifications",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [
+      "pageerror: Invalid or unexpected token"
+    ],
+    "screenshot": "tests/e2e/screenshots/candidate_mobile__candidate_notifications.png"
+  },
+  {
+    "role": "candidate",
+    "vp": "mobile",
+    "route": "/candidate/support",
+    "finalUrl": "/candidate/support",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [
+      "pageerror: Invalid or unexpected token"
+    ],
+    "screenshot": "tests/e2e/screenshots/candidate_mobile__candidate_support.png"
+  },
+  {
+    "role": "candidate",
+    "vp": "mobile",
+    "route": "/candidate/interview/org",
+    "finalUrl": "/candidate/interview/org",
+    "status": 200,
+    "overflowPx": 0,
+    "errors": [
+      "pageerror: Invalid or unexpected token"
+    ],
+    "screenshot": "tests/e2e/screenshots/candidate_mobile__candidate_interview_org.png"
+  }
+]

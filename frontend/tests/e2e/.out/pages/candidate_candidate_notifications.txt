@@ -1,0 +1,34 @@
+URL: http://localhost:3100/candidate/notifications
+
+Skip to content
+Aı
+Recruitex
+Candidate Portal
+Dashboard
+JOB BOARD
+Job board
+Resume
+APPLICATIONS
+My applications
+Interview results
+INTERVIEW PREPARATION
+Basic interview
+Technical interview
+Learning
+GENERAL
+My profile
+Plan & billing
+Notifications
+Support
+EC
+E2E crawlc
+e2e-crawlc-1795381169481-0@example.com
+Notifications
+
+Updates from HR and platform admins
+
+Refresh
+
+No notifications yet
+
+Application decisions, scheduled interviews and support replies show up here.

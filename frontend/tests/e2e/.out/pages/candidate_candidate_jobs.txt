@@ -1,0 +1,42 @@
+URL: http://localhost:3100/candidate/jobs
+
+Skip to content
+Aı
+Recruitex
+Candidate Portal
+Dashboard
+JOB BOARD
+Job board
+Resume
+APPLICATIONS
+My applications
+Interview results
+INTERVIEW PREPARATION
+Basic interview
+Technical interview
+Learning
+GENERAL
+My profile
+Plan & billing
+Notifications
+Support
+EC
+E2E crawlc
+e2e-crawlc-1795381169481-0@example.com
+Job board
+
+Browse open roles and apply with your uploaded resume.
+
+My applications
+All jobs
+0
+Not applied
+0
+Applied
+0
+
+0 of 0 applied
+
+No open jobs right now
+
+New roles will appear here as soon as employers post them.

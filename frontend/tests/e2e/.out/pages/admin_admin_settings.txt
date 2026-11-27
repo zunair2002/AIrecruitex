@@ -1,0 +1,58 @@
+URL: http://localhost:3100/admin/settings
+
+Skip to content
+Aı
+Recruitex
+Admin Portal
+Overview
+PLATFORM
+User management
+Jobs & applications
+INSIGHT
+Reports
+Activity log
+Monitoring
+GENERAL
+Support desk
+Broadcast
+Settings
+EC
+E2E crawla
+e2e-crawla-1795381409292-2@example.com
+Platform settings
+
+The single global settings document the backend reads at runtime.
+
+General
+
+How the platform presents itself and who can join.
+
+Site name
+
+The platform name stored on the settings document.
+
+Allow new sign-ups
+
+Stored on the settings document for the platform's sign-up policy.
+
+On
+Matching and uploads
+
+Rules applied when candidates apply to jobs.
+
+Match threshold
+
+An application is flagged as matched when its match score reaches this percentage. Applied at apply time — existing applications keep the flag they were given.
+
+50%
+0%
+100%
+Max resume size
+
+Stored for reference — the upload middleware's own 5MB limit applies to actual uploads.
+
+MB
+
+Last updated Nov 23, 2026, 02:05 AM
+
+Save settings

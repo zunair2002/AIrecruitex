@@ -1,0 +1,69 @@
+URL: http://localhost:3100/recruiter/jobs/create
+
+Skip to content
+Aı
+Recruitex
+HR Portal
+Dashboard
+HIRING
+Create job
+My jobs
+Question pool
+CANDIDATES
+Applicants
+Interview reports
+Selected
+GENERAL
+Learning courses
+Notifications
+Support
+EC
+E2E crawlh
+e2e-crawlh-1795381310025-1@example.com
+Back to jobs
+Create job
+
+Candidates' resumes are matched against the required skills you list here.
+
+Job details
+
+What candidates see when they browse open roles.
+
+Job title *
+Description *
+Matching
+
+List the required skills, attach the job description, or both.
+
+Required skills
+0 skills
+
+Comma separated. These are the exact terms searched in each candidate's resume text — the match score is the share of them found.
+
+Skills you type appear here as chips.
+
+Job description file (optional)
+
+Click to upload or drag and drop
+
+PDF or DOCX, max 5MB
+
+If you leave the skills field empty, skills are suggested from this file's text.
+
+Cancel
+Post job
+How matching works
+
+Every applicant is scored against this job automatically.
+
+List the skills
+
+Each required skill is searched for in the candidate's resume text.
+
+Score every applicant
+
+The match score is the share of your required skills found.
+
+No skills yet?
+
+Attach the job description and skills are suggested from its text.

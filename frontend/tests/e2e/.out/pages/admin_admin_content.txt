@@ -1,0 +1,57 @@
+URL: http://localhost:3100/admin/content
+
+Skip to content
+Aı
+Recruitex
+Admin Portal
+Overview
+PLATFORM
+User management
+Jobs & applications
+INSIGHT
+Reports
+Activity log
+Monitoring
+GENERAL
+Support desk
+Broadcast
+Settings
+EC
+E2E crawla
+e2e-crawla-1795381409292-2@example.com
+Jobs and applications
+
+Every job and application on the platform, across all HR accounts.
+
+Jobs
+
+0
+
+Across all HR accounts
+
+Open jobs
+
+0
+
+Accepting applications
+
+Applications
+
+0
+
+Submitted by candidates
+
+Matched
+
+0
+
+At or above the threshold
+
+Jobs
+0
+Applications
+0
+
+No jobs found
+
+Jobs posted by HR accounts appear here.

@@ -1,0 +1,88 @@
+URL: http://localhost:3100/admin/dashboard
+
+Skip to content
+Aı
+Recruitex
+Admin Portal
+Overview
+PLATFORM
+User management
+Jobs & applications
+INSIGHT
+Reports
+Activity log
+Monitoring
+GENERAL
+Support desk
+Broadcast
+Settings
+EC
+E2E crawla
+e2e-crawla-1795381409292-2@example.com
+
+ADMIN CONSOLE · MONDAY, NOVEMBER 23
+
+Platform overview
+
+Hello, E2E. All systems operational · 0 support tickets open.
+
+Manage users
+Broadcast
+100
+%
+
+Active accounts
+
+3 of 3 users can sign in
+
+Users
+3
+1 candidates · 1 HR
+Jobs
+0
+0 open now
+Applications
+0
+0 above threshold
+Interviews
+0
+0% completed
+Recent activity
+
+What people did across the platform, newest first.
+
+Full log
+
+No activity yet
+
+Role changes, job closures, broadcasts and settings edits appear here.
+
+System health
+Details
+
+All systems operational
+
+Database
+Connected
+API uptime
+7m 48s
+Support queue
+
+0
+
+No tickets waiting — all caught up.
+
+Open support desk
+Users by role
+Reports
+HR
+133%
+Candidate
+133%
+Admin
+133%
+Applications by status
+
+Average match score 0%
+
+No applications yet.

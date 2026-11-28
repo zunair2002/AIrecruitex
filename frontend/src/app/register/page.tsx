@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { Briefcase, ShieldCheck, UserRound, Users } from "lucide-react";
 import {
@@ -54,6 +54,7 @@ export default function RegisterPage() {
 
   const [role, setRole] = useState<UserRole>("hr");
   // Signup emails an OTP instead of returning a session; this holds the step.
+  const signupPending = useRef(false);
   const [pending, setPending] = useState<{ email: string } | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -74,6 +75,8 @@ export default function RegisterPage() {
       return;
     }
 
+    if (signupPending.current) return;
+    signupPending.current = true;
     setIsSubmitting(true);
     try {
       const result = await register({
@@ -85,6 +88,7 @@ export default function RegisterPage() {
       setPending({ email: result.email });
     } catch (err) {
       setError(toErrorMessage(err));
+      signupPending.current = false;
       setIsSubmitting(false);
     }
   };
@@ -98,7 +102,7 @@ export default function RegisterPage() {
     >
       <AuthCardHeading
         title="Create an account"
-        description="A short form. Then a code in your inbox."
+        description="Create your account and verify your email address."
       />
 
       {pending ? (

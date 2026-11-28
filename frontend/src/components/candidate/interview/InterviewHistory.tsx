@@ -4,15 +4,12 @@ import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   ArrowRight,
-  BookOpen,
   ChartNoAxesColumnIncreasing,
   CheckCircle2,
-  CircleCheck,
   Clock3,
   Info,
   Plus,
   Target,
-  TrendingUp,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { getInterviewReport, listMySessions } from "@/lib/interviewApi";
@@ -52,7 +49,7 @@ import { compactInputClass } from "@/components/ui/controls";
 import { CertificatePanel } from "./CertificatePanel";
 import { FinalScoreRing } from "./ScoreBreakdown";
 import { FailedInterviewNextSteps } from "./FailedInterviewNextSteps";
-import { ReportList, TurnHistory } from "./InterviewRunner";
+import { PracticeReport, practiceSummary, TurnHistory } from "./InterviewRunner";
 
 const ALL = "all";
 
@@ -246,7 +243,7 @@ export function InterviewHistory() {
             ) : report.error ? (
               <ErrorBlock message={report.error} onRetry={report.reload} />
             ) : report.data && selected ? (
-              report.data.status === "completed" ? (
+              report.data.status !== "in_progress" ? (
                 <>
                   <Card
                     title="Interview report"
@@ -287,16 +284,14 @@ export function InterviewHistory() {
                           </span>
                         )}
                         <p className="mt-3 whitespace-pre-line text-sm leading-6 text-body">
-                          {report.data.report?.summary ||
-                            report.data.feedback ||
-                            "No overall feedback was returned."}
+                          {practiceSummary(report.data)}
                         </p>
                       </div>
                     </div>
                   </Card>
 
                   {report.data.report?.reportType === "candidate" && (
-                    <InterviewReportDetails
+                    <RoundProgress
                       report={report.data.report}
                       stage={report.data.stage}
                       round={report.data.round}
@@ -313,10 +308,7 @@ export function InterviewHistory() {
                     />
                   )}
 
-                  <TurnHistory
-                    turns={report.data.turns}
-                    title="Questions & answers"
-                  />
+                  <PracticeReport session={report.data} />
 
                   {report.data.certificateEligible && (
                     <CertificatePanel
@@ -382,7 +374,7 @@ export function InterviewHistory() {
   );
 }
 
-function InterviewReportDetails({
+function RoundProgress({
   report,
   stage,
   round,
@@ -432,68 +424,30 @@ function InterviewReportDetails({
           : stage === "technical" || round === 2
             ? "Completed"
             : "Locked";
-  const sections = [
-    {
-      title: "Strengths",
-      items: report.strengths,
-      icon: <CircleCheck aria-hidden="true" className="h-4 w-4" />,
-      tile: "bg-brand-50 text-brand-600",
-      dot: "bg-brand-500",
-    },
-    {
-      title: "Areas to improve",
-      items: report.areasToImprove,
-      icon: <TrendingUp aria-hidden="true" className="h-4 w-4" />,
-      tile: "bg-brand-50 text-brand-500",
-      dot: "bg-brand-300",
-    },
-    {
-      title: "Learning plan",
-      items: report.learningPlan,
-      icon: <BookOpen aria-hidden="true" className="h-4 w-4" />,
-      tile: "bg-brand-50 text-brand-700",
-      dot: "bg-brand-500",
-    },
-  ];
 
   return (
-    <>
-      <Card
-        title="Round progress"
-        description="Scores and status for each interview round"
-        action={<span className="text-sm text-muted">Pass mark: 70%</span>}
-      >
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
-          <RoundProgressCard
-            title="Round 1"
-            subtitle="Basic"
-            score={basicScore}
-            status={roundOneStatus}
-            tone="violet"
-          />
-          <RoundProgressCard
-            title="Round 2"
-            subtitle="Technical"
-            score={technicalScore}
-            status={roundTwoStatus}
-            tone="blue"
-          />
-        </div>
-      </Card>
-
-      {sections.map(({ title, items, icon, tile, dot }) =>
-        items && items.length > 0 ? (
-          <ReportList
-            key={title}
-            title={title}
-            items={items}
-            icon={icon}
-            tile={tile}
-            dot={dot}
-          />
-        ) : null,
-      )}
-    </>
+    <Card
+      title="Round progress"
+      description="Scores and status for each interview round"
+      action={<span className="text-sm text-muted">Pass mark: 70%</span>}
+    >
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+        <RoundProgressCard
+          title="Round 1"
+          subtitle="Basic"
+          score={basicScore}
+          status={roundOneStatus}
+          tone="violet"
+        />
+        <RoundProgressCard
+          title="Round 2"
+          subtitle="Technical"
+          score={technicalScore}
+          status={roundTwoStatus}
+          tone="blue"
+        />
+      </div>
+    </Card>
   );
 }
 

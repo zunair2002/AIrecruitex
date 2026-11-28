@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { handleNavClick } from "./smoothScroll";
 import { BrandWordmark } from "./Logo";
 
 export const Footer = () => {
@@ -24,13 +23,12 @@ export const Footer = () => {
             <Link href="/about" className="text-sm text-subtle hover:text-white">
               About
             </Link>
-            <a
-              href="#how-it-works"
-              onClick={(e) => handleNavClick(e, "#how-it-works")}
+            <Link
+              href="/#how-it-works"
               className="text-sm text-subtle hover:text-white"
             >
               How it works
-            </a>
+            </Link>
             <Link href="/pricing" className="text-sm text-subtle hover:text-white">
               Pricing
             </Link>

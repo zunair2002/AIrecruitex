@@ -3,12 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { handleNavClick } from "./smoothScroll";
 import { BrandWordmark } from "./Logo";
 
 const navLinks = [
-  { href: "#how-it-works", label: "How it works", isPage: false },
-  { href: "#features", label: "Platform", isPage: false },
+  { href: "/#how-it-works", label: "How it works", isPage: false },
+  { href: "/#features", label: "Platform", isPage: false },
   { href: "/about", label: "About", isPage: true },
   { href: "/pricing", label: "Pricing", isPage: true },
   { href: "/contact", label: "Contact", isPage: true },
@@ -37,7 +36,6 @@ export const Navbar = () => {
               <a
                 key={link.href}
                 href={link.href}
-                onClick={(e) => handleNavClick(e, link.href)}
                 className={linkClass}
               >
                 {link.label}
@@ -101,9 +99,7 @@ export const Navbar = () => {
                   <a
                     key={link.href}
                     href={link.href}
-                    onClick={(e) =>
-                      handleNavClick(e, link.href, () => setIsMobileMenuOpen(false))
-                    }
+                    onClick={() => setIsMobileMenuOpen(false)}
                     className="px-2 py-3 text-base text-ink"
                   >
                     {link.label}

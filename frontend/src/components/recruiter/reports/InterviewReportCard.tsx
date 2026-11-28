@@ -124,13 +124,14 @@ export function InterviewReportDetail({
 }: {
   report: ApplicationReport;
   jobTitle: string;
-  onStatusChanged?: () => void;
+  onStatusChanged: (id: string, status: ApplicationStatus) => void;
 }) {
   const { token } = useAuth();
   const { application, interviewSession, orgInterviewSession } = report;
   const candidate = populated(application.candidateId);
 
-  const [status, setStatus] = useState<ApplicationStatus>(application.status);
+  const status = application.status;
+  const decided = status === "selected" || status === "rejected";
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState<ApplicationStatus | null>(null);
   // Final decision only once an interview (AI or org) has been completed.
@@ -139,12 +140,12 @@ export function InterviewReportDetail({
     orgInterviewSession?.status === "completed";
 
   const changeStatus = async (next: ApplicationStatus) => {
+    if (busy || decided) return;
     setBusy(next);
     setError(null);
     try {
       const updated = await updateApplicationStatus(application._id, next, token);
-      setStatus(updated.status);
-      onStatusChanged?.();
+      onStatusChanged(application._id, updated.status);
     } catch (err) {
       setError(toErrorMessage(err));
     } finally {
@@ -230,7 +231,8 @@ export function InterviewReportDetail({
                   : "Select or reject once the interview is complete."}
               </p>
             </div>
-            {interviewCompleted && (
+            {decided && <span role="status" className={APPLICATION_STATUS_BADGE[status]}>{APPLICATION_STATUS_LABELS[status]}</span>}
+            {interviewCompleted && !decided && (
             <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap">
               {DECISION_ACTIONS.map(({ status: option, variant, icon }) => (
                 <Button
@@ -240,14 +242,12 @@ export function InterviewReportDetail({
                   leadingIcon={icon}
                   loading={busy === option}
                   onClick={() => changeStatus(option)}
-                  disabled={busy !== null || status === option}
+                  disabled={busy !== null}
                   className="max-sm:h-10"
                 >
                   {busy === option
                     ? "Saving…"
-                    : status === option
-                      ? APPLICATION_STATUS_LABELS[option]
-                      : DECISION_LABELS[option]}
+                    : DECISION_LABELS[option]}
                 </Button>
               ))}
             </div>

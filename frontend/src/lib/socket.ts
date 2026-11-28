@@ -62,6 +62,7 @@ export type SupportTicketEvent = {
 
 /** Every server->client event, keyed by the exact string the backend emits. */
 export type ServerEvents = {
+  "interview:time-up": { sessionId: ObjectId };
   "admin:notification": AdminNotificationEvent;
   "application:status": ApplicationStatusEvent;
   "application:ai-interview-scheduled": AiInterviewScheduledEvent;
@@ -72,6 +73,7 @@ export type ServerEvents = {
 export type ServerEventName = keyof ServerEvents;
 
 export const SERVER_EVENTS: ServerEventName[] = [
+  "interview:time-up",
   "admin:notification",
   "application:status",
   "application:ai-interview-scheduled",
@@ -86,7 +88,8 @@ export const SERVER_EVENTS: ServerEventName[] = [
  * survives a reconnect after the laptop sleeps or the server restarts.
  */
 export function connectSocket(userId: ObjectId): Socket {
-  const socket = io(API_BASE_URL, {
+  const socket = io(new URL(API_BASE_URL).origin, {
+    path: "/socket.io/",
     transports: ["websocket", "polling"],
     reconnectionAttempts: Infinity,
     reconnectionDelay: 1000,

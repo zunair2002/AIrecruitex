@@ -11,6 +11,7 @@ import {
   TrendingUp,
   Unlock,
 } from "lucide-react";
+import { useServerEvent } from "@/context/RealtimeContext";
 import { useAuth } from "@/context/AuthContext";
 import { apiErrorStatus, toErrorMessage } from "@/lib/api";
 import { getInterviewReport, submitAnswer } from "@/lib/interviewApi";
@@ -23,6 +24,7 @@ import {
 import {
   isFinishedSession,
   type InterviewReport,
+  type PracticeQuestionResult,
   type InterviewSessionCompleted,
   type InterviewSessionView,
   type InterviewTurnView,
@@ -95,8 +97,12 @@ export function InterviewRunner({
     setHasTimedOut(true);
   }, []);
 
+  useServerEvent("interview:time-up", ({ sessionId }) => {
+    if (session.status === "in_progress" && session.sessionId === sessionId) handleExpire();
+  });
+
   useEffect(() => {
-    if (!hasTimedOut) return;
+    if (session.status !== "in_progress" || !hasTimedOut) return;
     let cancelled = false;
     const controller = new AbortController();
 
@@ -122,7 +128,7 @@ export function InterviewRunner({
       controller.abort();
       window.clearInterval(id);
     };
-  }, [hasTimedOut, session.sessionId, token, onSessionChange]);
+  }, [hasTimedOut, session.status, session.sessionId, token, onSessionChange]);
 
   const handleSubmit = async () => {
     const text = answer.takeAnswer();
@@ -335,9 +341,7 @@ function CompletedInterview({
               )}
             </div>
             <p className="mt-4 whitespace-pre-line text-sm leading-6 text-body">
-              {session.report?.summary ||
-                session.feedback ||
-                "No overall feedback was returned."}
+              {practiceSummary(session)}
             </p>
           </div>
         </div>
@@ -371,13 +375,13 @@ function CompletedInterview({
         </section>
       )}
 
-      {session.report && <ReportDetails report={session.report} />}
+      {session.report && <StageScores report={session.report} />}
 
       {session.result === "fail" && (
         <FailedInterviewNextSteps tips={tips} report={session.report} />
       )}
 
-      <TurnHistory turns={session.turns} title="Question-by-question feedback" />
+      <PracticeReport session={session} />
 
       {session.certificateEligible && (
         <CertificatePanel
@@ -451,7 +455,7 @@ const REPORT_LISTS = [
 ] as const;
 
 /** One titled list of report bullets (strengths, areas to improve, plan). */
-export function ReportList({
+function ReportList({
   title,
   items,
   icon,
@@ -476,16 +480,16 @@ export function ReportList({
         <h2 className="text-base font-semibold text-ink">{title}</h2>
       </div>
       <ul className="divide-y divide-line-soft">
-        {items.map((item) => (
+        {items.map((item, index) => (
           <li
-            key={item}
+            key={index}
             className="flex items-start gap-3 py-2.5 text-sm leading-6 text-body first:pt-0 last:pb-0"
           >
             <span
               aria-hidden="true"
               className={`mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full ${dot}`}
             />
-            <span className="min-w-0">{item}</span>
+            <span className="min-w-0 whitespace-pre-line">{item}</span>
           </li>
         ))}
       </ul>
@@ -493,34 +497,100 @@ export function ReportList({
   );
 }
 
-/** The report's stage scores and narrative lists (the summary is shown by the caller). */
-export function ReportDetails({ report }: { report: InterviewReport }) {
+function StageScores({ report }: { report: InterviewReport }) {
   const hasScores =
     report.basicScore !== undefined || report.technicalScore !== undefined;
 
+  if (!hasScores) return null;
+  return (
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      {report.basicScore !== undefined && (
+        <ScoreBar
+          label="Round 1 — Basic"
+          score={Math.round(report.basicScore * 10)}
+          gradient="bg-brand"
+        />
+      )}
+      {report.technicalScore !== undefined && (
+        <ScoreBar
+          label="Round 2 — Technical"
+          score={Math.round(report.technicalScore * 10)}
+          gradient="bg-brand"
+        />
+      )}
+    </div>
+  );
+}
+
+function normalizedText(text = "") {
+  return text.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+}
+
+function withoutAnswerExcerpt(text: string) {
+  return text.replace(/\s*(?:Your |Candidate(?:'s)? )?Answer:\s*["\u201c][^"\u201d]*["\u201d]/gi, "").trim();
+}
+
+export function practiceSummary(session: InterviewSessionCompleted) {
+  const summary = session.report?.summary || session.feedback || "";
+  const technical = session.stage === "technical" || (!session.stage && session.round === 2);
+  return (technical ? withoutAnswerExcerpt(summary) : summary) || "No overall feedback was returned.";
+}
+
+function technicalBullets(lines: string[] = []) {
+  const seen = new Set<string>();
+  return lines.map(line => withoutAnswerExcerpt(line)
+    .replace(/\s*\(Round [12] Q\d+\)\s*$/, "")
+    .trim()
+  ).filter(line => {
+    const key = normalizedText(line);
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function TechnicalCoaching({ session }: { session: InterviewSessionCompleted }) {
+  const { report } = session;
+  const lists = {
+    strengths: technicalBullets(report?.strengths),
+    areasToImprove: technicalBullets([...(report?.areasToImprove ?? []), ...(report?.weaknesses ?? [])]),
+    learningPlan: technicalBullets(report?.learningPlan),
+  };
+  const rows = session.questionResults?.length ? session.questionResults : session.turns;
+  return (
+    <div className="flex w-full min-w-0 flex-col gap-4 [overflow-wrap:anywhere]">
+      {REPORT_LISTS.map(({ key, title, icon, tile, dot }) => (
+        <ReportList key={key}
+          title={key === "learningPlan" ? "Learning Plan" : key === "areasToImprove" ? "Areas to Improve" : title}
+          icon={icon} tile={tile} dot={dot}
+          items={lists[key].length ? lists[key] : ["No details saved."]} />
+      ))}
+      <TurnHistory turns={rows ?? []} title="Question Review" technical />
+    </div>
+  );
+}
+
+export function PracticeReport({ session }: { session: InterviewSessionCompleted }) {
+  const report = session.report;
+  if (session.stage === "technical" || (!session.stage && session.round === 2)) {
+    return <TechnicalCoaching session={session} />;
+  }
+  const plans = new Set(report?.learningPlan);
+  const gaps = report?.areasToImprove?.map((gap) => {
+    const reference = gap.match(/\(Round [12] Q\d+\)$/)?.[0];
+    const exercise = reference && Array.from(plans).find((line) => line.endsWith(reference));
+    if (!exercise) return gap;
+    plans.delete(exercise);
+    return gap + "\n" + exercise;
+  });
+  const lists = { strengths: report?.strengths, areasToImprove: gaps, learningPlan: [...plans] };
+  const scores = new Map(session.turns.map(turn => [`Round ${turn.round} Q${turn.questionNumber}`, turn.score]));
+  const rows = session.questionResults?.map(row => ({ ...row, score: scores.get(row.label) }));
   return (
     <>
-      {hasScores && (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {report.basicScore !== undefined && (
-            <ScoreBar
-              label="Round 1 — Basic"
-              score={Math.round(report.basicScore * 10)}
-              gradient="bg-brand"
-            />
-          )}
-          {report.technicalScore !== undefined && (
-            <ScoreBar
-              label="Round 2 — Technical"
-              score={Math.round(report.technicalScore * 10)}
-              gradient="bg-brand"
-            />
-          )}
-        </div>
-      )}
-
+      <TurnHistory turns={rows?.length ? rows : session.turns} title="Question-by-question feedback" />
       {REPORT_LISTS.map(({ key, title, icon, tile, dot }) => {
-        const items = report[key];
+        const items = lists[key];
         return items && items.length > 0 ? (
           <ReportList
             key={key}
@@ -539,11 +609,15 @@ export function ReportDetails({ report }: { report: InterviewReport }) {
 export function TurnHistory({
   turns,
   title,
+  technical = false,
 }: {
-  turns: InterviewTurnView[];
+  turns: (InterviewTurnView | (PracticeQuestionResult & { score?: number }))[];
   title: string;
+  technical?: boolean;
 }) {
-  if (turns.length === 0) return null;
+  if (turns.length === 0) return technical ? (
+    <Card title={title}><p className="text-sm text-muted">No questions saved.</p></Card>
+  ) : null;
   return (
     <Card
       title={title}
@@ -555,57 +629,85 @@ export function TurnHistory({
       }
     >
       <ol className="divide-y divide-line-soft border-t border-line-soft">
-        {turns.map((turn) => (
-          <li
-            key={`${turn.round}-${turn.questionNumber}`}
-            className="flex gap-3 px-5 py-5 sm:gap-4 sm:px-6"
-          >
-            <span
-              aria-hidden="true"
-              className="mt-0.5 hidden h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-700 sm:flex"
+        {turns.map((turn) => {
+          const tip = "label" in turn ? turn.tip : turn.improvementTip;
+          const showTip = tip && (!technical || !normalizedText(turn.feedback).includes(normalizedText(tip)));
+          return (
+            <li
+              key={"label" in turn ? turn.label : `${turn.round}-${turn.questionNumber}`}
+              className="flex gap-3 px-5 py-5 sm:gap-4 sm:px-6"
             >
-              <MessageSquareText className="h-4 w-4" />
-            </span>
-            <div className="min-w-0 flex-1">
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-                <div className="min-w-0">
-                  <p className="text-xs font-medium uppercase tracking-wider text-muted">
-                    Round {turn.round} · Question {turn.questionNumber}
+              <span
+                aria-hidden="true"
+                className="mt-0.5 hidden h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-700 sm:flex"
+              >
+                <MessageSquareText className="h-4 w-4" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+                  <div className="min-w-0">
+                    <p className="text-xs font-medium uppercase tracking-wider text-muted">
+                      {"label" in turn ? turn.label : `Round ${turn.round} · Question ${turn.questionNumber}`}
+                    </p>
+                    <h3 className="mt-1 text-sm font-semibold leading-6 text-ink">
+                      {turn.question}
+                    </h3>
+                  </div>
+                  <div className="flex shrink-0 flex-wrap items-center gap-1.5">
+                    {technical ? (
+                      <>
+                        {"participation" in turn && turn.participation && turn.participation !== "answered" && (
+                          <Badge>{turn.participation.replace(/_/g, " ")}</Badge>
+                        )}
+                        {"unanswered" in turn && turn.unanswered && <Badge>Timed out</Badge>}
+                        {"evaluation" in turn && (turn.evaluation === "pending" || turn.evaluation === "pending_eval") ? (
+                          <Badge>Evaluation pending</Badge>
+                        ) : ("evaluation" in turn && turn.evaluation && turn.evaluation !== "done") ? (
+                          <Badge>Evaluation: {turn.evaluation.replace(/_/g, " ")}</Badge>
+                        ) : null}
+                        {turn.verdict && <Badge>{turn.verdict.replace(/_/g, " ")}</Badge>}
+                      </>
+                    ) : "evaluation" in turn ? (
+                      <>
+                        <Badge>Participation: {turn.participation.replace(/_/g, " ")}</Badge>
+                        <Badge>Evaluation: {turn.evaluation === "pending_eval" ? "pending" : turn.evaluation.replace(/_/g, " ")}</Badge>
+                        {turn.verdict && <Badge>{turn.verdict.replace(/_/g, " ")}</Badge>}
+                      </>
+                    ) : (
+                      <>
+                        <VerdictBadge verdict={turn.verdict} />
+                        {turn.estimated && <Badge>Estimated</Badge>}
+                      </>
+                    )}
+                    {turn.score !== undefined && (
+                      <Badge tone="brand" className="tabular-nums">
+                        {turn.score}/10
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+                <div className="mt-3 rounded-lg border-l-2 border-brand-200 bg-surface-2 px-3.5 py-3">
+                  <p className="text-xs font-medium text-muted">Your answer</p>
+                  <p className="mt-1 whitespace-pre-line break-words text-sm leading-6 text-body">
+                    {turn.answer || "No answer provided."}
                   </p>
-                  <h3 className="mt-1 text-sm font-semibold leading-6 text-ink">
-                    {turn.question}
-                  </h3>
                 </div>
-                <div className="flex shrink-0 flex-wrap items-center gap-1.5">
-                  <VerdictBadge verdict={turn.verdict} />
-                  {turn.score !== undefined && (
-                    <Badge tone="brand" className="tabular-nums">
-                      {turn.score}/10
-                    </Badge>
-                  )}
-                </div>
+                {(technical || turn.feedback) && (
+                  <p className="mt-3 whitespace-pre-line text-sm leading-6 text-body">
+                    <span className="font-semibold text-ink">Feedback: </span>
+                    {turn.feedback || "No feedback saved."}
+                  </p>
+                )}
+                {showTip && (
+                  <p className="mt-2 whitespace-pre-line text-sm leading-6 text-brand-800">
+                    <span className="font-semibold text-brand-700">Tip: </span>
+                    {tip}
+                  </p>
+                )}
               </div>
-              <div className="mt-3 rounded-lg border-l-2 border-brand-200 bg-surface-2 px-3.5 py-3">
-                <p className="text-xs font-medium text-muted">Your answer</p>
-                <p className="mt-1 whitespace-pre-line break-words text-sm leading-6 text-body">
-                  {turn.answer || "No answer provided."}
-                </p>
-              </div>
-              {turn.feedback && (
-                <p className="mt-3 whitespace-pre-line text-sm leading-6 text-body">
-                  <span className="font-semibold text-ink">Feedback: </span>
-                  {turn.feedback}
-                </p>
-              )}
-              {turn.improvementTip && (
-                <p className="mt-2 whitespace-pre-line text-sm leading-6 text-brand-800">
-                  <span className="font-semibold text-brand-700">Tip: </span>
-                  {turn.improvementTip}
-                </p>
-              )}
-            </div>
-          </li>
-        ))}
+            </li>
+          );
+        })}
       </ol>
     </Card>
   );

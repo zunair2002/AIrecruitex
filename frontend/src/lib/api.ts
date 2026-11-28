@@ -13,7 +13,7 @@ export const API_BASE_URL =
 export class ApiError extends Error {
   status: number;
 
-  constructor(message: string, status: number) {
+  constructor(message: string, status: number, readonly retryAfterSeconds?: number) {
     super(message);
     this.name = "ApiError";
     this.status = status;
@@ -124,7 +124,8 @@ export async function apiRequest<T>(
     const message =
       payload?.message ?? `Request failed with status ${response.status}`;
     reportAuthFailure(response.status, message);
-    throw new ApiError(message, response.status);
+    const retryAfter = Number(response.headers.get("Retry-After"));
+    throw new ApiError(message, response.status, retryAfter > 0 ? retryAfter : undefined);
   }
 
   // Unwrap `data` when the envelope carries it — testing for the KEY, not its

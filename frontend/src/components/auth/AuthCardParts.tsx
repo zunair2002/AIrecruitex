@@ -1,6 +1,7 @@
 "use client";
 
-import { Suspense, useId, useState, type ReactNode } from "react";
+import { ApiError, apiRequest, toErrorMessage } from "@/lib/api";
+import { Suspense, useEffect, useId, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { MessageSquareText, ListChecks, ScanSearch } from "lucide-react";
@@ -330,6 +331,7 @@ export function RegisterForm({
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   // Set once signup succeeds; swaps this form for the OTP step.
+  const signupPending = useRef(false);
   const [pending, setPending] = useState<{ email: string } | null>(null);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -346,6 +348,8 @@ export function RegisterForm({
       return;
     }
 
+    if (signupPending.current) return;
+    signupPending.current = true;
     setIsSubmitting(true);
     try {
       const result = await register({
@@ -361,6 +365,7 @@ export function RegisterForm({
           ? err.message
           : "Something went wrong. Please try again.",
       );
+      signupPending.current = false;
       setIsSubmitting(false);
     }
   };
@@ -436,6 +441,88 @@ export function LoginForm() {
   );
 }
 
+function RecoveryForm({ initialEmail, onBack }: { initialEmail: string; onBack: () => void }) {
+  const [step, setStep] = useState<"request" | "verify" | "complete" | "done">("request");
+  const [email, setEmail] = useState(initialEmail);
+  const [otp, setOtp] = useState("");
+  const [token, setToken] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmation, setConfirmation] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const inFlight = useRef(false);
+  const [canResend, setCanResend] = useState(false);
+  const [resendAt, setResendAt] = useState(0);
+  useEffect(() => {
+    if (!resendAt) return;
+    const timer = setTimeout(() => setCanResend(true), Math.max(0, resendAt - Date.now()));
+    return () => clearTimeout(timer);
+  }, [resendAt]);
+
+  async function submit(action: "request" | "verify" | "complete") {
+    if (inFlight.current || (action === "request" && resendAt > Date.now()) || (step === "verify" && action === "request" && !canResend)) return;
+    inFlight.current = true;
+    setBusy(true);
+    setError(null);
+    try {
+      const url = "/api/auth/password-reset/" + action;
+      if (action === "request") {
+        await apiRequest(url, { method: "POST", body: { email } });
+        setOtp("");
+        setCanResend(false);
+        setResendAt(Date.now() + 60_000);
+        setStep("verify");
+      } else if (action === "verify") {
+        const data = await apiRequest<{ resetToken: string }>(url, { method: "POST", body: { email, otp } });
+        if (!data?.resetToken) throw new Error("Verification could not be confirmed. Please try again.");
+        setToken(data.resetToken);
+        setOtp("");
+        setStep("complete");
+      } else {
+        if (password !== confirmation) throw new Error("Passwords must match.");
+        await apiRequest(url, { method: "POST", body: { email, resetToken: token, password } });
+        setToken("");
+        setPassword("");
+        setConfirmation("");
+        setStep("done");
+      }
+    } catch (err) {
+      setError(toErrorMessage(err));
+      if (action === "request" && err instanceof ApiError && err.status === 429) {
+        setCanResend(false);
+        setResendAt(Date.now() + (err.retryAfterSeconds ?? 60) * 1000);
+      }
+    } finally {
+      inFlight.current = false;
+      setBusy(false);
+    }
+  }
+
+  return <form className="space-y-5" onSubmit={event => { event.preventDefault(); if (!busy && step !== "done") void submit(step); }}>
+    <h2 className="text-xl font-semibold">Reset your password</h2>
+    <AuthError message={error} />
+    {step === "request" && <label className={labelClass}>Email
+      <input type="email" required autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} className={authInputClass} />
+    </label>}
+    {step === "verify" && <>
+      <p>If your account is eligible, check {email} for a six-digit code. It expires in 10 minutes.</p>
+      <label className={labelClass}>Verification code
+        <input required inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength={6} value={otp} onChange={e => setOtp(e.target.value)} className={authInputClass} />
+      </label>
+      <button type="button" disabled={busy || !canResend} className={inlineLinkClass} onClick={() => void submit("request")}>
+        {canResend ? "Resend code" : "Resend available after cooldown"}
+      </button>
+    </>}
+    {step === "complete" && <>
+      <PasswordField id="reset-password" label="New password" value={password} onChange={setPassword} minLength={6} autoComplete="new-password" />
+      <PasswordField id="confirm-reset-password" label="Confirm new password" value={confirmation} onChange={setConfirmation} autoComplete="new-password" />
+    </>}
+    {step === "done" ? <p role="status">Password updated. Sign in with your new password.</p> :
+      <Button type="submit" fullWidth loading={busy} disabled={step === "request" && resendAt > 0 && !canResend}>{step === "request" ? "Send code" : step === "verify" ? "Verify code" : "Update password"}</Button>}
+    <button type="button" disabled={busy} className={inlineLinkClass} onClick={onBack}>Back to sign in</button>
+  </form>;
+}
+
 function LoginFormWithParams() {
   const { login } = useAuth();
   const router = useRouter();
@@ -447,6 +534,9 @@ function LoginFormWithParams() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [recovering, setRecovering] = useState(false);
+  if (recovering) return <RecoveryForm initialEmail={email} onBack={() => setRecovering(false)} />;
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -498,9 +588,9 @@ function LoginFormWithParams() {
         autoComplete="current-password"
         placeholder="Your password"
         labelAction={
-          <a href="#" className={`text-sm ${inlineLinkClass}`}>
+          <button type="button" onClick={() => { setPassword(""); setError(null); setRecovering(true); }} className={`text-sm ${inlineLinkClass}`}>
             Forgot password?
-          </a>
+          </button>
         }
       />
       <Button type="submit" size="lg" fullWidth loading={isSubmitting}>
@@ -556,7 +646,7 @@ export function AuthCardLayout({
         description={
           activeTab === "login"
             ? "Sign in to continue screening."
-            : "A short form. Then a code in your inbox."
+            : "Create your account and verify your email address."
         }
       />
       <AuthTabs activeTab={activeTab} onChange={onTabChange} />

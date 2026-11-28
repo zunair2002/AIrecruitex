@@ -407,6 +407,7 @@ export type InterviewReport = {
   decision: InterviewDecision;
   summary: string;
   strengths: string[];
+  weaknesses?: string[];
   areasToImprove?: string[];
   learningPlan?: string[];
   concerns?: string[];
@@ -543,6 +544,15 @@ export type InterviewSessionInProgress = {
   cancelReason?: string;
 };
 
+export type PracticeQuestionResult = Pick<InterviewTurnView, "question" | "answer" | "feedback"> & {
+  label: string;
+  topic?: string;
+  participation: "answered" | "skipped" | "timed_out" | "not_reached" | "unknown";
+  evaluation: "done" | "estimated" | "pending" | "pending_eval" | "failed" | "not_evaluated" | "unknown";
+  verdict?: TurnVerdict | "addressed" | "partially_addressed" | "not_addressed";
+  tip?: string;
+};
+
 export type InterviewSessionCompleted = {
   sessionId: ObjectId;
   /** "expired" when the time limit ended it rather than the candidate. */
@@ -557,6 +567,7 @@ export type InterviewSessionCompleted = {
   feedback?: string;
   /** Absent for a hidden session. */
   report?: InterviewReport;
+  questionResults?: PracticeQuestionResult[];
   turns: InterviewTurnView[];
   /** Round 1 only: true once it scored enough to unlock Round 2. */
   round2Unlocked?: boolean;
